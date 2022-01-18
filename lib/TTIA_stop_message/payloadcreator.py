@@ -1,6 +1,5 @@
 from .payloads import *
 
-
 class PayloadCreator:
 
     @classmethod
@@ -13,6 +12,10 @@ class PayloadCreator:
             return ReportBaseMsgTagUplink(init_data=payload_pdu, init_type='pdu')
         elif message_id == 0x03:  # 定時回報確認訊息
             return ReportMsgcountUplink(init_data=payload_pdu, init_type='pdu')
+        elif message_id == 0x04:  # 定時回報確認訊息
+            return ReportMsgcountDownlink(init_data=payload_pdu, init_type='pdu')
+        elif message_id == 0x05:  # 定時回報確認訊息
+            return ReportUpdateMsgTagDownlink(init_data=payload_pdu, init_type='pdu')
         elif message_id == 0x06:  # 更新站牌文字確認訊息
             pass
             # sendbuf = self.handleReportUpdateMsgTagUplink(TTIAHeaderdata, data)
@@ -41,7 +44,10 @@ class PayloadCreator:
             return ReportBaseMsgTagUplink(init_data=b'', init_type='default')
         elif message_id == 0x03:  # 定時回報確認訊息
             return ReportMsgcountUplink(init_data=b'', init_type='default')
-
+        elif message_id == 0x04:  # 定時回報確認訊息
+            return ReportMsgcountDownlink(init_data=b'', init_type='default')
+        elif message_id == 0x05:  # 定時回報確認訊息
+            return ReportUpdateMsgTagDownlink(init_data=b'', init_type='default')
         elif message_id == 0x06:  # 更新站牌文字確認訊息
             return
 
@@ -64,6 +70,10 @@ class PayloadCreator:
             return ReportBaseMsgTagUplink(init_data=payload_json, init_type='json')
         elif message_id == 0x03:  # 定時回報確認訊息
             return ReportMsgcountUplink(init_data=payload_json, init_type='json')
+        elif message_id == 0x04:  # 定時回報確認訊息
+            return ReportMsgcountDownlink(init_data=payload_json, init_type='json')
+        elif message_id == 0x05:  # 定時回報確認訊息
+            return ReportUpdateMsgTagDownlink(init_data=payload_json, init_type='json')
 
         elif message_id == 0x06:  # 更新站牌文字確認訊息
             return

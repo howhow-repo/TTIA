@@ -13,6 +13,10 @@ def is_json_format(msg):
 
 class TTIABusStopMessage:
     def __init__(self, init_data, init_type):
+        self.header = None
+        self.payload = None
+        self.option_payload = None
+
         if init_type == 'pdu':
             self.from_pdu(init_data)
         elif init_type == 'json':

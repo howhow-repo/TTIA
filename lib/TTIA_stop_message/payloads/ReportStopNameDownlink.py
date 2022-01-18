@@ -9,8 +9,6 @@ class ReportStopNameDownlink:
         self.Sequence = 0
 
     def pack(self):
-        PathCName1 = bytearray()
-        PathCName1.extend(self.PathCName.encode("big5"))
-        PathEName1 = bytearray()
-        PathEName1.extend(self.PathEName.encode("big5"))
-        return struct.pack('<H12s12sH', self.RouteID, PathCName1, PathEName1, self.Sequence)
+        PathCName = bytearray(self.PathCName.encode("big5"))
+        PathEName = bytearray(self.PathEName.encode("big5"))
+        return struct.pack('<H12s12sH', self.RouteID, PathCName, PathEName, self.Sequence)

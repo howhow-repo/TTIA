@@ -19,10 +19,12 @@ def fwversion_str_to_int_list(fw_str: str) -> list:
 
 
 class RegUplink(PayloadBase):
+    message_id = 0x00
+
     def __init__(self, init_data, init_type):
         super().__init__(init_data, init_type)
 
-    def from_pdu(self, pdu, offset=0):
+    def from_pdu(self, pdu):
         payload = struct.unpack_from('<15s15sBBBB', pdu)
         self.IMSI = payload[0].decode('utf-8').rstrip('\0')
         self.IMEI = payload[1].decode('utf-8').rstrip('\0')

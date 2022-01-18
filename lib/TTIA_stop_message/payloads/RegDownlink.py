@@ -4,8 +4,13 @@ from .payload_base import PayloadBase
 
 
 class RegDownlink(PayloadBase):
-    def from_pdu(self, pdu, offset=0):
-        payload = struct.unpack_from('<BH32s32sBBHBBHHBBBBBBB32sBBBBBBBBBH', pdu, offset)
+    message_id = 0x01
+
+    def __init__(self, init_data, init_type):
+        super().__init__(init_data, init_type)
+
+    def from_pdu(self, pdu):
+        payload = struct.unpack_from('<BH32s32sBBHBBHHBBBBBBB32sBBBBBBBBBH', pdu)
         self.Result = payload[0]
         self.MsgTag = payload[1]  # 系統訊息
         self.StopCName = bytearray(payload[2]).decode('big5')
