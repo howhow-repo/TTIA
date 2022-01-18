@@ -18,6 +18,8 @@ class PayloadCreator:
             return ReportUpdateMsgTagDownlink(init_data=payload_pdu, init_type='pdu')
         elif message_id == 0x06:  # 更新站牌文字確認訊息
             return ReportUpdateMsgTagUplink(init_data=payload_pdu, init_type='pdu')
+        elif message_id == 0x07:  # 更新站牌文字確認訊息
+            return ReportUpdateBusinfoDownlink(init_data=payload_pdu, init_type='pdu')
         elif message_id == 0x08:  # 更新即時公車資訊確認訊息
             pass
             # sendbuf = self.handleReportUpdateBusinfoUplink(TTIAHeaderdata, data)
@@ -48,7 +50,8 @@ class PayloadCreator:
             return ReportUpdateMsgTagDownlink(init_data=b'', init_type='default')
         elif message_id == 0x06:  # 更新站牌文字確認訊息
             return ReportUpdateMsgTagUplink(init_data=b'', init_type='default')
-
+        elif message_id == 0x07:  # 更新站牌文字確認訊息
+            return ReportUpdateBusinfoDownlink(init_data=b'', init_type='default')
         elif message_id == 0x08:  # 更新即時公車資訊確認訊息
             return
 
@@ -74,7 +77,8 @@ class PayloadCreator:
             return ReportUpdateMsgTagDownlink(init_data=payload_json, init_type='json')
         elif message_id == 0x06:  # 更新站牌文字確認訊息
             return ReportUpdateMsgTagUplink(init_data=payload_json, init_type='json')
-
+        elif message_id == 0x07:  # 更新站牌文字確認訊息
+            return ReportUpdateBusinfoDownlink(init_data=payload_json, init_type='json')
         elif message_id == 0x08:  # 更新即時公車資訊確認訊息
             return
 
