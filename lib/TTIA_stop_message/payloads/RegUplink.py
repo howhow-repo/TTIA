@@ -1,5 +1,4 @@
 import struct
-
 from .payload_base import PayloadBase
 
 
