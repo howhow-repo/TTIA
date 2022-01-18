@@ -1,8 +1,32 @@
 import struct
+from .payload_base import PayloadBase
 
 
-class ReportUpdateBusinfoUplink:
-    def __init__(self, buff=None, offset=0):
-        header = struct.unpack_from('<BB', buff, offset)
-        self.MsgStatus = header[0]
-        self.Reserved = header[1]
+class ReportUpdateBusinfoUplink(PayloadBase):
+    message_id = 0x08
+
+    def __init__(self, init_data, init_type):
+        super().__init__(init_data, init_type)
+
+    def from_pdu(self, pdu):
+        payload = struct.unpack_from('<BB', pdu)
+        self.MsgStatus = payload[0]
+        self.Reserved = payload[1]
+
+    def to_pdu(self):
+        return struct.pack('<BB', self.MsgStatus, self.Reserved)
+
+    def from_json(self, json):
+        self.MsgStatus = json['MsgStatus']
+        self.Reserved = json['Reserved']
+
+    def to_json(self):
+        r = {
+            'MsgStatus': self.MsgStatus,
+            'Reserved': self.Reserved,
+        }
+        return r
+
+    def from_default(self):
+        self.MsgStatus = 0
+        self.Reserved = 0

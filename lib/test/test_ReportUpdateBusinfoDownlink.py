@@ -56,10 +56,11 @@ HEADER_PDU = struct.pack('<4sBBHQHH',
 ReportUpdateBusinfoDownlink_PDU = HEADER_PDU + payload
 
 
-class TestReportUpdateMsgTagDownlink:
+class TestReportUpdateBusinfoDownlink:
     def __init__(self):
         ReportUpdateBusinfoDownlink = TTIABusStopMessage(init_data=ReportUpdateBusinfoDownlink_PDU, init_type='pdu')
         print('Testing on message id: ', ReportUpdateBusinfoDownlink.header.MessageID)
-        print("BYPASS PDU:  ", ReportUpdateBusinfoDownlink.to_pdu())
         print("ORG PDU:     ", ReportUpdateBusinfoDownlink_PDU)
+        print("BYPASS PDU:  ", ReportUpdateBusinfoDownlink.to_pdu())
+        print("json:        ", ReportUpdateBusinfoDownlink.to_json())
         print("is same: ", ReportUpdateBusinfoDownlink.to_pdu() == ReportUpdateBusinfoDownlink_PDU, "\n")

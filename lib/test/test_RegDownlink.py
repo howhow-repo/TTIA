@@ -74,6 +74,7 @@ class TestREGDOWNLINK:
     def __init__(self):
         REGDOWNLINK = TTIABusStopMessage(init_data=REGDOWNLINK_PDU, init_type='pdu')
         print('Testing on message id: ', REGDOWNLINK.header.MessageID)
-        print((REGDOWNLINK.to_pdu()))
-        print(REGDOWNLINK_PDU)
-        print(REGDOWNLINK.to_pdu() == REGDOWNLINK_PDU, "\n")
+        print("ORG PDU:     ", REGDOWNLINK_PDU)
+        print("BYPASS PDU:  ", REGDOWNLINK.to_pdu())
+        print("json:        ", REGDOWNLINK.to_json())
+        print("is same: ", REGDOWNLINK.to_pdu() == REGDOWNLINK_PDU, "\n")

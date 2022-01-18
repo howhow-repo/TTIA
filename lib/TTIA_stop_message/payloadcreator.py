@@ -21,9 +21,7 @@ class PayloadCreator:
         elif message_id == 0x07:  # 更新站牌文字確認訊息
             return ReportUpdateBusinfoDownlink(init_data=payload_pdu, init_type='pdu')
         elif message_id == 0x08:  # 更新即時公車資訊確認訊息
-            pass
-            # sendbuf = self.handleReportUpdateBusinfoUplink(TTIAHeaderdata, data)
-            return
+            return ReportUpdateBusinfoUplink(init_data=payload_pdu, init_type='pdu')
         elif message_id == 0x09:  # 異常回報確認訊息
             pass
             # sendbuf = self.handleAbnormalReportUpdateUplink(TTIAHeaderdata, data)
@@ -53,7 +51,7 @@ class PayloadCreator:
         elif message_id == 0x07:  # 更新站牌文字確認訊息
             return ReportUpdateBusinfoDownlink(init_data=b'', init_type='default')
         elif message_id == 0x08:  # 更新即時公車資訊確認訊息
-            return
+            return ReportUpdateBusinfoUplink(init_data=b'', init_type='default')
 
         elif message_id == 0x09:  # 異常回報確認訊息
             return
@@ -80,7 +78,7 @@ class PayloadCreator:
         elif message_id == 0x07:  # 更新站牌文字確認訊息
             return ReportUpdateBusinfoDownlink(init_data=payload_json, init_type='json')
         elif message_id == 0x08:  # 更新即時公車資訊確認訊息
-            return
+            return ReportUpdateBusinfoUplink(init_data=payload_json, init_type='json')
 
         elif message_id == 0x09:  # 異常回報確認訊息
             return

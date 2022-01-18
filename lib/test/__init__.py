@@ -4,5 +4,7 @@ from .test_ReportBaseMsgTagUplink import TestReportBaseMsgTagUplink
 from .test_ReportMsgcountUplink import TestReportMsgcountUplink
 from .test_ReportUpdateMsgTagDownlink import TestReportUpdateMsgTagDownlink
 from .test_ReportUpdateMsgTagUplink import TestReportUpdateMsgTagUplink
-from .test_ReportUpdateBusinfoDownlink import TestReportUpdateMsgTagDownlink
+from .test_ReportUpdateBusinfoDownlink import TestReportUpdateBusinfoDownlink
+from .test_ReportUpdateBusinfoUplink import TestReportUpdateBusinfoUplink
+
 

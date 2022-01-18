@@ -29,6 +29,7 @@ class TestReportMsgcountUplink:
     def __init__(self):
         ReportMsgcountUplink = TTIABusStopMessage(init_data=ReportMsgcountUplink_PDU, init_type='pdu')
         print('Testing on message id: ', ReportMsgcountUplink.header.MessageID)
-        print((ReportMsgcountUplink.to_pdu()))
-        print(ReportMsgcountUplink_PDU)
-        print(ReportMsgcountUplink.to_pdu() == ReportMsgcountUplink_PDU, "\n")
+        print("ORG PDU:     ", ReportMsgcountUplink_PDU)
+        print("BYPASS PDU:  ", ReportMsgcountUplink.to_pdu())
+        print("json:        ", ReportMsgcountUplink.to_json())
+        print("is same: ", ReportMsgcountUplink.to_pdu() == ReportMsgcountUplink_PDU, "\n")

@@ -34,6 +34,7 @@ class ReportUpdateBusinfoDownlink(PayloadBase):
         self.RcvSecond = payload[20]
         self.Reserved = payload[21]
 
+        # TODO: this should be optional_payload
         self.Cinfo = bytearray(payload[22]).decode('big5')
         self.Einfo = bytearray(payload[23]).decode('ascii')
         self.RouteMsgCContent = bytearray(payload[24]).decode('big5')
@@ -50,6 +51,65 @@ class ReportUpdateBusinfoDownlink(PayloadBase):
                            self.Cinfo.encode("big5"), self.Einfo.encode(), self.RouteMsgCContent.encode("big5"),
                            self.RouteMsgEContent.encode()
                            )
+
+    def from_json(self, json):
+        self.RouteID = json['RouteID']
+        self.BusID = json['BusID']
+        self.CurrentStop = json['CurrentStop']
+        self.DestinationStop = json['DestinationStop']
+        self.IsLastBus = json['IsLastBus']
+        self.EstimateTime = json['EstimateTime']
+        self.StopDistance = json['StopDistance']
+        self.Direction = json['Direction']
+        self.Type = json['Type']
+        self.TransYear = json['TransYear']
+        self.TransMonth = json['TransMonth']
+        self.TransDay = json['TransDay']
+        self.TransHour = json['TransHour']
+        self.TransMinute = json['TransMinute']
+        self.TransSecond = json['TransSecond']
+        self.RcvYear = json['RcvYear']
+        self.RcvMonth = json['RcvMonth']
+        self.RcvDay = json['RcvDay']
+        self.RcvHour = json['RcvHour']
+        self.RcvMinute = json['RcvMinute']
+        self.RcvSecond = json['RcvSecond']
+        self.Reserved = json['Reserved']
+        self.Cinfo = json['Cinfo']
+        self.Einfo = json['Einfo']
+        self.RouteMsgCContent = json['RouteMsgCContent']
+        self.RouteMsgEContent = json['RouteMsgEContent']
+
+    def to_json(self):
+        r = {
+            'RouteID': self.RouteID,
+            'BusID': self.BusID,
+            'CurrentStop': self.CurrentStop,
+            'DestinationStop': self.DestinationStop,
+            'IsLastBus': self.IsLastBus,
+            'EstimateTime': self.EstimateTime,
+            'StopDistance': self.StopDistance,
+            'Direction': self.Direction,
+            'Type': self.Type,
+            'TransYear': self.TransYear,
+            'TransMonth': self.TransMonth,
+            'TransDay': self.TransDay,
+            'TransHour': self.TransHour,
+            'TransMinute': self.TransMinute,
+            'TransSecond': self.TransSecond,
+            'RcvYear': self.RcvYear,
+            'RcvMonth': self.RcvMonth,
+            'RcvDay': self.RcvDay,
+            'RcvHour': self.RcvHour,
+            'RcvMinute': self.RcvMinute,
+            'RcvSecond': self.RcvSecond,
+            'Reserved': self.Reserved,
+            'Cinfo': self.Cinfo,
+            'Einfo': self.Einfo,
+            'RouteMsgCContent': self.RouteMsgCContent,
+            'RouteMsgEContent': self.RouteMsgEContent,
+        }
+        return r
 
     def from_default(self):
         self.RouteID = 0

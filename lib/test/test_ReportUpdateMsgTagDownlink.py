@@ -27,6 +27,7 @@ class TestReportUpdateMsgTagDownlink:
     def __init__(self):
         ReportUpdateMsgTagDownlink = TTIABusStopMessage(init_data=ReportUpdateMsgTagDownlink_PDU, init_type='pdu')
         print('Testing on message id: ', ReportUpdateMsgTagDownlink.header.MessageID)
-        print("BYPASS PDU:  ", ReportUpdateMsgTagDownlink.to_pdu())
         print("ORG PDU:     ", ReportUpdateMsgTagDownlink_PDU)
+        print("BYPASS PDU:  ", ReportUpdateMsgTagDownlink.to_pdu())
+        print("json:        ", ReportUpdateMsgTagDownlink.to_json())
         print("is same: ", ReportUpdateMsgTagDownlink.to_pdu() == ReportUpdateMsgTagDownlink_PDU, "\n")

@@ -41,6 +41,21 @@ class RegDownlink(PayloadBase):
         self.DistanceFunctionMode = payload[27]
         self.ReportPeriod = payload[28]
 
+    def to_pdu(self):
+        StopCName = bytearray(self.StopCName.encode("big5"))
+        StopEName = bytearray(self.StopEName.encode("ascii"))
+        IdleMessage = bytearray(self.IdleMessage.encode("big5"))
+        return struct.pack('<BH32s32sBBHBBHHBBBBBBB32sBBBBBBBBBH',
+                           self.Result,
+                           self.MsgTag,
+                           StopCName, StopEName, self.LongitudeDu, self.LongitudeFen, self.LongitudeMiao,
+                           self.LatitudeDu, self.LatitudeFen, self.LatitudeMiao,
+                           self.TypeID, self.BootTimeh, self.BootTimem, self.BootTimes, self.ShutdownTimeh,
+                           self.ShutdownTimem, self.ShutdownTimes, self.MessageGroupID, IdleMessage,
+                           (self.Year - 2000), self.Month, self.Day, self.Hour, self.Minute, self.Second,
+                           self.DisplayMode, self.TextRollingSpeed, self.DistanceFunctionMode, self.ReportPeriod
+                           )
+
     def from_json(self, json):
         self.Result = json['Result']
         self.MsgTag = json['MsgTag']  # 系統訊息
@@ -72,20 +87,39 @@ class RegDownlink(PayloadBase):
         self.DistanceFunctionMode = json['DistanceFunctionMode']
         self.ReportPeriod = json['ReportPeriod']
 
-    def to_pdu(self):
-        StopCName = bytearray(self.StopCName.encode("big5"))
-        StopEName = bytearray(self.StopEName.encode("ascii"))
-        IdleMessage = bytearray(self.IdleMessage.encode("big5"))
-        return struct.pack('<BH32s32sBBHBBHHBBBBBBB32sBBBBBBBBBH',
-                           self.Result,
-                           self.MsgTag,
-                           StopCName, StopEName, self.LongitudeDu, self.LongitudeFen, self.LongitudeMiao,
-                           self.LatitudeDu, self.LatitudeFen, self.LatitudeMiao,
-                           self.TypeID, self.BootTimeh, self.BootTimem, self.BootTimes, self.ShutdownTimeh,
-                           self.ShutdownTimem, self.ShutdownTimes, self.MessageGroupID, IdleMessage,
-                           (self.Year - 2000), self.Month, self.Day, self.Hour, self.Minute, self.Second,
-                           self.DisplayMode, self.TextRollingSpeed, self.DistanceFunctionMode, self.ReportPeriod
-                           )
+    def to_json(self):
+        r = {
+            'Result': self.Result,
+            'MsgTag': self.MsgTag,
+            'StopCName': self.StopCName,
+            'StopEName': self.StopEName,
+            'LongitudeDu': self.LongitudeDu,
+            'LongitudeFen': self.LongitudeFen,
+            'LongitudeMiao': self.LongitudeMiao,
+            'LatitudeDu': self.LatitudeDu,
+            'LatitudeFen': self.LatitudeFen,
+            'LatitudeMiao': self.LatitudeMiao,
+            'TypeID': self.TypeID,
+            'BootTimeh': self.BootTimeh,
+            'BootTimem': self.BootTimem,
+            'BootTimes': self.BootTimes,
+            'ShutdownTimeh': self.ShutdownTimeh,
+            'ShutdownTimem': self.ShutdownTimem,
+            'ShutdownTimes': self.ShutdownTimes,
+            'MessageGroupID': self.MessageGroupID,
+            'IdleMessage': self.IdleMessage,
+            'Year': self.Year,
+            'Month': self.Month,
+            'Day': self.Day,
+            'Hour': self.Hour,
+            'Minute': self.Minute,
+            'Second': self.Second,
+            'DisplayMode': self.DisplayMode,
+            'TextRollingSpeed': self.TextRollingSpeed,
+            'DistanceFunctionMode': self.DistanceFunctionMode,
+            'ReportPeriod': self.ReportPeriod,
+        }
+        return r
 
     def from_default(self):
         self.Result = 0
