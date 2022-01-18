@@ -12,8 +12,7 @@ class PayloadCreator:
         elif message_id == 0x02:  # 基本資料設定確認訊息
             return ReportBaseMsgTagUplink(init_data=payload_pdu, init_type='pdu')
         elif message_id == 0x03:  # 定時回報確認訊息
-            pass
-            # sendbuf = self.handleReportMsgcountUplink(TTIAHeaderdata, data)
+            return ReportMsgcountUplink(init_data=payload_pdu, init_type='pdu')
         elif message_id == 0x06:  # 更新站牌文字確認訊息
             pass
             # sendbuf = self.handleReportUpdateMsgTagUplink(TTIAHeaderdata, data)
@@ -40,9 +39,8 @@ class PayloadCreator:
             return RegDownlink(init_data=b'', init_type='default')
         elif message_id == 0x02:  # 基本資料設定確認訊息
             return ReportBaseMsgTagUplink(init_data=b'', init_type='default')
-
         elif message_id == 0x03:  # 定時回報確認訊息
-            return
+            return ReportMsgcountUplink(init_data=b'', init_type='default')
 
         elif message_id == 0x06:  # 更新站牌文字確認訊息
             return
@@ -64,9 +62,8 @@ class PayloadCreator:
             return RegDownlink(init_data=payload_json, init_type='json')
         elif message_id == 0x02:  # 基本資料設定確認訊息
             return ReportBaseMsgTagUplink(init_data=payload_json, init_type='json')
-
         elif message_id == 0x03:  # 定時回報確認訊息
-            return
+            return ReportMsgcountUplink(init_data=payload_json, init_type='json')
 
         elif message_id == 0x06:  # 更新站牌文字確認訊息
             return

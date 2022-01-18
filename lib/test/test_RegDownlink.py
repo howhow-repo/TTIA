@@ -73,6 +73,7 @@ REGDOWNLINK_PDU = HEADER_PDU + payload
 class TestREGDOWNLINK:
     def __init__(self):
         REGDOWNLINK = TTIABusStopMessage(init_data=REGDOWNLINK_PDU, init_type='pdu')
+        print('Testing on message id: ', REGDOWNLINK.header.MessageID)
         print((REGDOWNLINK.to_pdu()))
         print(REGDOWNLINK_PDU)
         print(REGDOWNLINK.to_pdu() == REGDOWNLINK_PDU, "\n")
