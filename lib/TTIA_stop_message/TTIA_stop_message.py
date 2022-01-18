@@ -5,50 +5,51 @@ from .header import Header
 from .payloadcreator import PayloadCreator
 
 
-def is_pdu_format(pdu):
-    if len(pdu) < 20:
-        return False
-    header = Header(init_data=pdu[:20], init_type='pdu')
-
-    print(len(pdu))
-    print(header.Len)
-    print(len(pdu[20:]))
-
-    if header.Len < len(pdu[20:]):
-        return False
-    return True
-
-
 def is_json_format(msg):
     if 'header' in msg and 'payload' in msg:
         return True
     return False
 
 
-class TTIAStopMessage(MessageBase, ABC):
+class TTIABusStopMessage:
     def __init__(self, init_data, init_type):
-        super().__init__(init_data, init_type)
+        if init_type == 'pdu':
+            self.from_pdu(init_data)
+        elif init_type == 'json':
+            self.from_json(init_data)
+        elif init_type == 'default':
+            self.from_default(init_data)
 
-    def from_pdu(self, pdu, offset=0):
+    def from_pdu(self, pdu):
         """
         Follow TTIA Stop protocol, set input UDP binary message to python obj.
 
         :param pdu:
-            Check TTIA Stop Protocol, length must longer than 20 bytes; Len in header must match length of payload.
+            Base on TTIA Stop Protocol, length must longer than 20 bytes; Len in header must match length of payload.
         :param offset:
             offset of unpacking pdu.
         :return:
 
         """
-        if not is_pdu_format(pdu):
-            raise ValueError("input pdu has wrong format.")
+        if len(pdu) < 20:
+            raise ValueError("input pdu is not long enough")
 
         self.header = Header(init_data=pdu[:20], init_type='pdu')
+
+        if self.header.Len < len(pdu[20:]):
+            raise ValueError("input pdu has wrong payload length.")
+
         self.payload = PayloadCreator.pdu_create_payload_obj(pdu[20:20 + self.header.Len], self.header.MessageID)
-        self.option_payload = pdu[20 + self.header.Len + 1:]
+
+        if len(pdu) > 20 + self.header.Len:
+            self.option_payload = pdu[20 + self.header.Len + 1:]
+        else:
+            self.option_payload = b''
 
     def to_pdu(self):
-        return self.header.to_pdu() + self.payload.to_pdu()
+        payload_pdu = self.payload.to_pdu()
+        self.header.Len = len(payload_pdu)
+        return self.header.to_pdu() + payload_pdu
 
     def from_json(self, json):
         """
@@ -69,9 +70,17 @@ class TTIAStopMessage(MessageBase, ABC):
         self.option_payload = json['option_payload']
 
     def to_json(self):
+        self.header.Len = len(self.payload.to_pdu())
         j = {
             'header': self.header.to_json(),
             'payload': self.payload.to_json(),
             'option_payload': self.option_payload
         }
         return j
+
+    def from_default(self, message_id: int):
+        self.header = Header(b'', 'default')
+        self.payload = PayloadCreator.default_create_payload_obj(message_id)
+        payload_pdu = self.payload.to_pdu()
+        self.header.Len = len(payload_pdu)
+        self.option_payload = b''

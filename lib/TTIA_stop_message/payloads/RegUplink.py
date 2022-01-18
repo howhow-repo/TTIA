@@ -4,6 +4,14 @@ from .payload_base import PayloadBase
 
 
 def fwversion_str_to_int_list(fw_str: str) -> list:
+    """
+    :param fw_str:
+        "<num like str>.<num like str><num like str>"
+        ex: "5.03", "4.89"...
+    :return:
+        [int, int, int]
+        ex: [5, 0, 3], [4, 8, 9]...
+    """
     fv = [w for w in fw_str.split('.')]
     fv1 = int(fv[0])
     fv23 = [int(w) for w in fv[1]]
@@ -41,3 +49,9 @@ class RegUplink(PayloadBase):
             'Reserved': self.Reserved
         }
         return r
+
+    def from_default(self):
+        self.IMSI = ''
+        self.IMEI = ''
+        self.FirmwareVersion = '1.00'
+        self.Reserved = 0

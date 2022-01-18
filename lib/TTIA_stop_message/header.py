@@ -1,7 +1,7 @@
 import struct
 from abc import ABC
 
-from .message_base import MessageBase
+from .message_base import MessageBase, MessageConstants
 
 
 class Header(MessageBase, ABC):
@@ -41,3 +41,12 @@ class Header(MessageBase, ABC):
             'Len': self.Len,
         }
         return r
+
+    def from_default(self):
+        self.ProtocolID = MessageConstants.ProtocolID
+        self.ProtocolVer = MessageConstants.ProtocolID
+        self.MessageID = 0
+        self.Provider = 0
+        self.StopID = 0
+        self.Sequence = 0
+        self.Len = 0

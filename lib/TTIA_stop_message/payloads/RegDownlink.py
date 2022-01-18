@@ -5,11 +5,11 @@ from .payload_base import PayloadBase
 
 class RegDownlink(PayloadBase):
     def from_pdu(self, pdu, offset=0):
-        payload = struct.unpack_from('<BH32s32sBBHBBHHBBBBBB32sBBBBBBBBBH', pdu, offset)
+        payload = struct.unpack_from('<BH32s32sBBHBBHHBBBBBBB32sBBBBBBBBBH', pdu, offset)
         self.Result = payload[0]
         self.MsgTag = payload[1]  # 系統訊息
-        self.StopCName = payload[2]
-        self.StopEName = payload[3]
+        self.StopCName = bytearray(payload[2]).decode('big5')
+        self.StopEName = bytearray(payload[3]).decode('big5')
         self.LongitudeDu = payload[4]
         self.LongitudeFen = payload[5]
         self.LongitudeMiao = payload[6]
@@ -24,7 +24,7 @@ class RegDownlink(PayloadBase):
         self.ShutdownTimem = payload[15]
         self.ShutdownTimes = payload[16]
         self.MessageGroupID = payload[17]
-        self.IdleMessage = payload[18]
+        self.IdleMessage = bytearray(payload[18]).decode('big5')
         self.Year = payload[19] + 2000
         self.Month = payload[20]
         self.Day = payload[21]
@@ -37,6 +37,52 @@ class RegDownlink(PayloadBase):
         self.ReportPeriod = payload[28]
 
     def from_json(self, json):
+        self.Result = json['Result']
+        self.MsgTag = json['MsgTag']  # 系統訊息
+        self.StopCName = json['StopCName']
+        self.StopEName = json['StopEName']
+        self.LongitudeDu = json['LongitudeDu']
+        self.LongitudeFen = json['LongitudeFen']
+        self.LongitudeMiao = json['LongitudeMiao']
+        self.LatitudeDu = json['LatitudeDu']
+        self.LatitudeFen = json['LatitudeFen']
+        self.LatitudeMiao = json['LatitudeMiao']
+        self.TypeID = json['TypeID']
+        self.BootTimeh = json['BootTimeh']
+        self.BootTimem = json['BootTimem']
+        self.BootTimes = json['BootTimes']
+        self.ShutdownTimeh = json['ShutdownTimeh']
+        self.ShutdownTimem = json['ShutdownTimem']
+        self.ShutdownTimes = json['ShutdownTimes']
+        self.MessageGroupID = json['MessageGroupID']
+        self.IdleMessage = json['IdleMessage']
+        self.Year = json['Year']
+        self.Month = json['Month']
+        self.Day = json['Day']
+        self.Hour = json['Hour']
+        self.Minute = json['Minute']
+        self.Second = json['Second']
+        self.DisplayMode = json['DisplayMode']
+        self.TextRollingSpeed = json['TextRollingSpeed']
+        self.DistanceFunctionMode = json['DistanceFunctionMode']
+        self.ReportPeriod = json['ReportPeriod']
+
+    def to_pdu(self):
+        StopCName = bytearray(self.StopCName.encode("big5"))
+        StopEName = bytearray(self.StopEName.encode("ascii"))
+        IdleMessage = bytearray(self.IdleMessage.encode("big5"))
+        return struct.pack('<BH32s32sBBHBBHHBBBBBBB32sBBBBBBBBBH',
+                           self.Result,
+                           self.MsgTag,
+                           StopCName, StopEName, self.LongitudeDu, self.LongitudeFen, self.LongitudeMiao,
+                           self.LatitudeDu, self.LatitudeFen, self.LatitudeMiao,
+                           self.TypeID, self.BootTimeh, self.BootTimem, self.BootTimes, self.ShutdownTimeh,
+                           self.ShutdownTimem, self.ShutdownTimes, self.MessageGroupID, IdleMessage,
+                           (self.Year - 2000), self.Month, self.Day, self.Hour, self.Minute, self.Second,
+                           self.DisplayMode, self.TextRollingSpeed, self.DistanceFunctionMode, self.ReportPeriod
+                           )
+
+    def from_default(self):
         self.Result = 0
         self.MsgTag = 0  # 系統訊息
         self.StopCName = ''
@@ -56,7 +102,7 @@ class RegDownlink(PayloadBase):
         self.ShutdownTimes = 0
         self.MessageGroupID = 0
         self.IdleMessage = ''
-        self.Year = 0
+        self.Year = 2000
         self.Month = 0
         self.Day = 0
         self.Hour = 0
@@ -66,21 +112,3 @@ class RegDownlink(PayloadBase):
         self.TextRollingSpeed = 0
         self.DistanceFunctionMode = 0
         self.ReportPeriod = 0
-
-    def to_pdu(self):
-        StopCName1 = bytearray()
-        StopCName1.extend(self.StopCName.encode("big5"))
-        StopEName1 = bytearray()
-        StopEName1.extend(self.StopEName.encode("big5"))
-        IdleMessage1 = bytearray()
-        IdleMessage1.extend(self.IdleMessage.encode("big5"))
-        return struct.pack('<BH32s32sBBHBBHHBBBBBB32sBBBBBBBBBH',
-                           self.Result,
-                           self.MsgTag,
-                           StopCName1, StopEName1, self.LongitudeDu, self.LongitudeFen, self.LongitudeMiao,
-                           self.LatitudeDu, self.LatitudeFen, self.LatitudeMiao,
-                           self.TypeID, self.BootTimeh, self.BootTimem, self.BootTimes, self.ShutdownTimeh,
-                           self.ShutdownTimem, self.ShutdownTimes, IdleMessage1,
-                           (self.Year - 2000), self.Month, self.Day, self.Hour, self.Minute, self.Second,
-                           self.DisplayMode, self.TextRollingSpeed, self.DistanceFunctionMode, self.ReportPeriod
-                           )

@@ -1,3 +1,3 @@
-from .TTIA_stop_message import TTIAStopMessage
+from .TTIA_stop_message import TTIABusStopMessage
 from .message_constants import MessageConstants
 from .header import Header

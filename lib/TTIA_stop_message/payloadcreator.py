@@ -7,6 +7,8 @@ class PayloadCreator:
     def pdu_create_payload_obj(cls, payload_pdu, message_id):
         if message_id == 0x00:  # 註冊請求訊息
             return RegUplink(init_data=payload_pdu, init_type='pdu')
+        elif message_id == 0x01:  # 基本資料設定確認訊息
+            return RegDownlink(init_data=payload_pdu, init_type='pdu')
         elif message_id == 0x02:  # 基本資料設定確認訊息
             pass
             # sendbuf = self.handleBaseMsgTagUplink(TTIAHeaderdata, data)
@@ -28,6 +30,32 @@ class PayloadCreator:
         elif message_id == 0x0C:  # 華夏自定義的protocol，處理站牌名稱
             pass
             # sendbuf = self.handleStopNameMsgTagUplink(TTIAHeaderdata, data)
+            return
+        else:
+            raise NotImplementedError("no message payload define.")
+
+    @classmethod
+    def default_create_payload_obj(cls, message_id):
+        if message_id == 0x00:  # 註冊請求訊息
+            return RegUplink(init_data=b'', init_type='default')
+        elif message_id == 0x01:  # 基本資料設定確認訊息
+            return RegDownlink(init_data=b'', init_type='default')
+        elif message_id == 0x02:  # 基本資料設定確認訊息
+            return
+
+        elif message_id == 0x03:  # 定時回報確認訊息
+            return
+
+        elif message_id == 0x06:  # 更新站牌文字確認訊息
+            return
+
+        elif message_id == 0x08:  # 更新即時公車資訊確認訊息
+            return
+
+        elif message_id == 0x09:  # 異常回報確認訊息
+            return
+
+        elif message_id == 0x0C:  # 華夏自定義的protocol，處理站牌名稱
             return
 
     @classmethod
