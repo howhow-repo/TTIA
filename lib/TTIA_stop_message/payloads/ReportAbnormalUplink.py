@@ -1,20 +1,94 @@
 import struct
+from .payload_base import PayloadBase
 
 
-class ReportAbnormalUplink:
-    def __init__(self, buff=None, offset=0):
-        header = struct.unpack_from('<BBBBBBBBBBBBBB', buff, offset)
-        self.StatusCode = header[0]
-        self.Type = header[1]
-        self.TransYear = header[2]
-        self.TransMonth = header[3]
-        self.TransDay = header[4]
-        self.TransHour = header[5]
-        self.TransMinute = header[6]
-        self.TransSecond = header[7]
-        self.RcvYear = header[8]
-        self.RcvMonth = header[9]
-        self.RcvDay = header[10]
-        self.RcvHour = header[11]
-        self.RcvMinute = header[12]
-        self.RcvSecond = header[13]
+class ReportAbnormalUplink(PayloadBase):
+    message_id = 0x09
+
+    def __init__(self, init_data, init_type, buff=None, offset=0):
+        super().__init__(init_data, init_type)
+
+    def from_pdu(self, pdu):
+        payload = struct.unpack_from('<BBBBBBBBBBBBBB', pdu)
+        self.StatusCode = payload[0]
+        self.Type = payload[1]
+        self.TransYear = payload[2] + 2000
+        self.TransMonth = payload[3]
+        self.TransDay = payload[4]
+        self.TransHour = payload[5]
+        self.TransMinute = payload[6]
+        self.TransSecond = payload[7]
+        self.RcvYear = payload[8] + 2000
+        self.RcvMonth = payload[9]
+        self.RcvDay = payload[10]
+        self.RcvHour = payload[11]
+        self.RcvMinute = payload[12]
+        self.RcvSecond = payload[13]
+
+    def to_pdu(self):
+        return struct.pack('<BBBBBBBBBBBBBB',
+                           self.StatusCode,
+                           self.Type,
+                           self.TransYear - 2000,
+                           self.TransMonth,
+                           self.TransDay,
+                           self.TransHour,
+                           self.TransMinute,
+                           self.TransSecond,
+                           self.RcvYear - 2000,
+                           self.RcvMonth,
+                           self.RcvDay,
+                           self.RcvHour,
+                           self.RcvMinute,
+                           self.RcvSecond)
+
+    def from_json(self, json):
+        self.StatusCode = json['StatusCode']
+        self.Type = json['Type']
+        self.TransYear = json['TransYear']
+        self.TransMonth = json['TransMonth']
+        self.TransDay = json['TransDay']
+        self.TransHour = json['TransHour']
+        self.TransMinute = json['TransMinute']
+        self.TransSecond = json['TransSecond']
+        self.RcvYear = json['RcvYear']
+        self.RcvMonth = json['RcvMonth']
+        self.RcvDay = json['RcvDay']
+        self.RcvHour = json['RcvHour']
+        self.RcvMinute = json['RcvMinute']
+        self.RcvSecond= json['RcvSecond']
+
+    def to_json(self):
+        r = {
+            'StatusCode': self.StatusCode,
+            'Type':self.Type,
+            'TransYear':self.TransYear,
+            'TransMonth':self.TransMonth,
+            'TransDay':self.TransDay,
+            'TransHour':self.TransHour,
+            'TransMinute':self.TransMinute,
+            'TransSecond':self.TransSecond,
+            'RcvYear':self.RcvYear,
+            'RcvMonth':self.RcvMonth,
+            'RcvDay':self.RcvDay,
+            'RcvHour':self.RcvHour,
+            'RcvMinute':self.RcvMinute,
+            'RcvSecond':self.RcvSecond
+        }
+        return r
+
+    def from_default(self):
+        self.StatusCode = 0
+        self.Type = 1
+        self.TransYear = 2000
+        self.TransMonth = 1
+        self.TransDay = 1
+        self.TransHour = 0
+        self.TransMinute = 0
+        self.TransSecond = 0
+        self.RcvYear = 2000
+        self.RcvMonth = 1
+        self.RcvDay = 1
+        self.RcvHour = 0
+        self.RcvMinute = 0
+        self.RcvSecond = 0
