@@ -9,7 +9,20 @@ MsgTag = 0
 MsgNo = 0
 MsgContent = "我是中文"
 
+MsgPriority = 0
+MsgType = 0
+MsgStopDelay = 2
+MsgChangeDelay = 1
+
+
 payload = struct.pack('<HH160s', MsgTag, MsgNo, bytearray(MsgContent.encode("big5")))
+
+option_payload = struct.pack('<BBBB',
+                           MsgPriority,
+                           MsgType,
+                           MsgStopDelay,
+                           MsgChangeDelay,
+                           )
 
 HEADER_PDU = struct.pack('<4sBBHQHH',
                          bytearray(MessageConstants.ProtocolID.encode('ascii')),
@@ -20,7 +33,7 @@ HEADER_PDU = struct.pack('<4sBBHQHH',
                          65535,  # Sequence
                          len(payload))  # Len
 
-ReportUpdateMsgTagDownlink_PDU = HEADER_PDU + payload
+ReportUpdateMsgTagDownlink_PDU = HEADER_PDU + payload + option_payload
 
 
 class TestReportUpdateMsgTagDownlink:

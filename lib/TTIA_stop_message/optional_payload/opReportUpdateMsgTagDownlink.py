@@ -23,13 +23,13 @@ class OpReportUpdateMsgTagDownlink(OpPayloadBase):
                            self.MsgChangeDelay,
                            )
 
-    def from_json(self, json):
+    def from_dict(self, json):
         self.MsgPriority = json['MsgPriority']
         self.MsgType = json['MsgType']
         self.MsgStopDelay = json['MsgStopDelay']
         self.MsgChangeDelay = json['MsgChangeDelay']
 
-    def to_json(self):
+    def to_dict(self):
         r = {
             'MsgPriority': self.MsgPriority,
             'MsgType': self.MsgType,

@@ -37,7 +37,7 @@ class OpRegDownlink(OpPayloadBase):
                            self.WeekDay,
                            )
 
-    def from_json(self, json):
+    def from_dict(self, json):
         self.MessageGroupZoneID = json['MessageGroupZoneID']
         self.MessageGroupCasID = json['MessageGroupCasID']
         self.WeekendBootTimeh = json['WeekendBootTimeh']
@@ -53,7 +53,7 @@ class OpRegDownlink(OpPayloadBase):
         self.EventReportPeriod = json['EventReportPeriod']
         self.WeekDay = json['WeekDay']
 
-    def to_json(self):
+    def to_dict(self):
         r = {
             'MessageGroupZoneID': self.MessageGroupZoneID,
             'MessageGroupCasID': self.MessageGroupCasID,

@@ -3,37 +3,24 @@ from .optional_payload import *
 
 class OptionPayloadCreater:
     @classmethod
-    def pdu_create_option_payload_obj(cls, payload_pdu, message_id):
-        if message_id == 0x01:  # 註冊請求訊息
-            return OpRegDownlink(init_data=payload_pdu, init_type='pdu')
-        elif message_id == 0x05:
-            # TODO
-            return OpEmpty(init_data=payload_pdu, init_type='pdu')
-        elif message_id == 0x07:
-            return OpReportUpdateBusinfoDownlink(init_data=payload_pdu, init_type='pdu')
-        else:
-            return OpEmpty(init_data=payload_pdu, init_type='pdu')
+    def create_option_payload_obj(cls, payload, message_id):
+        if len(payload) == 0:
+            return OpEmpty(**{'init_data': b'', 'init_type': 'default'})
 
-    @classmethod
-    def json_create_option_payload_obj(cls, payload_json, message_id):
-        if message_id == 0x01:  # 註冊請求訊息
-            return OpRegDownlink(init_data=payload_json, init_type='json')
-        elif message_id == 0x05:
-            # TODO
-            return OpEmpty(init_data=payload_json, init_type='json')
-        elif message_id == 0x07:
-            return OpReportUpdateBusinfoDownlink(init_data=payload_json, init_type='json')
+        if type(payload) == bytes:
+            paras = {'init_data': payload, 'init_type': 'pdu'}
+        elif type(payload) == dict:
+            paras = {'init_data': payload, 'init_type': 'json'}
+        elif payload is None:
+            paras = {'init_data': b'', 'init_type': 'default'}
         else:
-            return OpEmpty(init_data=payload_json, init_type='json')
+            raise ValueError("No such payload raw data type, please use bytes or dict or None")
 
-    @classmethod
-    def default_create_option_payload_obj(cls, message_id):
         if message_id == 0x01:  # 註冊請求訊息
-            return OpRegDownlink(init_data=b'', init_type='json')
+            return OpRegDownlink(**paras)
         elif message_id == 0x05:
-            # TODO
-            return OpEmpty(init_data=b'', init_type='json')
+            return OpReportUpdateMsgTagDownlink(**paras)
         elif message_id == 0x07:
-            return OpReportUpdateBusinfoDownlink(init_data=b'', init_type='default')
+            return OpReportUpdateBusinfoDownlink(**paras)
         else:
-            return OpEmpty(init_data=b'', init_type='default')
+            return OpEmpty(**paras)

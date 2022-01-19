@@ -14,10 +14,10 @@ class ReportMsgcountDownlink(PayloadBase):
     def to_pdu(self):
         return b''
 
-    def from_json(self, json):
+    def from_dict(self, json):
         pass
 
-    def to_json(self):
+    def to_dict(self):
         r = {}
         return r
 

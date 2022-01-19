@@ -42,7 +42,7 @@ class ReportAbnormalUplink(PayloadBase):
                            self.RcvMinute,
                            self.RcvSecond)
 
-    def from_json(self, json):
+    def from_dict(self, json):
         self.StatusCode = json['StatusCode']
         self.Type = json['Type']
         self.TransYear = json['TransYear']
@@ -58,7 +58,7 @@ class ReportAbnormalUplink(PayloadBase):
         self.RcvMinute = json['RcvMinute']
         self.RcvSecond= json['RcvSecond']
 
-    def to_json(self):
+    def to_dict(self):
         r = {
             'StatusCode': self.StatusCode,
             'Type':self.Type,

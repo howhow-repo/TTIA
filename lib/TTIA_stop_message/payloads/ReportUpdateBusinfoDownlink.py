@@ -48,7 +48,7 @@ class ReportUpdateBusinfoDownlink(PayloadBase):
                            self.RcvYear - 2000, self.RcvMonth, self.RcvDay, self.RcvHour, self.RcvMinute,
                            self.RcvSecond, self.Reserved,)
 
-    def from_json(self, json):
+    def from_dict(self, json):
         self.RouteID = json['RouteID']
         self.BusID = json['BusID']
         self.CurrentStop = json['CurrentStop']
@@ -72,7 +72,7 @@ class ReportUpdateBusinfoDownlink(PayloadBase):
         self.RcvSecond = json['RcvSecond']
         self.Reserved = json['Reserved']
 
-    def to_json(self):
+    def to_dict(self):
         r = {
             'RouteID': self.RouteID,
             'BusID': self.BusID,

@@ -16,11 +16,11 @@ class ReportUpdateBusinfoUplink(PayloadBase):
     def to_pdu(self):
         return struct.pack('<BB', self.MsgStatus, self.Reserved)
 
-    def from_json(self, json):
+    def from_dict(self, json):
         self.MsgStatus = json['MsgStatus']
         self.Reserved = json['Reserved']
 
-    def to_json(self):
+    def to_dict(self):
         r = {
             'MsgStatus': self.MsgStatus,
             'Reserved': self.Reserved,

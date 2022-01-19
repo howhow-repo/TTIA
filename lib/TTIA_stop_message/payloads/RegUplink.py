@@ -36,13 +36,13 @@ class RegUplink(PayloadBase):
         IMEI = bytearray(self.IMEI.encode('ascii'))
         return struct.pack('<15s15sBBBB', IMSI, IMEI, fv1, fv2, fv3, self.Reserved)
 
-    def from_json(self, json):
+    def from_dict(self, json):
         self.IMSI = json['IMSI']
         self.IMEI = json['IMEI']
         self.FirmwareVersion = json['FirmwareVersion']
         self.Reserved = json['Reserved']
 
-    def to_json(self):
+    def to_dict(self):
         r = {
             'IMSI': self.IMSI,
             'IMEI': self.IMEI,

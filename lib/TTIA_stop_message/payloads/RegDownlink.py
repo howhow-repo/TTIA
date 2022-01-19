@@ -56,7 +56,7 @@ class RegDownlink(PayloadBase):
                            self.DisplayMode, self.TextRollingSpeed, self.DistanceFunctionMode, self.ReportPeriod
                            )
 
-    def from_json(self, json):
+    def from_dict(self, json):
         self.Result = json['Result']
         self.MsgTag = json['MsgTag']  # 系統訊息
         self.StopCName = json['StopCName']
@@ -87,7 +87,7 @@ class RegDownlink(PayloadBase):
         self.DistanceFunctionMode = json['DistanceFunctionMode']
         self.ReportPeriod = json['ReportPeriod']
 
-    def to_json(self):
+    def to_dict(self):
         r = {
             'Result': self.Result,
             'MsgTag': self.MsgTag,

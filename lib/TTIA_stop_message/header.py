@@ -21,7 +21,7 @@ class Header(MessageBase, ABC):
         return struct.pack('<4sBBHQHH', byte_like_ProtocolID, self.ProtocolVer, self.MessageID,
                            self.Provider, self.StopID, self.Sequence, self.Len)
 
-    def from_json(self, json):
+    def from_dict(self, json):
         self.ProtocolID = json['ProtocolID']
         self.ProtocolVer = json['ProtocolVer']
         self.MessageID = json['MessageID']
@@ -30,7 +30,7 @@ class Header(MessageBase, ABC):
         self.Sequence = json['Sequence']
         self.Len = json['Len']
 
-    def to_json(self):
+    def to_dict(self):
         r = {
             'ProtocolID': self.ProtocolID,
             'ProtocolVer': self.ProtocolVer,

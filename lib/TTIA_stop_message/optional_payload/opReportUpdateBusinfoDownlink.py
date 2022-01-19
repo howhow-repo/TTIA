@@ -28,7 +28,7 @@ class OpReportUpdateBusinfoDownlink(OpPayloadBase):
                            self.Sequence,
                            )
 
-    def from_json(self, json):
+    def from_dict(self, json):
         self.SpectialEstimateTime = json['SpectialEstimateTime']
         self.MsgCContent = json['MsgCContent']
         self.MsgEContent = json['MsgEContent']
@@ -37,7 +37,7 @@ class OpReportUpdateBusinfoDownlink(OpPayloadBase):
         self.VoiceAlertMode = json['VoiceAlertMode']
         self.Sequence = json['Sequence']
 
-    def to_json(self):
+    def to_dict(self):
         r = {
             'SpectialEstimateTime': self.SpectialEstimateTime,
             'MsgCContent': self.MsgCContent,

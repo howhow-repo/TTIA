@@ -10,7 +10,7 @@ class MessageBase:
         if init_type == 'pdu':
             self.from_pdu(init_data)
         elif init_type == 'json':
-            self.from_json(init_data)
+            self.from_dict(init_data)
         elif init_type == 'default':
             self.from_default()
 
@@ -20,10 +20,10 @@ class MessageBase:
     def to_pdu(self):
         raise NotImplementedError
 
-    def from_json(self, json):
+    def from_dict(self, json):
         raise NotImplementedError
 
-    def to_json(self):
+    def to_dict(self):
         raise NotImplementedError
 
     def from_default(self):
