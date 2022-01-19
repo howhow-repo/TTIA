@@ -22,6 +22,11 @@ RcvHour = 6
 RcvMinute = 15
 RcvSecond = 15
 
+MsgPriority = 0
+MsgType = 0
+MsgStopDelay = 2
+MsgChangeDelay = 1
+
 payload = struct.pack('<BBBBBBBBBBBBBB',
                            StatusCode,
                            Type,
@@ -38,6 +43,13 @@ payload = struct.pack('<BBBBBBBBBBBBBB',
                            RcvMinute,
                            RcvSecond)
 
+option_payload = struct.pack('<BBBB',
+                           MsgPriority,
+                           MsgType,
+                           MsgStopDelay,
+                           MsgChangeDelay,
+                           )
+
 HEADER_PDU = struct.pack('<4sBBHQHH',
                          bytearray(MessageConstants.ProtocolID.encode('ascii')),
                          MessageConstants.ProtocolVer,
@@ -48,7 +60,7 @@ HEADER_PDU = struct.pack('<4sBBHQHH',
                          len(payload))  # Len
 
 
-ReportMsgcountDownlink_PDU = HEADER_PDU + payload
+ReportMsgcountDownlink_PDU = HEADER_PDU + payload + option_payload
 
 
 class TestReportMsgcountDownlink:
