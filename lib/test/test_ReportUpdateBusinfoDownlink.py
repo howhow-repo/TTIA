@@ -28,20 +28,28 @@ RcvMinute = 5
 RcvSecond = 45
 Reserved = 0
 
-Cinfo = "我是中文"
-Einfo = "im english"
+
+
+SpectialEstimateTime = 0
+MsgCContent = '我是中文'
+MsgEContent = "im english"
 RouteMsgCContent = "我是中文2"
 RouteMsgEContent = "im english too"
+VoiceAlertMode = 0
+Sequence = 0
 
-payload = struct.pack('<HHQQBHHBBBBBBBBBBBBBBB12s12s24s24s', RouteID, BusID, CurrentStop,
+payload = struct.pack('<HHQQBHHBBBBBBBBBBBBBBB', RouteID, BusID, CurrentStop,
                            DestinationStop, IsLastBus, EstimateTime, StopDistance,
                            Direction,
                            Type, TransYear - 2000, TransMonth, TransDay, TransHour,
                            TransMinute, TransSecond,
                            RcvYear - 2000, RcvMonth, RcvDay, RcvHour, RcvMinute,
                            RcvSecond, Reserved,
-                           Cinfo.encode("big5"), Einfo.encode(), RouteMsgCContent.encode("big5"),
-                           RouteMsgEContent.encode()
+                           )
+
+option_payload = struct.pack('<B12s12s24s24sBH', SpectialEstimateTime,
+                           MsgCContent.encode("big5"), MsgEContent.encode(), RouteMsgCContent.encode("big5"),
+                           RouteMsgEContent.encode(), VoiceAlertMode, Sequence
                            )
 
 HEADER_PDU = struct.pack('<4sBBHQHH',
@@ -53,7 +61,7 @@ HEADER_PDU = struct.pack('<4sBBHQHH',
                          65535,  # Sequence
                          len(payload))  # Len
 
-ReportUpdateBusinfoDownlink_PDU = HEADER_PDU + payload
+ReportUpdateBusinfoDownlink_PDU = HEADER_PDU + payload + option_payload
 
 
 class TestReportUpdateBusinfoDownlink:

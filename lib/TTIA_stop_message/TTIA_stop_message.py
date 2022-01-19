@@ -3,6 +3,7 @@ from abc import ABC
 from .message_base import MessageBase
 from .header import Header
 from .payloadcreator import PayloadCreator
+from .optionpayloadcreater import OptionPayloadCreater
 
 
 def is_json_format(msg):
@@ -13,6 +14,14 @@ def is_json_format(msg):
 
 class TTIABusStopMessage:
     def __init__(self, init_data, init_type):
+        """
+        :param init_data:
+            bytes like obj if init_type == 'pdu'
+            dict obj if init_type == 'json'
+            message id (int) if init_type == 'default'
+        :param init_type:
+            str: 'pdu' or 'json' or 'default'
+        """
         self.header = None
         self.payload = None
         self.option_payload = None
@@ -40,20 +49,18 @@ class TTIABusStopMessage:
 
         self.header = Header(init_data=pdu[:20], init_type='pdu')
 
-        if self.header.Len < len(pdu[20:]):
-            raise ValueError("input pdu has wrong payload length.")
+        if self.header.Len > len(pdu[20:]):
+            raise ValueError(f"input pdu has wrong payload length. \n"
+                             f"header.Len: {self.header.Len}, payload+option payload len:{len(pdu[20:])}")
 
         self.payload = PayloadCreator.pdu_create_payload_obj(pdu[20:20 + self.header.Len], self.header.MessageID)
-
-        if len(pdu) > 20 + self.header.Len:
-            self.option_payload = pdu[20 + self.header.Len + 1:]
-        else:
-            self.option_payload = b''
+        self.option_payload = OptionPayloadCreater.pdu_create_option_payload_obj(pdu[20 + self.header.Len:], self.header.MessageID)
 
     def to_pdu(self):
         payload_pdu = self.payload.to_pdu()
+        option_payload_pdu = self.option_payload.to_pdu()
         self.header.Len = len(payload_pdu)
-        return self.header.to_pdu() + payload_pdu
+        return self.header.to_pdu() + payload_pdu + option_payload_pdu
 
     def from_json(self, json):
         """
@@ -71,14 +78,14 @@ class TTIABusStopMessage:
 
         self.header.from_json(json['header'])
         self.payload = PayloadCreator.json_create_payload_obj(json['payload'], self.header.MessageID)
-        self.option_payload = json['option_payload']
+        self.option_payload = OptionPayloadCreater.json_create_option_payload_obj(json['payload'], self.header.MessageID)
 
     def to_json(self):
         self.header.Len = len(self.payload.to_pdu())
         j = {
             'header': self.header.to_json(),
             'payload': self.payload.to_json(),
-            'option_payload': self.option_payload
+            'option_payload': self.option_payload.to_json()
         }
         return j
 
@@ -87,4 +94,4 @@ class TTIABusStopMessage:
         self.payload = PayloadCreator.default_create_payload_obj(message_id)
         payload_pdu = self.payload.to_pdu()
         self.header.Len = len(payload_pdu)
-        self.option_payload = b''
+        self.option_payload = OptionPayloadCreater.default_create_option_payload_obj(message_id)

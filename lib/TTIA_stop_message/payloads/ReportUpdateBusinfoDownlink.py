@@ -4,13 +4,18 @@ from .payload_base import PayloadBase
 
 
 class ReportUpdateBusinfoDownlink(PayloadBase):
+    """
+        Warning: This is now not following TTIA STOP Protocol.
+        Option payload has been combine with payload.
+    """
     message_id = 0x07
 
     def __init__(self, init_data, init_type):
+        self.from_default()
         super().__init__(init_data, init_type)
 
     def from_pdu(self, pdu):
-        payload = struct.unpack_from('<HHQQBHHBBBBBBBBBBBBBBB12s12s24s24s', pdu)
+        payload = struct.unpack_from('<HHQQBHHBBBBBBBBBBBBBBB', pdu)
         self.RouteID = payload[0]
         self.BusID = payload[1]
         self.CurrentStop = payload[2]
@@ -34,23 +39,14 @@ class ReportUpdateBusinfoDownlink(PayloadBase):
         self.RcvSecond = payload[20]
         self.Reserved = payload[21]
 
-        # TODO: this should be optional_payload
-        self.Cinfo = bytearray(payload[22]).decode('big5')
-        self.Einfo = bytearray(payload[23]).decode('ascii')
-        self.RouteMsgCContent = bytearray(payload[24]).decode('big5')
-        self.RouteMsgEContent = bytearray(payload[25]).decode('ascii')
-
     def to_pdu(self):
-        return struct.pack('<HHQQBHHBBBBBBBBBBBBBBB12s12s24s24s', self.RouteID, self.BusID, self.CurrentStop,
+        return struct.pack('<HHQQBHHBBBBBBBBBBBBBBB', self.RouteID, self.BusID, self.CurrentStop,
                            self.DestinationStop, self.IsLastBus, self.EstimateTime, self.StopDistance,
                            self.Direction,
                            self.Type, self.TransYear - 2000, self.TransMonth, self.TransDay, self.TransHour,
                            self.TransMinute, self.TransSecond,
                            self.RcvYear - 2000, self.RcvMonth, self.RcvDay, self.RcvHour, self.RcvMinute,
-                           self.RcvSecond, self.Reserved,
-                           self.Cinfo.encode("big5"), self.Einfo.encode(), self.RouteMsgCContent.encode("big5"),
-                           self.RouteMsgEContent.encode()
-                           )
+                           self.RcvSecond, self.Reserved,)
 
     def from_json(self, json):
         self.RouteID = json['RouteID']
@@ -75,10 +71,6 @@ class ReportUpdateBusinfoDownlink(PayloadBase):
         self.RcvMinute = json['RcvMinute']
         self.RcvSecond = json['RcvSecond']
         self.Reserved = json['Reserved']
-        self.Cinfo = json['Cinfo']
-        self.Einfo = json['Einfo']
-        self.RouteMsgCContent = json['RouteMsgCContent']
-        self.RouteMsgEContent = json['RouteMsgEContent']
 
     def to_json(self):
         r = {
@@ -104,10 +96,6 @@ class ReportUpdateBusinfoDownlink(PayloadBase):
             'RcvMinute': self.RcvMinute,
             'RcvSecond': self.RcvSecond,
             'Reserved': self.Reserved,
-            'Cinfo': self.Cinfo,
-            'Einfo': self.Einfo,
-            'RouteMsgCContent': self.RouteMsgCContent,
-            'RouteMsgEContent': self.RouteMsgEContent,
         }
         return r
 
@@ -135,9 +123,5 @@ class ReportUpdateBusinfoDownlink(PayloadBase):
         self.RcvSecond = 0
         self.Reserved = 0
         self.min = 0
-        self.Cinfo = ''
-        self.Einfo = ''
-        self.RouteMsgCContent = ''
-        self.RouteMsgEContent = ''
 
 

@@ -56,6 +56,8 @@ class PayloadCreator:
 
         elif message_id == 0x0C:  # 華夏自定義的protocol，處理站牌名稱
             return
+        else:
+            raise NotImplementedError("no message payload define.")
 
     @classmethod
     def json_create_payload_obj(cls, payload_json, message_id):
@@ -83,3 +85,5 @@ class PayloadCreator:
 
         elif message_id == 0x0C:  # 華夏自定義的protocol，處理站牌名稱
             return
+        else:
+            raise NotImplementedError("no message payload define.")
