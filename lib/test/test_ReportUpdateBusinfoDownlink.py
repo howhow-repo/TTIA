@@ -70,5 +70,5 @@ class TestReportUpdateBusinfoDownlink:
         print('Testing on message id: ', ReportUpdateBusinfoDownlink.header.MessageID)
         print("ORG PDU:     ", ReportUpdateBusinfoDownlink_PDU)
         print("BYPASS PDU:  ", ReportUpdateBusinfoDownlink.to_pdu())
-        print("json:        ", ReportUpdateBusinfoDownlink.to_json())
+        print("json:        ", ReportUpdateBusinfoDownlink.to_dict())
         print("is same: ", ReportUpdateBusinfoDownlink.to_pdu() == ReportUpdateBusinfoDownlink_PDU, "\n")

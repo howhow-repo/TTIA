@@ -1,94 +1,67 @@
+from .message_base import MessageBase
 from .payloads import *
 
+
 class PayloadCreator:
-
     @classmethod
-    def pdu_create_payload_obj(cls, payload_pdu, message_id):
-        if message_id == 0x00:  # 註冊請求訊息
-            return RegUplink(init_data=payload_pdu, init_type='pdu')
-        elif message_id == 0x01:  # 基本資料設定確認訊息
-            return RegDownlink(init_data=payload_pdu, init_type='pdu')
-        elif message_id == 0x02:  # 基本資料設定確認訊息
-            return ReportBaseMsgTagUplink(init_data=payload_pdu, init_type='pdu')
-        elif message_id == 0x03:  # 定時回報確認訊息
-            return ReportMsgcountUplink(init_data=payload_pdu, init_type='pdu')
-        elif message_id == 0x04:  # 定時回報確認訊息
-            return ReportMsgcountDownlink(init_data=payload_pdu, init_type='pdu')
-        elif message_id == 0x05:  # 定時回報確認訊息
-            return ReportUpdateMsgTagDownlink(init_data=payload_pdu, init_type='pdu')
-        elif message_id == 0x06:  # 更新站牌文字確認訊息
-            return ReportUpdateMsgTagUplink(init_data=payload_pdu, init_type='pdu')
-        elif message_id == 0x07:  # 更新站牌文字確認訊息
-            return ReportUpdateBusinfoDownlink(init_data=payload_pdu, init_type='pdu')
-        elif message_id == 0x08:  # 更新即時公車資訊確認訊息
-            return ReportUpdateBusinfoUplink(init_data=payload_pdu, init_type='pdu')
-        elif message_id == 0x09:  # 異常回報確認訊息
-            return ReportAbnormalUplink(init_data=payload_pdu, init_type='pdu')
-        elif message_id == 0x0A:  # 異常回報確認訊息
-            return ReportAbnormalDownlink(init_data=payload_pdu, init_type='pdu')
-        elif message_id == 0x0C:  # 華夏自定義的protocol，處理站牌名稱
-            pass
-            # sendbuf = self.handleStopNameMsgTagUplink(TTIAHeaderdata, data)
-            return
+    def create_payload_obj(cls, payload_type: str, payload, message_id) -> MessageBase:
+        """
+        :param payload_type:
+            'pdu' or 'json' or 'default'
+            depends on the type of your payload is.
+        :param payload:
+            raw data of payload. It can be byte like / dict / nothong, depends on the decode type you want.
+        :param message_id:
+            fill the message id in header
+        :return:
+            a payload object
+        """
+        if payload_type == 'pdu':
+            paras = {'init_data': payload, 'init_type': 'pdu'}
+        elif payload_type == 'json':
+            paras = {'init_data': payload, 'init_type': 'json'}
+        elif payload_type == 'default':
+            paras = {'init_data': b'', 'init_type': 'default'}
         else:
-            raise NotImplementedError("no message payload define.")
+            raise ValueError("No such payload raw data")
 
-    @classmethod
-    def default_create_payload_obj(cls, message_id):
         if message_id == 0x00:  # 註冊請求訊息
-            return RegUplink(init_data=b'', init_type='default')
+            return RegUplink(**paras)
         elif message_id == 0x01:  # 基本資料設定確認訊息
-            return RegDownlink(init_data=b'', init_type='default')
+            return RegDownlink(**paras)
         elif message_id == 0x02:  # 基本資料設定確認訊息
-            return ReportBaseMsgTagUplink(init_data=b'', init_type='default')
+            return ReportBaseMsgTagUplink(**paras)
         elif message_id == 0x03:  # 定時回報確認訊息
-            return ReportMsgcountUplink(init_data=b'', init_type='default')
+            return ReportMsgcountUplink(**paras)
         elif message_id == 0x04:  # 定時回報確認訊息
-            return ReportMsgcountDownlink(init_data=b'', init_type='default')
+            return ReportMsgcountDownlink(**paras)
         elif message_id == 0x05:  # 定時回報確認訊息
-            return ReportUpdateMsgTagDownlink(init_data=b'', init_type='default')
+            return ReportUpdateMsgTagDownlink(**paras)
         elif message_id == 0x06:  # 更新站牌文字確認訊息
-            return ReportUpdateMsgTagUplink(init_data=b'', init_type='default')
+            return ReportUpdateMsgTagUplink(**paras)
         elif message_id == 0x07:  # 更新站牌文字確認訊息
-            return ReportUpdateBusinfoDownlink(init_data=b'', init_type='default')
+            return ReportUpdateBusinfoDownlink(**paras)
         elif message_id == 0x08:  # 更新即時公車資訊確認訊息
-            return ReportUpdateBusinfoUplink(init_data=b'', init_type='default')
+            return ReportUpdateBusinfoUplink(**paras)
         elif message_id == 0x09:  # 異常回報確認訊息
-            return ReportAbnormalUplink(init_data=b'', init_type='default')
+            return ReportAbnormalUplink(**paras)
         elif message_id == 0x0A:  # 異常回報確認訊息
-            return ReportAbnormalDownlink(init_data=b'', init_type='default')
-
-        elif message_id == 0x0C:  # 華夏自定義的protocol，處理站牌名稱
-            return
-        else:
-            raise NotImplementedError("no message payload define.")
-
-    @classmethod
-    def json_create_payload_obj(cls, payload_json, message_id):
-        if message_id == 0x00:  # 註冊請求訊息
-            return RegUplink(init_data=payload_json, init_type='json')
-        elif message_id == 0x01:  # 基本資料設定確認訊息
-            return RegDownlink(init_data=payload_json, init_type='json')
-        elif message_id == 0x02:  # 基本資料設定確認訊息
-            return ReportBaseMsgTagUplink(init_data=payload_json, init_type='json')
-        elif message_id == 0x03:  # 定時回報確認訊息
-            return ReportMsgcountUplink(init_data=payload_json, init_type='json')
-        elif message_id == 0x04:  # 定時回報確認訊息
-            return ReportMsgcountDownlink(init_data=payload_json, init_type='json')
-        elif message_id == 0x05:  # 定時回報確認訊息
-            return ReportUpdateMsgTagDownlink(init_data=payload_json, init_type='json')
-        elif message_id == 0x06:  # 更新站牌文字確認訊息
-            return ReportUpdateMsgTagUplink(init_data=payload_json, init_type='json')
-        elif message_id == 0x07:  # 更新站牌文字確認訊息
-            return ReportUpdateBusinfoDownlink(init_data=payload_json, init_type='json')
-        elif message_id == 0x08:  # 更新即時公車資訊確認訊息
-            return ReportUpdateBusinfoUplink(init_data=payload_json, init_type='json')
-        elif message_id == 0x09:  # 異常回報確認訊息
-            return ReportAbnormalUplink(init_data=payload_json, init_type='json')
-        elif message_id == 0x0A:  # 異常回報確認訊息
-            return ReportAbnormalDownlink(init_data=payload_json, init_type='json')
-
-        elif message_id == 0x0C:  # 華夏自定義的protocol，處理站牌名稱
-            return
+            return ReportAbnormalDownlink(**paras)
+        elif message_id == 0x0B:  # 異常回報確認訊息
+            return ReportUpdateRouteinfoDownlink(**paras)
+        elif message_id == 0x0C:  #
+            return ReportUpdateRouteinfoUplink(**paras)
+        elif message_id == 0x0D:  #
+            return ReportSetBrightnessDownlink(**paras)
+        elif message_id == 0x0E:  #
+            return ReportSetBrightnessUplink(**paras)
+        elif message_id == 0x10:  #
+            return ReportRebootDownlink(**paras)
+        elif message_id == 0x11:  #
+            return ReportRebootUplink(**paras)
+        elif message_id == 0x12:  #
+            return ReportUpdateGifDownlink(**paras)
+        elif message_id == 0x13:  #
+            return ReportUpdateGifUplink(**paras)
         else:
             raise NotImplementedError("no message payload define.")

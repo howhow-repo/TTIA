@@ -33,5 +33,5 @@ class TestREGUPLINK:
         print('Testing on message id: ', REGUPLINK.header.MessageID)
         print("ORG PDU:     ", REGUPLINK_PDU)
         print("BYPASS PDU:  ", REGUPLINK.to_pdu())
-        print("json:        ", REGUPLINK.to_json())
+        print("json:        ", REGUPLINK.to_dict())
         print("is same: ", REGUPLINK.to_pdu() == REGUPLINK_PDU, "\n")

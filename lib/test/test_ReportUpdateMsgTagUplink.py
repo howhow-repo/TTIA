@@ -30,5 +30,5 @@ class TestReportUpdateMsgTagUplink:
         print('Testing on message id: ', ReportUpdateMsgTagUplink.header.MessageID)
         print("ORG PDU:     ", ReportUpdateMsgTagUplink_PDU)
         print("BYPASS PDU:  ", ReportUpdateMsgTagUplink.to_pdu())
-        print("json:        ", ReportUpdateMsgTagUplink.to_json())
+        print("json:        ", ReportUpdateMsgTagUplink.to_dict())
         print("is same: ", ReportUpdateMsgTagUplink.to_pdu() == ReportUpdateMsgTagUplink_PDU, "\n")

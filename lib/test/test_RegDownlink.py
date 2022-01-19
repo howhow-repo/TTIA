@@ -104,5 +104,5 @@ class TestREGDOWNLINK:
         print('Testing on message id: ', REGDOWNLINK.header.MessageID)
         print("ORG PDU:     ", REGDOWNLINK_PDU)
         print("BYPASS PDU:  ", REGDOWNLINK.to_pdu())
-        print("json:        ", REGDOWNLINK.to_json())
+        print("json:        ", REGDOWNLINK.to_dict())
         print("is same: ", REGDOWNLINK.to_pdu() == REGDOWNLINK_PDU, "\n")

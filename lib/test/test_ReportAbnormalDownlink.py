@@ -30,5 +30,5 @@ class TestReportAbnormalDownlink:
         print('Testing on message id: ', ReportAbnormalDownlink.header.MessageID)
         print("ORG PDU:     ", ReportAbnormalDownlink_PDU)
         print("BYPASS PDU:  ", ReportAbnormalDownlink.to_pdu())
-        print("json:        ", ReportAbnormalDownlink.to_json())
+        print("json:        ", ReportAbnormalDownlink.to_dict())
         print("is same: ", ReportAbnormalDownlink.to_pdu() == ReportAbnormalDownlink_PDU, "\n")

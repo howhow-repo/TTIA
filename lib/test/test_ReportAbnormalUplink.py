@@ -57,5 +57,5 @@ class TestReportAbnormalUplink:
         print('Testing on message id: ', ReportAbnormalUplink.header.MessageID)
         print("ORG PDU:     ", ReportAbnormalUplink_PDU)
         print("BYPASS PDU:  ", ReportAbnormalUplink.to_pdu())
-        print("json:        ", ReportAbnormalUplink.to_json())
+        print("json:        ", ReportAbnormalUplink.to_dict())
         print("is same: ", ReportAbnormalUplink.to_pdu() == ReportAbnormalUplink_PDU, "\n")

@@ -28,5 +28,5 @@ class TestReportUpdateBusinfoUplink:
         print('Testing on message id: ', ReportUpdateBusinfoUplink.header.MessageID)
         print("ORG PDU:     ", ReportUpdateBusinfoUplink_PDU)
         print("BYPASS PDU:  ", ReportUpdateBusinfoUplink.to_pdu())
-        print("json:        ", ReportUpdateBusinfoUplink.to_json())
+        print("json:        ", ReportUpdateBusinfoUplink.to_dict())
         print("is same: ", ReportUpdateBusinfoUplink.to_pdu() == ReportUpdateBusinfoUplink_PDU, "\n")

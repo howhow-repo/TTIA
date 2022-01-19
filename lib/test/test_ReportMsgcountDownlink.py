@@ -69,5 +69,5 @@ class TestReportMsgcountDownlink:
         print('Testing on message id: ', ReportMsgcountDownlink.header.MessageID)
         print("ORG PDU:     ", ReportMsgcountDownlink_PDU)
         print("BYPASS PDU:  ", ReportMsgcountDownlink.to_pdu())
-        print("json:        ", ReportMsgcountDownlink.to_json())
+        print("json:        ", ReportMsgcountDownlink.to_dict())
         print("is same: ", ReportMsgcountDownlink.to_pdu() == ReportMsgcountDownlink_PDU, "\n")

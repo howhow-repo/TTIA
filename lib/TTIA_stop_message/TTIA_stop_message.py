@@ -29,11 +29,11 @@ class TTIABusStopMessage:
         if init_type == 'pdu':
             self.from_pdu(init_data)
         elif init_type == 'json':
-            self.from_json(init_data)
+            self.from_dict(init_data)
         elif init_type == 'default':
             self.from_default(init_data)
 
-    def from_pdu(self, pdu):
+    def from_pdu(self, pdu: bytes):
         """
         Follow TTIA Stop protocol, set input UDP binary message to python obj.
 
@@ -53,7 +53,7 @@ class TTIABusStopMessage:
             raise ValueError(f"input pdu has wrong payload length. \n"
                              f"header.Len: {self.header.Len}, payload+option payload len:{len(pdu[20:])}")
 
-        self.payload = PayloadCreator.pdu_create_payload_obj(pdu[20:20 + self.header.Len], self.header.MessageID)
+        self.payload = PayloadCreator.create_payload_obj('pdu', pdu[20:20 + self.header.Len], self.header.MessageID)
         self.option_payload = OptionPayloadCreater.pdu_create_option_payload_obj(pdu[20 + self.header.Len:], self.header.MessageID)
 
     def to_pdu(self):
@@ -62,7 +62,7 @@ class TTIABusStopMessage:
         self.header.Len = len(payload_pdu)
         return self.header.to_pdu() + payload_pdu + option_payload_pdu
 
-    def from_json(self, json):
+    def from_dict(self, json):
         """
         :param json:
             {
@@ -76,22 +76,22 @@ class TTIABusStopMessage:
         if not is_json_format(json):
             raise ValueError("input json has wrong format.")
 
-        self.header.from_json(json['header'])
-        self.payload = PayloadCreator.json_create_payload_obj(json['payload'], self.header.MessageID)
+        self.header.from_dict(json['header'])
+        self.payload = PayloadCreator.create_payload_obj('json', json['payload'], self.header.MessageID)
         self.option_payload = OptionPayloadCreater.json_create_option_payload_obj(json['payload'], self.header.MessageID)
 
-    def to_json(self):
+    def to_dict(self):
         self.header.Len = len(self.payload.to_pdu())
         j = {
-            'header': self.header.to_json(),
-            'payload': self.payload.to_json(),
-            'option_payload': self.option_payload.to_json()
+            'header': self.header.to_dict(),
+            'payload': self.payload.to_dict(),
+            'option_payload': self.option_payload.to_dict()
         }
         return j
 
     def from_default(self, message_id: int):
         self.header = Header(b'', 'default')
-        self.payload = PayloadCreator.default_create_payload_obj(message_id)
+        self.payload = PayloadCreator.create_payload_obj('default', b'', message_id)
         payload_pdu = self.payload.to_pdu()
         self.header.Len = len(payload_pdu)
         self.option_payload = OptionPayloadCreater.default_create_option_payload_obj(message_id)
