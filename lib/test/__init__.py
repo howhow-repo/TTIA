@@ -8,4 +8,4 @@ from .test_ReportUpdateMsgTagUplink import TestReportUpdateMsgTagUplink
 from .test_ReportUpdateBusinfoDownlink import TestReportUpdateBusinfoDownlink
 from .test_ReportUpdateBusinfoUplink import TestReportUpdateBusinfoUplink
 from .test_ReportAbnormalUplink import TestReportAbnormalUplink
-
+from .test_ReportAbnormalDownlink import TestReportAbnormalDownlink

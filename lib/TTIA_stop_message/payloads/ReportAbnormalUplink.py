@@ -5,7 +5,7 @@ from .payload_base import PayloadBase
 class ReportAbnormalUplink(PayloadBase):
     message_id = 0x09
 
-    def __init__(self, init_data, init_type, buff=None, offset=0):
+    def __init__(self, init_data, init_type):
         super().__init__(init_data, init_type)
 
     def from_pdu(self, pdu):
