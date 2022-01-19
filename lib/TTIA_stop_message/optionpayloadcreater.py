@@ -5,8 +5,7 @@ class OptionPayloadCreater:
     @classmethod
     def pdu_create_option_payload_obj(cls, payload_pdu, message_id):
         if message_id == 0x01:  # 註冊請求訊息
-            # TODO
-            return OpEmpty(init_data=payload_pdu, init_type='pdu')
+            return OpRegDownlink(init_data=payload_pdu, init_type='pdu')
         elif message_id == 0x05:
             # TODO
             return OpEmpty(init_data=payload_pdu, init_type='pdu')
@@ -18,8 +17,7 @@ class OptionPayloadCreater:
     @classmethod
     def json_create_option_payload_obj(cls, payload_json, message_id):
         if message_id == 0x01:  # 註冊請求訊息
-            # TODO
-            return OpEmpty(init_data=payload_json, init_type='json')
+            return OpRegDownlink(init_data=payload_json, init_type='json')
         elif message_id == 0x05:
             # TODO
             return OpEmpty(init_data=payload_json, init_type='json')
@@ -31,11 +29,10 @@ class OptionPayloadCreater:
     @classmethod
     def default_create_option_payload_obj(cls, message_id):
         if message_id == 0x01:  # 註冊請求訊息
-            # TODO
-            return OpEmpty(init_data=payload_json, init_type='json')
+            return OpRegDownlink(init_data=b'', init_type='json')
         elif message_id == 0x05:
             # TODO
-            return OpEmpty(init_data=payload_json, init_type='json')
+            return OpEmpty(init_data=b'', init_type='json')
         elif message_id == 0x07:
             return OpReportUpdateBusinfoDownlink(init_data=b'', init_type='default')
         else:

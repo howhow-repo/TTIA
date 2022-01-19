@@ -2,6 +2,11 @@ import struct
 
 from lib import MessageConstants, TTIABusStopMessage
 
+
+MESSAGEID = 0x01
+Provider = 65535
+
+
 Result = 0
 MsgTag = 0  # 系統訊息
 StopCName = '中文站名'
@@ -31,10 +36,24 @@ DisplayMode = 0
 TextRollingSpeed = 0
 DistanceFunctionMode = 0
 ReportPeriod = 0
-
 StopCName = bytearray(StopCName.encode("big5"))
 StopEName = bytearray(StopEName.encode("big5"))
 IdleMessage = bytearray(IdleMessage.encode("big5"))
+
+MessageGroupZoneID = 0
+MessageGroupCasID = 0
+WeekendBootTimeh = 16
+WeekendBootTimem = 0
+WeekendBootTimes = 0
+WeekendShutdownTimeh = 15
+WeekendShutdownTimem = 0
+WeekendShutdownTimes = 0
+District = '我是中文32Byte'
+MsgStopDelay = 2
+BootMessage = '我是中文32Byte'
+IdleTime = 300
+EventReportPeriod = 300
+WeekDay = 1
 
 payload = struct.pack('<BH32s32sBBHBBHHBBBBBBB32sBBBBBBBBBH',
                       Result,
@@ -56,8 +75,17 @@ payload = struct.pack('<BH32s32sBBHBBHHBBBBBBB32sBBBBBBBBBH',
                       DisplayMode, TextRollingSpeed, DistanceFunctionMode,
                       ReportPeriod )
 
-MESSAGEID = 0x01
-Provider = 65535
+option_payload = struct.pack('<HHBBBBBB32sB32sHHB',
+                           MessageGroupZoneID,MessageGroupCasID,
+                           WeekendBootTimeh,WeekendBootTimem, WeekendBootTimes,
+                           WeekendShutdownTimeh,WeekendShutdownTimem,WeekendShutdownTimes,
+                           District.encode("big5"),MsgStopDelay,
+                           BootMessage.encode("big5"),
+                           IdleTime,
+                           EventReportPeriod,
+                           WeekDay,
+                           )
+
 HEADER_PDU = struct.pack('<4sBBHQHH',
                          bytearray(MessageConstants.ProtocolID.encode('ascii')),
                          MessageConstants.ProtocolVer,
@@ -67,14 +95,12 @@ HEADER_PDU = struct.pack('<4sBBHQHH',
                          65535,  # Sequence
                          len(payload))  # Len
 
-REGDOWNLINK_PDU = HEADER_PDU + payload
+REGDOWNLINK_PDU = HEADER_PDU + payload + option_payload
 
 
 class TestREGDOWNLINK:
     def __init__(self):
-
         REGDOWNLINK = TTIABusStopMessage(init_data=REGDOWNLINK_PDU, init_type='pdu')
-
         print('Testing on message id: ', REGDOWNLINK.header.MessageID)
         print("ORG PDU:     ", REGDOWNLINK_PDU)
         print("BYPASS PDU:  ", REGDOWNLINK.to_pdu())
