@@ -1,4 +1,5 @@
 import struct
+import unittest
 
 from lib.TTIA_stop_message import TTIABusStopMessage, MessageConstants
 
@@ -51,11 +52,11 @@ HEADER_PDU = struct.pack('<4sBBHQHH',
 ReportAbnormalUplink_PDU = HEADER_PDU + payload
 
 
-class TestReportAbnormalUplink:
-    def __init__(self):
+class TestReportAbnormalUplink(unittest.TestCase):
+    def test_from_to_pdu(self):
         ReportAbnormalUplink = TTIABusStopMessage(init_data=ReportAbnormalUplink_PDU, init_type='pdu')
         print('Testing on message id: ', ReportAbnormalUplink.header.MessageID)
         print("ORG PDU:     ", ReportAbnormalUplink_PDU)
         print("BYPASS PDU:  ", ReportAbnormalUplink.to_pdu())
-        print("json:        ", ReportAbnormalUplink.to_dict())
-        print("is same: ", ReportAbnormalUplink.to_pdu() == ReportAbnormalUplink_PDU, "\n")
+        print("json:        ", ReportAbnormalUplink.to_dict(), '\n')
+        self.assertEqual(ReportAbnormalUplink.to_pdu(), ReportAbnormalUplink_PDU, "\n")
