@@ -13,8 +13,8 @@ class RegDownlink(PayloadBase):
         payload = struct.unpack_from('<BH32s32sBBHBBHHBBBBBBB32sBBBBBBBBBH', pdu)
         self.Result = payload[0]
         self.MsgTag = payload[1]  # 系統訊息
-        self.StopCName = bytearray(payload[2]).decode('big5')
-        self.StopEName = bytearray(payload[3]).decode('ascii')
+        self.StopCName = (payload[2].decode('big5')).rstrip('\x00')
+        self.StopEName = (payload[3].decode('ascii')).rstrip('\x00')
         self.LongitudeDu = payload[4]
         self.LongitudeFen = payload[5]
         self.LongitudeMiao = payload[6]
@@ -29,7 +29,7 @@ class RegDownlink(PayloadBase):
         self.ShutdownTimem = payload[15]
         self.ShutdownTimes = payload[16]
         self.MessageGroupID = payload[17]
-        self.IdleMessage = bytearray(payload[18]).decode('big5')
+        self.IdleMessage = (payload[18].decode('big5')).rstrip('\x00')
         self.Year = payload[19] + 2000
         self.Month = payload[20]
         self.Day = payload[21]

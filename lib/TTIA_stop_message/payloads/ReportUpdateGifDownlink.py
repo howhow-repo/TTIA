@@ -9,8 +9,8 @@ class ReportUpdateGifDownlink(PayloadBase):
         payload = struct.unpack_from('<HH160s160s', pdu)
         self.PicNo = payload[0]
         self.PicNum = payload[1]
-        self.PicURL = bytearray(payload[2]).decode('ascii')
-        self.MsgContent = bytearray(payload[3]).decode('big5')
+        self.PicURL = bytearray(payload[2]).decode('ascii').rstrip('\x00')
+        self.MsgContent = bytearray(payload[3]).decode('big5').rstrip('\x00')
 
     def to_pdu(self):
         return struct.pack("<HH160s160s", self.PicNo, self.PicNum,

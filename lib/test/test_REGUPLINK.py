@@ -38,3 +38,9 @@ class TestREGUPLINK(unittest.TestCase):
         obj_dict = default_msg.to_dict()
         from_dict_msg = TTIABusStopMessage(init_data=obj_dict, init_type='dict')
         self.assertEqual(from_dict_msg.to_dict(), obj_dict)
+
+    def test_from_to_pdu_by_default_creation(self):
+        default_msg = TTIABusStopMessage(init_data=MESSAGEID, init_type='default')
+        msg = TTIABusStopMessage(init_data=default_msg.to_pdu(), init_type='pdu')
+        self.assertEqual(msg.to_pdu(), default_msg.to_pdu())
+        self.assertEqual(msg.to_dict(), default_msg.to_dict())

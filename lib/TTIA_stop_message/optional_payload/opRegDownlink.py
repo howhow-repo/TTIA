@@ -18,9 +18,9 @@ class OpRegDownlink(OpPayloadBase):
         self.WeekendShutdownTimeh = payload[5]
         self.WeekendShutdownTimem = payload[6]
         self.WeekendShutdownTimes = payload[7]
-        self.District = bytearray(payload[8]).decode('big5')
+        self.District = (payload[8]).decode('big5').rstrip('\x00')
         self.MsgStopDelay = payload[9]
-        self.BootMessage = bytearray(payload[10]).decode('big5')
+        self.BootMessage = (payload[10]).decode('big5').rstrip('\x00')
         self.IdleTime = payload[11]
         self.EventReportPeriod = payload[12]
         self.WeekDay = payload[13]

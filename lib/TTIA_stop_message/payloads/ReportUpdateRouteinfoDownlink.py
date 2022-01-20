@@ -8,8 +8,8 @@ class ReportUpdateRouteinfoDownlink(PayloadBase):
     def from_pdu(self, pdu):
         payload = struct.unpack_from('<H12s12sH', pdu)
         self.RouteID = payload[0]
-        self.PathCName = bytearray(payload[1]).decode('big5')
-        self.PathEName = bytearray(payload[2]).decode('ascii')
+        self.PathCName = payload[1].decode('big5').rstrip('\x00')
+        self.PathEName = payload[2].decode('ascii').rstrip('\x00')
         self.Sequence = payload[3]
 
     def to_pdu(self):
@@ -37,5 +37,5 @@ class ReportUpdateRouteinfoDownlink(PayloadBase):
     def from_default(self):
         self.RouteID = 0
         self.PathCName = '中文站名'
-        self.PathEName = 'stop eng name'
+        self.PathEName = 'stopEngName'
         self.Sequence = 0

@@ -12,7 +12,7 @@ class ReportUpdateMsgTagDownlink(PayloadBase):
         payload = struct.unpack_from('<HH160s', pdu)
         self.MsgTag = payload[0]
         self.MsgNo = payload[1]
-        self.MsgContent = payload[2].decode('big5')
+        self.MsgContent = payload[2].decode('big5').rstrip('\x00')
 
     def to_pdu(self):
         MsgContent = bytearray(self.MsgContent.encode("big5"))

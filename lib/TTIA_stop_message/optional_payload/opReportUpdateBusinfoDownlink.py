@@ -11,10 +11,10 @@ class OpReportUpdateBusinfoDownlink(OpPayloadBase):
     def from_pdu(self, pdu):
         payload = struct.unpack_from('<B12s12s24s24sBH', pdu)
         self.SpectialEstimateTime = payload[0]
-        self.MsgCContent = bytearray(payload[1]).decode('big5')
-        self.MsgEContent = bytearray(payload[2]).decode('ascii')
-        self.RouteMsgCContent = bytearray(payload[3]).decode('big5')
-        self.RouteMsgEContent = bytearray(payload[4]).decode('ascii')
+        self.MsgCContent = bytearray(payload[1]).decode('big5').rstrip('\x00')
+        self.MsgEContent = bytearray(payload[2]).decode('ascii').rstrip('\x00')
+        self.RouteMsgCContent = bytearray(payload[3]).decode('big5').rstrip('\x00')
+        self.RouteMsgEContent = bytearray(payload[4]).decode('ascii').rstrip('\x00')
         self.VoiceAlertMode = payload[5]
         self.Sequence = payload[6]
 
