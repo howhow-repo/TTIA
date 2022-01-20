@@ -7,6 +7,11 @@ class TestBaseCase(unittest.TestCase):
     MESSAGEID = None
 
     def test_from_to_pdu_by_raw_pdu(self):
+        """
+            raw_pdu --init--> py_obj --to_pdu-> created_pdu (create by py_obj)
+            
+            created_pdu should be same as raw_pdu.
+        """
         assert self.pdu_pack is not None and self.MESSAGEID is not None, \
             "'pdu_pack' and 'MESSAGEID' must be define for test case."
 
@@ -14,6 +19,12 @@ class TestBaseCase(unittest.TestCase):
         self.assertEqual(msg.to_pdu(), self.pdu_pack)
 
     def test_from_to_dict_by_default_creation(self):
+        """
+            --init by default--> py_obj --to_dict-> obj_dict (create by py_obj)
+            obj_dict --init--> new_py_obj --to_dict-> new_obj_dict
+
+            obj_dict should be same as new_obj_dict.
+        """
         assert self.pdu_pack is not None and self.MESSAGEID is not None, \
             "'pdu_pack' and 'MESSAGEID' must be define for test case."
 
@@ -23,6 +34,13 @@ class TestBaseCase(unittest.TestCase):
         self.assertEqual(from_dict_msg.to_dict(), obj_dict)
 
     def test_from_to_pdu_by_default_creation(self):
+        """
+            --init by default--> py_obj --to_pdu-> created_pdu (create by py_obj)
+            created_pdu --init--> new_py_obj
+
+            py_obj.to_pdu() should be same as new_py_obj.to_pdu()
+            py_obj.to_dict() should be same as new_py_obj.to_dict()
+        """
         assert self.pdu_pack is not None and self.MESSAGEID is not None, \
             "'pdu_pack' and 'MESSAGEID' must be define for test case."
 

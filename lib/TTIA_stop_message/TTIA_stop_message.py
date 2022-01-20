@@ -4,6 +4,8 @@ from .message_base import MessageBase
 from .header import Header
 from .payloadcreator import PayloadCreator
 from .optionpayloadcreater import OptionPayloadCreater
+from .payloads import PayloadBase
+from .optional_payload import OpPayloadBase
 
 
 def is_format(msg):
@@ -25,9 +27,9 @@ class TTIABusStopMessage:
             Case3: Init an empty message with default property/value:
                 init_data = <don't care>, init_type='default'
         """
-        self.header = None
-        self.payload = None
-        self.option_payload = None
+        self.header = Header
+        self.payload = PayloadBase
+        self.option_payload = OpPayloadBase
 
         if init_type == 'pdu':
             self.from_pdu(init_data)
