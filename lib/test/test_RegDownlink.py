@@ -37,7 +37,7 @@ TextRollingSpeed = 0
 DistanceFunctionMode = 0
 ReportPeriod = 0
 StopCName = bytearray(StopCName.encode("big5"))
-StopEName = bytearray(StopEName.encode("big5"))
+StopEName = bytearray(StopEName.encode("ascii"))
 IdleMessage = bytearray(IdleMessage.encode("big5"))
 
 MessageGroupZoneID = 0
@@ -95,21 +95,16 @@ HEADER_PDU = struct.pack('<4sBBHQHH',
                          65535,  # Sequence
                          len(payload))  # Len
 
-REGDOWNLINK_PDU = HEADER_PDU + payload + option_payload
+pdu_pack = HEADER_PDU + payload + option_payload
 
 
 class TestREGDOWNLINK(unittest.TestCase):
-    def test_from_to_pdu(self):
-        REGDOWNLINK = TTIABusStopMessage(init_data=REGDOWNLINK_PDU, init_type='pdu')
-        print('Testing on message id: ', REGDOWNLINK.header.MessageID)
-        print("ORG PDU:     ", REGDOWNLINK_PDU)
-        print("BYPASS PDU:  ", REGDOWNLINK.to_pdu())
-        print("json:        ", REGDOWNLINK.to_dict(), "\n")
-        self.assertEqual(REGDOWNLINK.to_pdu(), REGDOWNLINK_PDU)
+    def test_from_to_pdu_by_raw_pdu(self):
+        msg = TTIABusStopMessage(init_data=pdu_pack, init_type='pdu')
+        self.assertEqual(msg.to_pdu(), pdu_pack)
 
-    def test_from_to_dict(self):
-        msg = TTIABusStopMessage(init_data=MESSAGEID, init_type='default')
-        obj_dict = msg.to_dict()
-        print(obj_dict)
-        REGDOWNLINK = TTIABusStopMessage(init_data=obj_dict, init_type='dict')
-        self.assertEqual(REGDOWNLINK.to_dict(), obj_dict)
+    def test_from_to_dict_by_default_creation(self):
+        default_msg = TTIABusStopMessage(init_data=MESSAGEID, init_type='default')
+        obj_dict = default_msg.to_dict()
+        from_dict_msg = TTIABusStopMessage(init_data=obj_dict, init_type='dict')
+        self.assertEqual(from_dict_msg.to_dict(), obj_dict)

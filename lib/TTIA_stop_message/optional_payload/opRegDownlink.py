@@ -81,9 +81,9 @@ class OpRegDownlink(OpPayloadBase):
         self.WeekendShutdownTimeh = 15
         self.WeekendShutdownTimem = 0
         self.WeekendShutdownTimes = 0
-        self.District = '我是中文32Byte'
+        self.District = ''
         self.MsgStopDelay = 2
-        self.BootMessage = '我是中文32Byte'
+        self.BootMessage = ''
         self.IdleTime = 300
         self.EventReportPeriod = 300
         self.WeekDay = 1

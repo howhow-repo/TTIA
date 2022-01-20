@@ -14,7 +14,7 @@ class RegDownlink(PayloadBase):
         self.Result = payload[0]
         self.MsgTag = payload[1]  # 系統訊息
         self.StopCName = bytearray(payload[2]).decode('big5')
-        self.StopEName = bytearray(payload[3]).decode('big5')
+        self.StopEName = bytearray(payload[3]).decode('ascii')
         self.LongitudeDu = payload[4]
         self.LongitudeFen = payload[5]
         self.LongitudeMiao = payload[6]

@@ -17,14 +17,16 @@ HEADER_PDU = struct.pack('<4sBBHQHH',
                          65535,  # Sequence
                          len(payload))  # Len
 
-ReportUpdateGifUplink_PDU = HEADER_PDU + payload
+pdu_pack = HEADER_PDU + payload
 
 
 class TestReportUpdateGifUplink(unittest.TestCase):
-    def test_from_to_pdu(self):
-        ReportUpdateGifUplink = TTIABusStopMessage(init_data=ReportUpdateGifUplink_PDU, init_type='pdu')
-        print('Testing on message id: ', ReportUpdateGifUplink.header.MessageID)
-        print("ORG PDU:     ", ReportUpdateGifUplink)
-        print("BYPASS PDU:  ", ReportUpdateGifUplink.to_pdu())
-        print("json:        ", ReportUpdateGifUplink.to_dict(), '\n')
-        self.assertEqual( ReportUpdateGifUplink.to_pdu(), ReportUpdateGifUplink_PDU)
+    def test_from_to_pdu_by_raw_pdu(self):
+        msg = TTIABusStopMessage(init_data=pdu_pack, init_type='pdu')
+        self.assertEqual(msg.to_pdu(), pdu_pack)
+
+    def test_from_to_dict_by_default_creation(self):
+        default_msg = TTIABusStopMessage(init_data=MESSAGEID, init_type='default')
+        obj_dict = default_msg.to_dict()
+        from_dict_msg = TTIABusStopMessage(init_data=obj_dict, init_type='dict')
+        self.assertEqual(from_dict_msg.to_dict(), obj_dict)
