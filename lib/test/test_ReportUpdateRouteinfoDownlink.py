@@ -31,9 +31,8 @@ pdu_pack = HEADER_PDU + payload
 
 class TestReportUpdateRouteinfoDownlink(unittest.TestCase):
     def test_from_to_pdu(self):
-        def test_from_to_pdu_by_raw_pdu(self):
-            msg = TTIABusStopMessage(init_data=pdu_pack, init_type='pdu')
-            self.assertEqual(msg.to_pdu(), pdu_pack)
+        msg = TTIABusStopMessage(init_data=pdu_pack, init_type='pdu')
+        self.assertEqual(msg.to_pdu(), pdu_pack)
 
     def test_from_to_dict_by_default_creation(self):
         default_msg = TTIABusStopMessage(init_data=MESSAGEID, init_type='default')
