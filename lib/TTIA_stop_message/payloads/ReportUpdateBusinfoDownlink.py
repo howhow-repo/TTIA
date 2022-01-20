@@ -4,11 +4,8 @@ from .payload_base import PayloadBase
 
 
 class ReportUpdateBusinfoDownlink(PayloadBase):
-    """
-        Warning: This is now not following TTIA STOP Protocol.
-        Option payload has been combine with payload.
-    """
     message_id = 0x07
+    message_cname = "更新即時公車資訊訊息"
 
     def __init__(self, init_data, init_type):
         self.from_default()

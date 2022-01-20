@@ -4,6 +4,7 @@ from .payload_base import PayloadBase
 
 class ReportUpdateMsgTagUplink(PayloadBase):
     message_id = 0x06
+    message_cname = "更新站牌文字確認訊息"
 
     def __init__(self, init_data, init_type, buff=None, offset=0):
         super().__init__(init_data, init_type)

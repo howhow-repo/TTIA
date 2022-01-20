@@ -4,6 +4,7 @@ from .payload_base import PayloadBase
 
 class ReportSetBrightnessDownlink(PayloadBase):
     message_id = 0x0D
+    message_cname = "亮度設定"
 
     def from_pdu(self, pdu):
         payload = struct.unpack_from('<B', pdu)

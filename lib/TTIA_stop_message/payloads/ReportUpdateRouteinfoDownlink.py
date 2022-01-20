@@ -4,6 +4,7 @@ from .payload_base import PayloadBase
 
 class ReportUpdateRouteinfoDownlink(PayloadBase):
     message_id = 0x0B
+    message_cname = "路線資料設定訊息"
 
     def from_pdu(self, pdu):
         payload = struct.unpack_from('<H12s12sH', pdu)

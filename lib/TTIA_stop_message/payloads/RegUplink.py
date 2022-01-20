@@ -19,6 +19,7 @@ def fwversion_str_to_int_list(fw_str: str) -> list:
 
 class RegUplink(PayloadBase):
     message_id = 0x00
+    message_cname = "基本資料查詢訊息"
 
     def __init__(self, init_data, init_type):
         super().__init__(init_data, init_type)

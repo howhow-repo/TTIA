@@ -6,7 +6,7 @@ from .payloadcreator import PayloadCreator
 from .optionpayloadcreater import OptionPayloadCreater
 
 
-def is_json_format(msg):
+def is_format(msg):
     if 'header' in msg and 'payload' in msg:
         return True
     return False
@@ -15,12 +15,15 @@ def is_json_format(msg):
 class TTIABusStopMessage:
     def __init__(self, init_data, init_type):
         """
-        :param init_data:
-            bytes like obj if init_type == 'pdu'
-            dict obj if init_type == 'dict'
-            message id (int) if init_type == 'default'
-        :param init_type:
-            str: 'pdu' or 'json' or 'default'
+        Use cases:
+            Case1: init_data is bytes like pdu:
+                init_data = <bytes like obj>, init_type='pdu'
+
+            Case2: init_data is json like dict:
+                init_data = <dict>, init_type='dict'
+
+            Case3: Init an empty message with default property/value:
+                init_data = <don't care>, init_type='default'
         """
         self.header = None
         self.payload = None
@@ -44,17 +47,21 @@ class TTIABusStopMessage:
         :return:
 
         """
-        if len(pdu) < 20:
-            raise ValueError("input pdu is not long enough")
+        assert len(pdu) >= 20, "Every message with header should longer then 20 bytes."
 
         self.header = Header(init_data=pdu[:20], init_type='pdu')
 
-        if self.header.Len > len(pdu[20:]):
-            raise ValueError(f"input pdu has wrong payload length. \n"
-                             f"header.Len: {self.header.Len}, payload+option payload len:{len(pdu[20:])}")
+        assert len(pdu[20:]) >= self.header.Len, "payload length must longer than Len in header."
 
-        self.payload = PayloadCreator.create_payload_obj(pdu[20:20 + self.header.Len], self.header.MessageID)
-        self.option_payload = OptionPayloadCreater.create_option_payload_obj(pdu[20 + self.header.Len:], self.header.MessageID)
+        try:
+            self.payload = PayloadCreator.create_payload_obj(pdu[20:20 + self.header.Len], self.header.MessageID)
+        except Exception as e:
+            raise ValueError(f"Fail to init payload by given pdu. \n {e}")
+
+        try:
+            self.option_payload = OptionPayloadCreater.create_option_payload_obj(pdu[20 + self.header.Len:], self.header.MessageID)
+        except Exception as e:
+            raise ValueError(f"Fail to init option_payload by given pdu \n {e}")
 
     def to_pdu(self):
         payload_pdu = self.payload.to_pdu()
@@ -62,9 +69,9 @@ class TTIABusStopMessage:
         self.header.Len = len(payload_pdu)
         return self.header.to_pdu() + payload_pdu + option_payload_pdu
 
-    def from_dict(self, json):
+    def from_dict(self, dict):
         """
-        :param json:
+        :param dict:
             {
                 "header":{<header_json_format>},
                 "payload":{<payload_json_format>},
@@ -73,13 +80,13 @@ class TTIABusStopMessage:
         :return:
 
         """
-        if not is_json_format(json):
-            raise ValueError("input json has wrong format.")
+        if not is_format(dict):
+            raise ValueError("input json has no require keys. \n "
+                             "Please check Your input is a dict like {'header':{...},'payload':{...}}")
 
-        self.header = Header(init_data=json['header'], init_type='dict')
-        self.payload = PayloadCreator.create_payload_obj(json['payload'], self.header.MessageID)
-
-        self.option_payload = OptionPayloadCreater.create_option_payload_obj(json['option_payload'], self.header.MessageID)
+        self.header = Header(init_data=dict['header'], init_type='dict')
+        self.payload = PayloadCreator.create_payload_obj(dict['payload'], self.header.MessageID)
+        self.option_payload = OptionPayloadCreater.create_option_payload_obj(dict['option_payload'], self.header.MessageID)
 
     def to_dict(self):
         self.header.Len = len(self.payload.to_pdu())

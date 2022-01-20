@@ -4,6 +4,7 @@ from .payload_base import PayloadBase
 
 class ReportUpdateGifUplink(PayloadBase):
     message_id = 0x13
+    message_cname = "動態圖示確認訊息"
 
     def from_pdu(self, pdu):
         pass

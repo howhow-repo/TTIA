@@ -4,6 +4,7 @@ from .payload_base import PayloadBase
 
 class ReportRebootDownlink(PayloadBase):
     message_id = 0x10
+    message_cname = "重開通知訊息(系統軟體重置)"
 
     def from_pdu(self, pdu):
         pass

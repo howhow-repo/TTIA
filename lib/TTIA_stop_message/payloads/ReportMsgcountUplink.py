@@ -4,6 +4,7 @@ from .payload_base import PayloadBase
 
 class ReportMsgcountUplink(PayloadBase):
     message_id = 0x03
+    message_cname = "定時回報訊息"
 
     def __init__(self, init_data, init_type):
         super().__init__(init_data, init_type)

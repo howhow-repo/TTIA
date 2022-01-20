@@ -4,6 +4,7 @@ from .payload_base import PayloadBase
 
 class ReportUpdateGifDownlink(PayloadBase):
     message_id = 0x12
+    message_cname = "動態圖示通知訊息"
 
     def from_pdu(self, pdu):
         payload = struct.unpack_from('<HH160s160s', pdu)

@@ -4,6 +4,7 @@ from .payload_base import PayloadBase
 
 class ReportAbnormalDownlink(PayloadBase):
     message_id = 0x0A
+    message_cname = "異常回報確認訊息"
 
     def __init__(self, init_data, init_type):
         super().__init__(init_data, init_type)

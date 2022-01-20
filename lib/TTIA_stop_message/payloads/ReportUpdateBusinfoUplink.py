@@ -4,6 +4,7 @@ from .payload_base import PayloadBase
 
 class ReportUpdateBusinfoUplink(PayloadBase):
     message_id = 0x08
+    message_cname = "更新即時公車資訊確認訊息"
 
     def __init__(self, init_data, init_type):
         super().__init__(init_data, init_type)
