@@ -1,7 +1,7 @@
 import struct
-import unittest
-from lib import MessageConstants, TTIABusStopMessage
 
+from .test_base_case import TestBaseCase
+from lib import MessageConstants
 
 MESSAGEID = 0x01
 Provider = 65535
@@ -98,19 +98,6 @@ HEADER_PDU = struct.pack('<4sBBHQHH',
 pdu_pack = HEADER_PDU + payload + option_payload
 
 
-class TestREGDOWNLINK(unittest.TestCase):
-    def test_from_to_pdu_by_raw_pdu(self):
-        msg = TTIABusStopMessage(init_data=pdu_pack, init_type='pdu')
-        self.assertEqual(msg.to_pdu(), pdu_pack)
-
-    def test_from_to_dict_by_default_creation(self):
-        default_msg = TTIABusStopMessage(init_data=MESSAGEID, init_type='default')
-        obj_dict = default_msg.to_dict()
-        from_dict_msg = TTIABusStopMessage(init_data=obj_dict, init_type='dict')
-        self.assertEqual(from_dict_msg.to_dict(), obj_dict)
-
-    def test_from_to_pdu_by_default_creation(self):
-        default_msg = TTIABusStopMessage(init_data=MESSAGEID, init_type='default')
-        msg = TTIABusStopMessage(init_data=default_msg.to_pdu(), init_type='pdu')
-        self.assertEqual(msg.to_pdu(), default_msg.to_pdu())
-        self.assertEqual(msg.to_dict(), default_msg.to_dict())
+class TestREGDOWNLINK(TestBaseCase):
+    pdu_pack = pdu_pack
+    MESSAGEID = MESSAGEID
