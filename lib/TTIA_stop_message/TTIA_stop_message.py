@@ -76,9 +76,10 @@ class TTIABusStopMessage:
         if not is_json_format(json):
             raise ValueError("input json has wrong format.")
 
-        self.header.from_dict(json['header'])
+        self.header = Header(init_data=json['header'], init_type='dict')
         self.payload = PayloadCreator.create_payload_obj(json['payload'], self.header.MessageID)
-        self.option_payload = OptionPayloadCreater.create_option_payload_obj(json['payload'], self.header.MessageID)
+
+        self.option_payload = OptionPayloadCreater.create_option_payload_obj(json['option_payload'], self.header.MessageID)
 
     def to_dict(self):
         self.header.Len = len(self.payload.to_pdu())
@@ -93,5 +94,8 @@ class TTIABusStopMessage:
         self.header = Header(b'', 'default')
         self.payload = PayloadCreator.create_payload_obj(None, message_id)
         payload_pdu = self.payload.to_pdu()
+
+        self.header.MessageID = message_id
         self.header.Len = len(payload_pdu)
+
         self.option_payload = OptionPayloadCreater.create_option_payload_obj(None, message_id)

@@ -1,5 +1,5 @@
 class MessageBase:
-    def __init__(self, init_data: bytes, init_type: str):
+    def __init__(self, init_data, init_type: str):
         """
         To init every TTIA Message, you have to define the raw data and type with 'pdu' or 'json'
         :param init_data:
@@ -9,7 +9,7 @@ class MessageBase:
         """
         if init_type == 'pdu':
             self.from_pdu(init_data)
-        elif init_type == 'json':
+        elif init_type == 'dict':
             self.from_dict(init_data)
         elif init_type == 'default':
             self.from_default()

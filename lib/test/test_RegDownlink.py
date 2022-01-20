@@ -9,7 +9,7 @@ Provider = 65535
 
 Result = 0
 MsgTag = 0  # 系統訊息
-StopCName = '中文站名'
+StopCName = '中文站名111'
 StopEName = 'English Stop name'
 LongitudeDu = 0
 LongitudeFen = 0
@@ -104,9 +104,12 @@ class TestREGDOWNLINK(unittest.TestCase):
         print('Testing on message id: ', REGDOWNLINK.header.MessageID)
         print("ORG PDU:     ", REGDOWNLINK_PDU)
         print("BYPASS PDU:  ", REGDOWNLINK.to_pdu())
-        print("json:        ", REGDOWNLINK.to_dict())
+        print("json:        ", REGDOWNLINK.to_dict(), "\n")
         self.assertEqual(REGDOWNLINK.to_pdu(), REGDOWNLINK_PDU)
 
-
-if __name__ == '__main__':
-    unittest.main()
+    def test_from_to_dict(self):
+        msg = TTIABusStopMessage(init_data=MESSAGEID, init_type='default')
+        obj_dict = msg.to_dict()
+        print(obj_dict)
+        REGDOWNLINK = TTIABusStopMessage(init_data=obj_dict, init_type='dict')
+        self.assertEqual(REGDOWNLINK.to_dict(), obj_dict)

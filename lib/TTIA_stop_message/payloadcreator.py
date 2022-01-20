@@ -18,7 +18,7 @@ class PayloadCreator:
         if type(payload) == bytes:
             paras = {'init_data': payload, 'init_type': 'pdu'}
         elif type(payload) == dict:
-            paras = {'init_data': payload, 'init_type': 'json'}
+            paras = {'init_data': payload, 'init_type': 'dict'}
         elif payload is None:
             paras = {'init_data': b'', 'init_type': 'default'}
         else:

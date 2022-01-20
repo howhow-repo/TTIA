@@ -1,10 +1,9 @@
 import struct
-from abc import ABC
 
 from .message_base import MessageBase, MessageConstants
 
 
-class Header(MessageBase, ABC):
+class Header(MessageBase):
 
     def from_pdu(self, header_pdu, offset=0):
         header = struct.unpack('<4sBBHQHH', header_pdu)
@@ -44,7 +43,7 @@ class Header(MessageBase, ABC):
 
     def from_default(self):
         self.ProtocolID = MessageConstants.ProtocolID
-        self.ProtocolVer = MessageConstants.ProtocolID
+        self.ProtocolVer = MessageConstants.ProtocolVer
         self.MessageID = 0
         self.Provider = 0
         self.StopID = 0
