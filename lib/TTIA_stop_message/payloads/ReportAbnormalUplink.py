@@ -26,7 +26,10 @@ class ReportAbnormalUplink(PayloadBase):
         self.RcvMinute = payload[12]
         self.RcvSecond = payload[13]
 
+        self.self_assert()
+
     def to_pdu(self):
+        self.self_assert()
         return struct.pack('<BBBBBBBBBBBBBB',
                            self.StatusCode,
                            self.Type,
@@ -57,24 +60,27 @@ class ReportAbnormalUplink(PayloadBase):
         self.RcvDay = input_dict['RcvDay']
         self.RcvHour = input_dict['RcvHour']
         self.RcvMinute = input_dict['RcvMinute']
-        self.RcvSecond= input_dict['RcvSecond']
+        self.RcvSecond = input_dict['RcvSecond']
+        self.self_assert()
 
     def to_dict(self):
+        self.self_assert()
+
         r = {
             'StatusCode': self.StatusCode,
-            'Type':self.Type,
-            'TransYear':self.TransYear,
-            'TransMonth':self.TransMonth,
-            'TransDay':self.TransDay,
-            'TransHour':self.TransHour,
-            'TransMinute':self.TransMinute,
-            'TransSecond':self.TransSecond,
-            'RcvYear':self.RcvYear,
-            'RcvMonth':self.RcvMonth,
-            'RcvDay':self.RcvDay,
-            'RcvHour':self.RcvHour,
-            'RcvMinute':self.RcvMinute,
-            'RcvSecond':self.RcvSecond
+            'Type': self.Type,
+            'TransYear': self.TransYear,
+            'TransMonth': self.TransMonth,
+            'TransDay': self.TransDay,
+            'TransHour': self.TransHour,
+            'TransMinute': self.TransMinute,
+            'TransSecond': self.TransSecond,
+            'RcvYear': self.RcvYear,
+            'RcvMonth': self.RcvMonth,
+            'RcvDay': self.RcvDay,
+            'RcvHour': self.RcvHour,
+            'RcvMinute': self.RcvMinute,
+            'RcvSecond': self.RcvSecond
         }
         return r
 
@@ -93,3 +99,17 @@ class ReportAbnormalUplink(PayloadBase):
         self.RcvHour = 0
         self.RcvMinute = 0
         self.RcvSecond = 0
+
+    def self_assert(self):
+        assert self.StatusCode in [0, 1, 2], "站牌錯誤代碼 0:正常 1:站牌斷線 2:字幕機斷線"
+        assert self.Type in [1, 2], "訊息種類 1:定期 2:非定期"
+        assert 1 <= self.TransMonth <= 12
+        assert 1 <= self.TransDay <= 31
+        assert 0 <= self.TransHour <= 23
+        assert 0 <= self.TransMinute <= 59
+        assert 0 <= self.TransSecond <= 59
+        assert 1 <= self.RcvMonth <= 12
+        assert 1 <= self.RcvDay <= 31
+        assert 0 <= self.RcvHour <= 59
+        assert 0 <= self.RcvMinute <= 59
+        assert 0 <= self.RcvSecond <= 59

@@ -15,8 +15,10 @@ class ReportUpdateMsgTagUplink(PayloadBase):
         self.MsgNo = payload[1]
         self.MsgStatus = payload[2]
         self.Reserved = payload[3]
+        self.self_assert()
 
     def to_pdu(self):
+        self.self_assert()
         return struct.pack('<HHBB', self.MsgTag, self.MsgNo, self.MsgStatus, self.Reserved)
 
     def from_dict(self, input_dict):
@@ -24,8 +26,10 @@ class ReportUpdateMsgTagUplink(PayloadBase):
         self.MsgNo = input_dict['MsgNo']
         self.MsgStatus = input_dict['MsgStatus']
         self.Reserved = input_dict['Reserved']
+        self.self_assert()
 
     def to_dict(self):
+        self.self_assert()
         r = {
             'MsgTag': self.MsgTag,
             'MsgNo': self.MsgNo,
@@ -39,3 +43,6 @@ class ReportUpdateMsgTagUplink(PayloadBase):
         self.MsgNo = 0
         self.MsgStatus = 0
         self.Reserved = 0
+
+    def self_assert(self):
+        assert self.MsgStatus in [0, 1], "訊息更新狀態 0:訊息更新失敗 1:訊息更新成功"

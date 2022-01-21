@@ -36,8 +36,10 @@ class RegUplink(PayloadBase):
         self.IMEI = payload[1].decode('utf-8').rstrip('\0')
         self.FirmwareVersion = str(payload[2]) + '.' + str(payload[3]) + str(payload[4])
         self.Reserved = payload[5]
+        self.self_assert()
 
     def to_pdu(self):
+        self.self_assert()
         fv1, fv2, fv3 = fwversion_str_to_int_list(self.FirmwareVersion)
         IMSI = bytearray(self.IMSI.encode('ascii'))
         IMEI = bytearray(self.IMEI.encode('ascii'))
@@ -48,8 +50,10 @@ class RegUplink(PayloadBase):
         self.IMEI = input_dict['IMEI']
         self.FirmwareVersion = input_dict['FirmwareVersion']
         self.Reserved = input_dict['Reserved']
+        self.self_assert()
 
     def to_dict(self):
+        self.self_assert()
         r = {
             'IMSI': self.IMSI,
             'IMEI': self.IMEI,
@@ -63,3 +67,6 @@ class RegUplink(PayloadBase):
         self.IMEI = ''
         self.FirmwareVersion = '1.00'
         self.Reserved = 0
+
+    def self_assert(self):
+        pass

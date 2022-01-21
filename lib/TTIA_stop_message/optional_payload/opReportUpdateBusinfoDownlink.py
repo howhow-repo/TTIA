@@ -17,8 +17,20 @@ class OpReportUpdateBusinfoDownlink(OpPayloadBase):
         self.RouteMsgEContent = bytearray(payload[4]).decode('ascii').rstrip('\x00')
         self.VoiceAlertMode = payload[5]
         self.Sequence = payload[6]
+        self.self_assert()
 
     def to_pdu(self):
+        self.self_assert()
+        MsgCContent = bytearray(self.MsgCContent.encode("big5"))
+        MsgEContent = bytearray(self.MsgEContent.encode("ascii"))
+        assert len(MsgCContent) <= 12, "MsgCContent overflow, please make sure it beneath 12 bytes"
+        assert len(MsgEContent) <= 12, "MsgEContent overflow, please make sure it beneath 12 bytes"
+
+        RouteMsgCContent = bytearray(self.RouteMsgCContent.encode("big5"))
+        RouteMsgEContent = bytearray(self.RouteMsgEContent.encode("ascii"))
+        assert len(RouteMsgCContent) <= 24, "RouteMsgCContent overflow, please make sure it beneath 24 bytes"
+        assert len(RouteMsgEContent) <= 24, "RouteMsgEContent overflow, please make sure it beneath 24 bytes"
+
         return struct.pack('<B12s12s24s24sBH', self.SpectialEstimateTime,
                            self.MsgCContent.encode("big5"),
                            self.MsgEContent.encode('ascii'),
@@ -36,8 +48,10 @@ class OpReportUpdateBusinfoDownlink(OpPayloadBase):
         self.RouteMsgEContent = input_dict['RouteMsgEContent']
         self.VoiceAlertMode = input_dict['VoiceAlertMode']
         self.Sequence = input_dict['Sequence']
+        self.self_assert()
 
     def to_dict(self):
+        self.self_assert()
         r = {
             'SpectialEstimateTime': self.SpectialEstimateTime,
             'MsgCContent': self.MsgCContent,
@@ -57,3 +71,10 @@ class OpReportUpdateBusinfoDownlink(OpPayloadBase):
         self.RouteMsgEContent = ''
         self.VoiceAlertMode = 0
         self.Sequence = 0
+
+    def self_assert(self):
+        assert self.SpectialEstimateTime in range(0, 8), \
+            "特定預估到站資訊 " \
+            "0:一般(以EstimateTime為預估到站時間 " \
+            "1:尚未發車 2:交管不停靠 3:末班車已過 4:今日未營運 5:進站中 6:即將到站 7:發車資訊 8:特殊中英文顯示資訊"
+        assert self.VoiceAlertMode in [0, 1], "廣播開關設定 0:功能關閉 1:功能開啟 (功能開啟[即將到站 預估時間< 180秒])"

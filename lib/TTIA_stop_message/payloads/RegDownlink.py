@@ -41,8 +41,14 @@ class RegDownlink(PayloadBase):
 
     def to_pdu(self):
         StopCName = bytearray(self.StopCName.encode("big5"))
+        assert len(StopCName) <= 32, "StopCName overflow, please make sure it beneath 32 bytes"
         StopEName = bytearray(self.StopEName.encode("ascii"))
+        assert len(StopEName) <= 32, "StopEName overflow, please make sure it beneath 32 bytes"
         IdleMessage = bytearray(self.IdleMessage.encode("big5"))
+        assert len(IdleMessage) <= 32, "IdleMessage overflow, please make sure it beneath 32 bytes"
+
+        self.self_assert()
+
         return struct.pack('<BH32s32sBBHBBHHBBBBBBB32sBBBBBBBBBH',
                            self.Result, self.MsgTag,
                            StopCName, StopEName,
@@ -68,14 +74,8 @@ class RegDownlink(PayloadBase):
         self.LatitudeFen = input_dict['LatitudeFen']
         self.LatitudeMiao = input_dict['LatitudeMiao']
         self.TypeID = input_dict['TypeID']
-
         self.BootTime = input_dict['BootTime']
-        assert type(self.BootTime) == time, \
-            "type of 'WeekendBootTime' must be <time>. Try using 'from datetime import time'"
         self.ShutdownTime = input_dict['ShutdownTime']
-        assert type(self.ShutdownTime) == time, \
-            "type of 'WeekendShutdownTime' must be <time>. Try using 'from datetime import time'"
-
         self.MessageGroupID = input_dict['MessageGroupID']
         self.IdleMessage = input_dict['IdleMessage']
         self.Year = input_dict['Year']
@@ -89,11 +89,10 @@ class RegDownlink(PayloadBase):
         self.DistanceFunctionMode = input_dict['DistanceFunctionMode']
         self.ReportPeriod = input_dict['ReportPeriod']
 
+        self.self_assert()
+
     def to_dict(self):
-        assert type(self.BootTime) == time, \
-            "type of 'WeekendBootTime' must be <time>. Try using 'from datetime import time'"
-        assert type(self.ShutdownTime) == time, \
-            "type of 'WeekendShutdownTime' must be <time>. Try using 'from datetime import time'"
+        self.self_assert()
         r = {
             'Result': self.Result,
             'MsgTag': self.MsgTag,
@@ -148,4 +147,12 @@ class RegDownlink(PayloadBase):
         self.DisplayMode = 0
         self.TextRollingSpeed = 0
         self.DistanceFunctionMode = 0
-        self.ReportPeriod = 0
+        self.ReportPeriod = 60
+
+    def self_assert(self):
+        assert type(self.BootTime) == time, \
+            "type of 'BootTime' must be <time>. Try using 'from datetime import time'"
+        assert type(self.ShutdownTime) == time, \
+            "type of 'ShutdownTime' must be <time>. Try using 'from datetime import time'"
+        assert 0 <= self.TextRollingSpeed <= 9, "TextRollingSpeed: 0(min)~9(max)"
+        assert self.DistanceFunctionMode in [0, 1], "DistanceFunctionMode 0:disable; 1:enable"

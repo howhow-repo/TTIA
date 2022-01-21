@@ -14,14 +14,20 @@ class ReportAbnormalDownlink(PayloadBase):
         self.MsgStatus = payload[0]
         self.Reserved = payload[1]
 
+        self.self_assert()
+
     def to_pdu(self):
+        self.self_assert()
         return struct.pack('<BB', self.MsgStatus, self.Reserved)
 
     def from_dict(self, input_dict):
         self.MsgStatus = input_dict['MsgStatus']
         self.Reserved = input_dict['Reserved']
 
+        self.self_assert()
+
     def to_dict(self):
+        self.self_assert()
         r = {
             'MsgStatus': self.MsgStatus,
             'Reserved': self.Reserved
@@ -31,3 +37,6 @@ class ReportAbnormalDownlink(PayloadBase):
     def from_default(self):
         self.MsgStatus = 1
         self.Reserved = 0
+
+    def self_assert(self):
+        assert self.MsgStatus in [0, 1], "Wrong MsgStatus. 0:fail 1:success"

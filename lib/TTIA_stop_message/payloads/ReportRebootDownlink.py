@@ -21,3 +21,6 @@ class ReportRebootDownlink(PayloadBase):
 
     def from_default(self):
         pass
+
+    def self_assert(self):
+        pass

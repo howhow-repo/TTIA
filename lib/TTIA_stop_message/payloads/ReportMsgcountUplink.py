@@ -31,3 +31,6 @@ class ReportMsgcountUplink(PayloadBase):
     def from_default(self):
         self.SentCount = 0
         self.RecvCount = 0
+
+    def self_assert(self):
+        pass

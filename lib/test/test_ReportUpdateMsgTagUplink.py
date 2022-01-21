@@ -10,7 +10,7 @@ Provider = 65535
 
 MsgTag = 0
 MsgNo = 0
-MsgStatus = 12
+MsgStatus = 1
 Reserved = 0
 
 payload = struct.pack('<HHBB', MsgTag, MsgNo, MsgStatus, Reserved)

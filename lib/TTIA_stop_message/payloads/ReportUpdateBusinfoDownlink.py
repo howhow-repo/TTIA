@@ -35,8 +35,10 @@ class ReportUpdateBusinfoDownlink(PayloadBase):
         self.RcvMinute = payload[19]
         self.RcvSecond = payload[20]
         self.Reserved = payload[21]
+        self.self_assert()
 
     def to_pdu(self):
+        self.self_assert()
         return struct.pack('<HHQQBHHBBBBBBBBBBBBBBB', self.RouteID, self.BusID, self.CurrentStop,
                            self.DestinationStop, self.IsLastBus, self.EstimateTime, self.StopDistance,
                            self.Direction,
@@ -68,8 +70,10 @@ class ReportUpdateBusinfoDownlink(PayloadBase):
         self.RcvMinute = input_dict['RcvMinute']
         self.RcvSecond = input_dict['RcvSecond']
         self.Reserved = input_dict['Reserved']
+        self.self_assert()
 
     def to_dict(self):
+        self.self_assert()
         r = {
             'RouteID': self.RouteID,
             'BusID': self.BusID,
@@ -105,7 +109,7 @@ class ReportUpdateBusinfoDownlink(PayloadBase):
         self.EstimateTime = 0
         self.StopDistance = 0
         self.Direction = 0
-        self.Type = 0
+        self.Type = 1
         self.TransYear = 2000
         self.TransMonth = 1
         self.TransDay = 1
@@ -121,4 +125,18 @@ class ReportUpdateBusinfoDownlink(PayloadBase):
         self.Reserved = 0
         self.min = 0
 
+    def self_assert(self):
+        assert self.IsLastBus in [0, 1], "是否為末班車 0:非末班車 1:末班車"
+        assert self.Direction in range(0, 3), "方向 0:去程 1:返程 2:尚未發車 3:末班已離駛"
+        assert self.Type in [1, 2], "本訊息種類 1:定期 2:非定期"
+        assert 1 <= self.TransMonth <= 12
+        assert 1 <= self.TransDay <= 31
+        assert 0 <= self.TransHour <= 23
+        assert 0 <= self.TransMinute <= 59
+        assert 0 <= self.TransSecond <= 59
+        assert 1 <= self.RcvMonth <= 12
+        assert 1 <= self.RcvDay <= 31
+        assert 0 <= self.RcvHour <= 59
+        assert 0 <= self.RcvMinute <= 59
+        assert 0 <= self.RcvSecond <= 59
 

@@ -12,8 +12,14 @@ class ReportUpdateGifDownlink(PayloadBase):
         self.PicNum = payload[1]
         self.PicURL = bytearray(payload[2]).decode('ascii').rstrip('\x00')
         self.MsgContent = bytearray(payload[3]).decode('big5').rstrip('\x00')
+        self.self_assert()
 
     def to_pdu(self):
+        self.self_assert()
+        assert len(bytearray(self.PicURL.encode('ascii'))) <= 160, \
+            "PicURL overflow, please make sure it beneath 160 bytes"
+        assert len(bytearray(self.MsgContent.encode('big5'))) <= 160, \
+            "MsgContent overflow, please make sure it beneath 160 bytes"
         return struct.pack("<HH160s160s", self.PicNo, self.PicNum,
                            bytearray(self.PicURL.encode('ascii')),
                            bytearray(self.MsgContent.encode('big5'))
@@ -24,8 +30,10 @@ class ReportUpdateGifDownlink(PayloadBase):
         self.PicNum = input_dict['PicNum']
         self.PicURL = input_dict['PicURL']
         self.MsgContent = input_dict['MsgContent']
+        self.self_assert()
 
     def to_dict(self):
+        self.self_assert()
         r = {
             'PicNo': self.PicNo,
             'PicNum': self.PicNum,
@@ -39,3 +47,6 @@ class ReportUpdateGifDownlink(PayloadBase):
         self.PicNum = 0
         self.PicURL = ''
         self.MsgContent = ''
+
+    def self_assert(self):
+        pass

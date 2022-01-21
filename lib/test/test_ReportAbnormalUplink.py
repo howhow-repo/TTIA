@@ -9,7 +9,7 @@ Provider = 65535
 IMSI = 'IMSI123456'
 IMEI = 'IMEI7891'
 
-StatusCode = 255
+StatusCode = 1
 Type = 1
 TransYear = 2021
 TransMonth = 1

@@ -9,14 +9,18 @@ class ReportSetBrightnessDownlink(PayloadBase):
     def from_pdu(self, pdu):
         payload = struct.unpack_from('<B', pdu)
         self.LightSet = payload[0]
+        self.self_assert()
 
     def to_pdu(self):
+        self.self_assert()
         return struct.pack('<B', self.LightSet)
 
     def from_dict(self, input_dict):
         self.LightSet = input_dict['LightSet']
+        self.self_assert()
 
     def to_dict(self):
+        self.self_assert()
         r = {
             'LightSet': self.LightSet,
         }
@@ -24,3 +28,6 @@ class ReportSetBrightnessDownlink(PayloadBase):
 
     def from_default(self):
         self.LightSet = 15
+
+    def self_assert(self):
+        assert 0 <= self.LightSet <= 15, "亮度設定 0:最暗 15:最亮"
