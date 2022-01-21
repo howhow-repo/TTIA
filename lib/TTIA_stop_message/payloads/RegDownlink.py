@@ -11,7 +11,7 @@ class RegDownlink(PayloadBase):
     def __init__(self, init_data, init_type):
         super().__init__(init_data, init_type)
 
-    def from_pdu(self, pdu):
+    def from_pdu(self, pdu: bytes):
         payload = struct.unpack_from('<BH32s32sBBHBBHHBBBBBBB32sBBBBBBBBBH', pdu)
         self.Result = payload[0]
         self.MsgTag = payload[1]  # 系統訊息
@@ -39,7 +39,7 @@ class RegDownlink(PayloadBase):
         self.DistanceFunctionMode = payload[27]
         self.ReportPeriod = payload[28]
 
-    def to_pdu(self):
+    def to_pdu(self) -> bytes:
         StopCName = bytearray(self.StopCName.encode("big5"))
         assert len(StopCName) <= 32, "StopCName overflow, please make sure it beneath 32 bytes"
         StopEName = bytearray(self.StopEName.encode("ascii"))
@@ -62,7 +62,7 @@ class RegDownlink(PayloadBase):
                            self.DisplayMode, self.TextRollingSpeed, self.DistanceFunctionMode, self.ReportPeriod
                            )
 
-    def from_dict(self, input_dict):
+    def from_dict(self, input_dict: dict):
         self.Result = input_dict['Result']
         self.MsgTag = input_dict['MsgTag']  # 系統訊息
         self.StopCName = input_dict['StopCName']
@@ -91,7 +91,7 @@ class RegDownlink(PayloadBase):
 
         self.self_assert()
 
-    def to_dict(self):
+    def to_dict(self) -> dict:
         self.self_assert()
         r = {
             'Result': self.Result,
@@ -124,7 +124,7 @@ class RegDownlink(PayloadBase):
 
     def from_default(self):
         self.Result = 0
-        self.MsgTag = 0  # 系統訊息
+        self.MsgTag = 0
         self.StopCName = ''
         self.StopEName = ''
         self.LongitudeDu = 0

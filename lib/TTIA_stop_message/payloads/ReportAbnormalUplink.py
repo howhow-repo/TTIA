@@ -9,7 +9,7 @@ class ReportAbnormalUplink(PayloadBase):
     def __init__(self, init_data, init_type):
         super().__init__(init_data, init_type)
 
-    def from_pdu(self, pdu):
+    def from_pdu(self, pdu: bytes):
         payload = struct.unpack_from('<BBBBBBBBBBBBBB', pdu)
         self.StatusCode = payload[0]
         self.Type = payload[1]
@@ -28,7 +28,7 @@ class ReportAbnormalUplink(PayloadBase):
 
         self.self_assert()
 
-    def to_pdu(self):
+    def to_pdu(self) -> bytes:
         self.self_assert()
         return struct.pack('<BBBBBBBBBBBBBB',
                            self.StatusCode,
@@ -46,7 +46,7 @@ class ReportAbnormalUplink(PayloadBase):
                            self.RcvMinute,
                            self.RcvSecond)
 
-    def from_dict(self, input_dict):
+    def from_dict(self, input_dict: dict):
         self.StatusCode = input_dict['StatusCode']
         self.Type = input_dict['Type']
         self.TransYear = input_dict['TransYear']
@@ -63,7 +63,7 @@ class ReportAbnormalUplink(PayloadBase):
         self.RcvSecond = input_dict['RcvSecond']
         self.self_assert()
 
-    def to_dict(self):
+    def to_dict(self) -> dict:
         self.self_assert()
 
         r = {

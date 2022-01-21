@@ -11,7 +11,7 @@ class ReportUpdateBusinfoDownlink(PayloadBase):
         self.from_default()
         super().__init__(init_data, init_type)
 
-    def from_pdu(self, pdu):
+    def from_pdu(self, pdu: bytes):
         payload = struct.unpack_from('<HHQQBHHBBBBBBBBBBBBBBB', pdu)
         self.RouteID = payload[0]
         self.BusID = payload[1]
@@ -37,7 +37,7 @@ class ReportUpdateBusinfoDownlink(PayloadBase):
         self.Reserved = payload[21]
         self.self_assert()
 
-    def to_pdu(self):
+    def to_pdu(self) -> bytes:
         self.self_assert()
         return struct.pack('<HHQQBHHBBBBBBBBBBBBBBB', self.RouteID, self.BusID, self.CurrentStop,
                            self.DestinationStop, self.IsLastBus, self.EstimateTime, self.StopDistance,
@@ -47,7 +47,7 @@ class ReportUpdateBusinfoDownlink(PayloadBase):
                            self.RcvYear - 2000, self.RcvMonth, self.RcvDay, self.RcvHour, self.RcvMinute,
                            self.RcvSecond, self.Reserved,)
 
-    def from_dict(self, input_dict):
+    def from_dict(self, input_dict: dict):
         self.RouteID = input_dict['RouteID']
         self.BusID = input_dict['BusID']
         self.CurrentStop = input_dict['CurrentStop']
@@ -72,7 +72,7 @@ class ReportUpdateBusinfoDownlink(PayloadBase):
         self.Reserved = input_dict['Reserved']
         self.self_assert()
 
-    def to_dict(self):
+    def to_dict(self) -> dict:
         self.self_assert()
         r = {
             'RouteID': self.RouteID,

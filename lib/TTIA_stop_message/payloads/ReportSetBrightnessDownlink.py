@@ -6,20 +6,20 @@ class ReportSetBrightnessDownlink(PayloadBase):
     message_id = 0x0D
     message_cname = "亮度設定"
 
-    def from_pdu(self, pdu):
+    def from_pdu(self, pdu: bytes):
         payload = struct.unpack_from('<B', pdu)
         self.LightSet = payload[0]
         self.self_assert()
 
-    def to_pdu(self):
+    def to_pdu(self) -> bytes:
         self.self_assert()
         return struct.pack('<B', self.LightSet)
 
-    def from_dict(self, input_dict):
+    def from_dict(self, input_dict: dict):
         self.LightSet = input_dict['LightSet']
         self.self_assert()
 
-    def to_dict(self):
+    def to_dict(self) -> dict:
         self.self_assert()
         r = {
             'LightSet': self.LightSet,

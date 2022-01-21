@@ -9,16 +9,16 @@ class ReportMsgcountDownlink(PayloadBase):
     def __init__(self, init_data, init_type):
         super().__init__(init_data, init_type)
 
-    def from_pdu(self, pdu):
+    def from_pdu(self, pdu: bytes):
         pass
 
-    def to_pdu(self):
+    def to_pdu(self) -> bytes:
         return b''
 
-    def from_dict(self, input_dict):
+    def from_dict(self, input_dict: dict):
         pass
 
-    def to_dict(self):
+    def to_dict(self) -> dict:
         r = {}
         return r
 

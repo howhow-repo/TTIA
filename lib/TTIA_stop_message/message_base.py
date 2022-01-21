@@ -14,16 +14,16 @@ class MessageBase:
         elif init_type == 'default':
             self.from_default()
 
-    def from_pdu(self, pdu):
+    def from_pdu(self, pdu: bytes):
         raise NotImplementedError
 
-    def to_pdu(self):
+    def to_pdu(self) -> bytes:
         raise NotImplementedError
 
-    def from_dict(self, input_dict):
+    def from_dict(self, input_dict: dict):
         raise NotImplementedError
 
-    def to_dict(self):
+    def to_dict(self) -> dict:
         raise NotImplementedError
 
     def from_default(self):

@@ -1,14 +1,5 @@
 import unittest
+from lib.TTIA_stop_message.test import *
 
-from lib.test import \
-    TestREGUPLINK, TestREGDOWNLINK, \
-    TestReportBaseMsgTagUplink, TestReportMsgcountDownlink,\
-    TestReportMsgcountUplink, TestReportUpdateMsgTagDownlink, TestReportUpdateMsgTagUplink, \
-    TestReportUpdateBusinfoUplink, TestReportUpdateBusinfoDownlink, \
-    TestReportAbnormalUplink, TestReportAbnormalDownlink,\
-    TestReportUpdateRouteinfoDownlink, TestReportUpdateRouteinfoUplink, \
-    TestReportSetBrightnessDownlink, TestReportSetBrightnessUplink, \
-    TestReportRebootDownlink, TestReportRebootUplink,  \
-    TestReportUpdateGifDownlink, TestReportUpdateGifUplink
 
 unittest.main()
