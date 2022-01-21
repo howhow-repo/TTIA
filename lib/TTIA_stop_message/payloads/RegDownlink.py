@@ -1,6 +1,7 @@
 import struct
 
 from .payload_base import PayloadBase
+from datetime import time
 
 
 class RegDownlink(PayloadBase):
@@ -23,12 +24,8 @@ class RegDownlink(PayloadBase):
         self.LatitudeFen = payload[8]
         self.LatitudeMiao = payload[9]
         self.TypeID = payload[10]
-        self.BootTimeh = payload[11]
-        self.BootTimem = payload[12]
-        self.BootTimes = payload[13]
-        self.ShutdownTimeh = payload[14]
-        self.ShutdownTimem = payload[15]
-        self.ShutdownTimes = payload[16]
+        self.BootTime = time(payload[11], payload[12], payload[13])
+        self.ShutdownTime = time(payload[14], payload[15], payload[16])
         self.MessageGroupID = payload[17]
         self.IdleMessage = (payload[18].decode('big5')).rstrip('\x00')
         self.Year = payload[19] + 2000
@@ -47,48 +44,56 @@ class RegDownlink(PayloadBase):
         StopEName = bytearray(self.StopEName.encode("ascii"))
         IdleMessage = bytearray(self.IdleMessage.encode("big5"))
         return struct.pack('<BH32s32sBBHBBHHBBBBBBB32sBBBBBBBBBH',
-                           self.Result,
-                           self.MsgTag,
-                           StopCName, StopEName, self.LongitudeDu, self.LongitudeFen, self.LongitudeMiao,
+                           self.Result, self.MsgTag,
+                           StopCName, StopEName,
+                           self.LongitudeDu, self.LongitudeFen, self.LongitudeMiao,
                            self.LatitudeDu, self.LatitudeFen, self.LatitudeMiao,
-                           self.TypeID, self.BootTimeh, self.BootTimem, self.BootTimes, self.ShutdownTimeh,
-                           self.ShutdownTimem, self.ShutdownTimes, self.MessageGroupID, IdleMessage,
+                           self.TypeID,
+                           self.BootTime.hour, self.BootTime.minute, self.BootTime.second,
+                           self.ShutdownTime.hour, self.ShutdownTime.minute, self.ShutdownTime.second,
+                           self.MessageGroupID, IdleMessage,
                            (self.Year - 2000), self.Month, self.Day, self.Hour, self.Minute, self.Second,
                            self.DisplayMode, self.TextRollingSpeed, self.DistanceFunctionMode, self.ReportPeriod
                            )
 
-    def from_dict(self, json):
-        self.Result = json['Result']
-        self.MsgTag = json['MsgTag']  # 系統訊息
-        self.StopCName = json['StopCName']
-        self.StopEName = json['StopEName']
-        self.LongitudeDu = json['LongitudeDu']
-        self.LongitudeFen = json['LongitudeFen']
-        self.LongitudeMiao = json['LongitudeMiao']
-        self.LatitudeDu = json['LatitudeDu']
-        self.LatitudeFen = json['LatitudeFen']
-        self.LatitudeMiao = json['LatitudeMiao']
-        self.TypeID = json['TypeID']
-        self.BootTimeh = json['BootTimeh']
-        self.BootTimem = json['BootTimem']
-        self.BootTimes = json['BootTimes']
-        self.ShutdownTimeh = json['ShutdownTimeh']
-        self.ShutdownTimem = json['ShutdownTimem']
-        self.ShutdownTimes = json['ShutdownTimes']
-        self.MessageGroupID = json['MessageGroupID']
-        self.IdleMessage = json['IdleMessage']
-        self.Year = json['Year']
-        self.Month = json['Month']
-        self.Day = json['Day']
-        self.Hour = json['Hour']
-        self.Minute = json['Minute']
-        self.Second = json['Second']
-        self.DisplayMode = json['DisplayMode']
-        self.TextRollingSpeed = json['TextRollingSpeed']
-        self.DistanceFunctionMode = json['DistanceFunctionMode']
-        self.ReportPeriod = json['ReportPeriod']
+    def from_dict(self, input_dict):
+        self.Result = input_dict['Result']
+        self.MsgTag = input_dict['MsgTag']  # 系統訊息
+        self.StopCName = input_dict['StopCName']
+        self.StopEName = input_dict['StopEName']
+        self.LongitudeDu = input_dict['LongitudeDu']
+        self.LongitudeFen = input_dict['LongitudeFen']
+        self.LongitudeMiao = input_dict['LongitudeMiao']
+        self.LatitudeDu = input_dict['LatitudeDu']
+        self.LatitudeFen = input_dict['LatitudeFen']
+        self.LatitudeMiao = input_dict['LatitudeMiao']
+        self.TypeID = input_dict['TypeID']
+
+        self.BootTime = input_dict['BootTime']
+        assert type(self.BootTime) == time, \
+            "type of 'WeekendBootTime' must be <time>. Try using 'from datetime import time'"
+        self.ShutdownTime = input_dict['ShutdownTime']
+        assert type(self.ShutdownTime) == time, \
+            "type of 'WeekendShutdownTime' must be <time>. Try using 'from datetime import time'"
+
+        self.MessageGroupID = input_dict['MessageGroupID']
+        self.IdleMessage = input_dict['IdleMessage']
+        self.Year = input_dict['Year']
+        self.Month = input_dict['Month']
+        self.Day = input_dict['Day']
+        self.Hour = input_dict['Hour']
+        self.Minute = input_dict['Minute']
+        self.Second = input_dict['Second']
+        self.DisplayMode = input_dict['DisplayMode']
+        self.TextRollingSpeed = input_dict['TextRollingSpeed']
+        self.DistanceFunctionMode = input_dict['DistanceFunctionMode']
+        self.ReportPeriod = input_dict['ReportPeriod']
 
     def to_dict(self):
+        assert type(self.BootTime) == time, \
+            "type of 'WeekendBootTime' must be <time>. Try using 'from datetime import time'"
+        assert type(self.ShutdownTime) == time, \
+            "type of 'WeekendShutdownTime' must be <time>. Try using 'from datetime import time'"
         r = {
             'Result': self.Result,
             'MsgTag': self.MsgTag,
@@ -101,12 +106,8 @@ class RegDownlink(PayloadBase):
             'LatitudeFen': self.LatitudeFen,
             'LatitudeMiao': self.LatitudeMiao,
             'TypeID': self.TypeID,
-            'BootTimeh': self.BootTimeh,
-            'BootTimem': self.BootTimem,
-            'BootTimes': self.BootTimes,
-            'ShutdownTimeh': self.ShutdownTimeh,
-            'ShutdownTimem': self.ShutdownTimem,
-            'ShutdownTimes': self.ShutdownTimes,
+            'BootTime': self.BootTime,
+            'ShutdownTime': self.ShutdownTime,
             'MessageGroupID': self.MessageGroupID,
             'IdleMessage': self.IdleMessage,
             'Year': self.Year,
@@ -134,12 +135,8 @@ class RegDownlink(PayloadBase):
         self.LatitudeFen = 0
         self.LatitudeMiao = 0
         self.TypeID = 0
-        self.BootTimeh = 0
-        self.BootTimem = 0
-        self.BootTimes = 0
-        self.ShutdownTimeh = 0
-        self.ShutdownTimem = 0
-        self.ShutdownTimes = 0
+        self.BootTime = time(0, 0, 0)
+        self.ShutdownTime = time(0, 0, 0)
         self.MessageGroupID = 0
         self.IdleMessage = ''
         self.Year = 2000

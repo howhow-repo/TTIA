@@ -43,21 +43,21 @@ class ReportAbnormalUplink(PayloadBase):
                            self.RcvMinute,
                            self.RcvSecond)
 
-    def from_dict(self, json):
-        self.StatusCode = json['StatusCode']
-        self.Type = json['Type']
-        self.TransYear = json['TransYear']
-        self.TransMonth = json['TransMonth']
-        self.TransDay = json['TransDay']
-        self.TransHour = json['TransHour']
-        self.TransMinute = json['TransMinute']
-        self.TransSecond = json['TransSecond']
-        self.RcvYear = json['RcvYear']
-        self.RcvMonth = json['RcvMonth']
-        self.RcvDay = json['RcvDay']
-        self.RcvHour = json['RcvHour']
-        self.RcvMinute = json['RcvMinute']
-        self.RcvSecond= json['RcvSecond']
+    def from_dict(self, input_dict):
+        self.StatusCode = input_dict['StatusCode']
+        self.Type = input_dict['Type']
+        self.TransYear = input_dict['TransYear']
+        self.TransMonth = input_dict['TransMonth']
+        self.TransDay = input_dict['TransDay']
+        self.TransHour = input_dict['TransHour']
+        self.TransMinute = input_dict['TransMinute']
+        self.TransSecond = input_dict['TransSecond']
+        self.RcvYear = input_dict['RcvYear']
+        self.RcvMonth = input_dict['RcvMonth']
+        self.RcvDay = input_dict['RcvDay']
+        self.RcvHour = input_dict['RcvHour']
+        self.RcvMinute = input_dict['RcvMinute']
+        self.RcvSecond= input_dict['RcvSecond']
 
     def to_dict(self):
         r = {

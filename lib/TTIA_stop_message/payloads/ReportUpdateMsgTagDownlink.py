@@ -19,10 +19,10 @@ class ReportUpdateMsgTagDownlink(PayloadBase):
         MsgContent = bytearray(self.MsgContent.encode("big5"))
         return struct.pack('<HH160s', self.MsgTag, self.MsgNo, MsgContent)
 
-    def from_dict(self, json):
-        self.MsgTag = json['MsgTag']
-        self.MsgNo = json['MsgNo']
-        self.MsgContent = json['MsgContent']
+    def from_dict(self, input_dict):
+        self.MsgTag = input_dict['MsgTag']
+        self.MsgNo = input_dict['MsgNo']
+        self.MsgContent = input_dict['MsgContent']
 
     def to_dict(self):
         r = {

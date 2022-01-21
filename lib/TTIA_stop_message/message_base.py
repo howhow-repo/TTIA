@@ -20,7 +20,7 @@ class MessageBase:
     def to_pdu(self):
         raise NotImplementedError
 
-    def from_dict(self, json):
+    def from_dict(self, input_dict):
         raise NotImplementedError
 
     def to_dict(self):

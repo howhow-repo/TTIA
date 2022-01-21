@@ -12,8 +12,14 @@ def fwversion_str_to_int_list(fw_str: str) -> list:
         ex: [5, 0, 3], [4, 8, 9]...
     """
     fv = [w for w in fw_str.split('.')]
-    fv1 = int(fv[0])
-    fv23 = [int(w) for w in fv[1]]
+    assert len(fv) == 2, "Wrong FW format. It should be like '<num like str>.<num like str><num like str>', " \
+                         "ex: '5.03', '4.89'..."
+    try:
+        fv1 = int(fv[0])
+        fv23 = [int(w) for w in fv[1]]
+    except Exception as e:
+        raise ValueError("Can not make words to integer")
+
     return [fv1, fv23[0], fv23[1]]
 
 
@@ -37,11 +43,11 @@ class RegUplink(PayloadBase):
         IMEI = bytearray(self.IMEI.encode('ascii'))
         return struct.pack('<15s15sBBBB', IMSI, IMEI, fv1, fv2, fv3, self.Reserved)
 
-    def from_dict(self, json):
-        self.IMSI = json['IMSI']
-        self.IMEI = json['IMEI']
-        self.FirmwareVersion = json['FirmwareVersion']
-        self.Reserved = json['Reserved']
+    def from_dict(self, input_dict):
+        self.IMSI = input_dict['IMSI']
+        self.IMEI = input_dict['IMEI']
+        self.FirmwareVersion = input_dict['FirmwareVersion']
+        self.Reserved = input_dict['Reserved']
 
     def to_dict(self):
         r = {

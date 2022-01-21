@@ -28,14 +28,14 @@ class OpReportUpdateBusinfoDownlink(OpPayloadBase):
                            self.Sequence,
                            )
 
-    def from_dict(self, json):
-        self.SpectialEstimateTime = json['SpectialEstimateTime']
-        self.MsgCContent = json['MsgCContent']
-        self.MsgEContent = json['MsgEContent']
-        self.RouteMsgCContent = json['RouteMsgCContent']
-        self.RouteMsgEContent = json['RouteMsgEContent']
-        self.VoiceAlertMode = json['VoiceAlertMode']
-        self.Sequence = json['Sequence']
+    def from_dict(self, input_dict):
+        self.SpectialEstimateTime = input_dict['SpectialEstimateTime']
+        self.MsgCContent = input_dict['MsgCContent']
+        self.MsgEContent = input_dict['MsgEContent']
+        self.RouteMsgCContent = input_dict['RouteMsgCContent']
+        self.RouteMsgEContent = input_dict['RouteMsgEContent']
+        self.VoiceAlertMode = input_dict['VoiceAlertMode']
+        self.Sequence = input_dict['Sequence']
 
     def to_dict(self):
         r = {

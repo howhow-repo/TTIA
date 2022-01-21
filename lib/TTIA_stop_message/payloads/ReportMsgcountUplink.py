@@ -17,9 +17,9 @@ class ReportMsgcountUplink(PayloadBase):
     def to_pdu(self):
         return struct.pack('<HH', self.SentCount, self.RecvCount)
 
-    def from_dict(self, json):
-        self.SentCount = json['SentCount']
-        self.RecvCount = json['RecvCount']
+    def from_dict(self, input_dict):
+        self.SentCount = input_dict['SentCount']
+        self.RecvCount = input_dict['RecvCount']
 
     def to_dict(self):
         r = {

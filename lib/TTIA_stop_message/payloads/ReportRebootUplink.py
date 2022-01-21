@@ -12,7 +12,7 @@ class ReportRebootUplink(PayloadBase):
     def to_pdu(self):
         return b''
 
-    def from_dict(self, json):
+    def from_dict(self, input_dict):
         pass
 
     def to_dict(self):

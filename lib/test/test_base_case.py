@@ -3,13 +3,18 @@ from lib import TTIABusStopMessage
 
 
 class TestBaseCase(unittest.TestCase):
+    """
+        Base type for testing TTIA python obj.
+        Please write test case here with method name start with "test",
+        such as "test_bla_bla_bla...."
+    """
     pdu_pack = None
     MESSAGEID = None
 
     def test_from_to_pdu_by_raw_pdu(self):
         """
             raw_pdu --init--> py_obj --to_pdu-> created_pdu (create by py_obj)
-            
+
             created_pdu should be same as raw_pdu.
         """
         assert self.pdu_pack is not None and self.MESSAGEID is not None, \

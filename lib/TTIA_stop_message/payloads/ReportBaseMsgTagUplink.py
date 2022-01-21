@@ -18,10 +18,10 @@ class ReportBaseMsgTagUplink(PayloadBase):
     def to_pdu(self):
         return struct.pack('<HBB', self.MsgTag, self.MsgStatus, self.Reserved)
 
-    def from_dict(self, json):
-        self.MsgTag = json['MsgTag']
-        self.MsgStatus = json['MsgStatus']
-        self.Reserved = json['Reserved']
+    def from_dict(self, input_dict):
+        self.MsgTag = input_dict['MsgTag']
+        self.MsgStatus = input_dict['MsgStatus']
+        self.Reserved = input_dict['Reserved']
 
     def to_dict(self):
         r = {

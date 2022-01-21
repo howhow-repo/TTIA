@@ -20,11 +20,11 @@ class ReportUpdateRouteinfoDownlink(PayloadBase):
                            self.Sequence
                            )
 
-    def from_dict(self, json):
-        self.RouteID = json['RouteID']
-        self.PathCName = json['PathCName']
-        self.PathEName = json['PathEName']
-        self.Sequence = json['Sequence']
+    def from_dict(self, input_dict):
+        self.RouteID = input_dict['RouteID']
+        self.PathCName = input_dict['PathCName']
+        self.PathEName = input_dict['PathEName']
+        self.Sequence = input_dict['Sequence']
 
     def to_dict(self):
         r = {

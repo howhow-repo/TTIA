@@ -19,11 +19,11 @@ class ReportUpdateGifDownlink(PayloadBase):
                            bytearray(self.MsgContent.encode('big5'))
                            )
 
-    def from_dict(self, json):
-        self.PicNo = json['PicNo']
-        self.PicNum = json['PicNum']
-        self.PicURL = json['PicURL']
-        self.MsgContent = json['MsgContent']
+    def from_dict(self, input_dict):
+        self.PicNo = input_dict['PicNo']
+        self.PicNum = input_dict['PicNum']
+        self.PicURL = input_dict['PicURL']
+        self.MsgContent = input_dict['MsgContent']
 
     def to_dict(self):
         r = {

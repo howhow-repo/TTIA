@@ -13,8 +13,8 @@ class ReportSetBrightnessDownlink(PayloadBase):
     def to_pdu(self):
         return struct.pack('<B', self.LightSet)
 
-    def from_dict(self, json):
-        self.LightSet = json['LightSet']
+    def from_dict(self, input_dict):
+        self.LightSet = input_dict['LightSet']
 
     def to_dict(self):
         r = {
