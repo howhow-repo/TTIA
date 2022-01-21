@@ -40,6 +40,7 @@ print(msg.payload.to_dict())
 from lib import TTIABusStopMessage
 
 data_dict = {"header":{...}, "payload": {...}}
+# please aware with every prop's data type
 msg = TTIABusStopMessage(init_data=data_dict, init_type='dict')
 
 ```
