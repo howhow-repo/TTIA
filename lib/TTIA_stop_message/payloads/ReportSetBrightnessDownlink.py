@@ -30,4 +30,4 @@ class ReportSetBrightnessDownlink(PayloadBase):
         self.LightSet = 15
 
     def self_assert(self):
-        assert 0 <= self.LightSet <= 15, "亮度設定 0:最暗 15:最亮"
+        assert 0 <= self.LightSet <= 15, "LightSet should be 0~15; 0:min 15:max"

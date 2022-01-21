@@ -154,5 +154,5 @@ class RegDownlink(PayloadBase):
             "type of 'BootTime' must be <time>. Try using 'from datetime import time'"
         assert type(self.ShutdownTime) == time, \
             "type of 'ShutdownTime' must be <time>. Try using 'from datetime import time'"
-        assert 0 <= self.TextRollingSpeed <= 9, "TextRollingSpeed: 0(min)~9(max)"
-        assert self.DistanceFunctionMode in [0, 1], "DistanceFunctionMode 0:disable; 1:enable"
+        assert 0 <= self.TextRollingSpeed <= 9, "TextRollingSpeed should be 0~9; 0(min)~9(max)"
+        assert self.DistanceFunctionMode in [0, 1], "DistanceFunctionMode should be 0~1; 0:disable; 1:enable"

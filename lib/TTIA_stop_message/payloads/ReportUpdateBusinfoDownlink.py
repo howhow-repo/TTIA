@@ -126,9 +126,9 @@ class ReportUpdateBusinfoDownlink(PayloadBase):
         self.min = 0
 
     def self_assert(self):
-        assert self.IsLastBus in [0, 1], "是否為末班車 0:非末班車 1:末班車"
-        assert self.Direction in range(0, 3), "方向 0:去程 1:返程 2:尚未發車 3:末班已離駛"
-        assert self.Type in [1, 2], "本訊息種類 1:定期 2:非定期"
+        assert self.IsLastBus in [0, 1], "IsLastBus should be 0~1; 0:非末班車 1:末班車"
+        assert self.Direction in range(0, 3), "Direction should be 0~3; 0:去程 1:返程 2:尚未發車 3:末班已離駛"
+        assert self.Type in [1, 2], "Type should be 1~2; 1:定期 2:非定期"
         assert 1 <= self.TransMonth <= 12
         assert 1 <= self.TransDay <= 31
         assert 0 <= self.TransHour <= 23
@@ -139,4 +139,3 @@ class ReportUpdateBusinfoDownlink(PayloadBase):
         assert 0 <= self.RcvHour <= 59
         assert 0 <= self.RcvMinute <= 59
         assert 0 <= self.RcvSecond <= 59
-

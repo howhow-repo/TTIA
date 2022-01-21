@@ -41,4 +41,4 @@ class ReportBaseMsgTagUplink(PayloadBase):
         self.Reserved = 0
 
     def self_assert(self):
-        assert self.MsgStatus in [0, 1], "訊息設定狀態 0:訊息設定失敗 1:訊息設定成功"
+        assert self.MsgStatus in [0, 1], "MsgStatus should be 0~1; 0:訊息設定失敗 1:訊息設定成功"

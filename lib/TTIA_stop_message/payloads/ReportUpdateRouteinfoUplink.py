@@ -38,4 +38,4 @@ class ReportUpdateRouteinfoUplink(PayloadBase):
         self.Reserved = 0
 
     def self_assert(self):
-        assert self.MsgStatus in [0, 1], "訊息更新狀態 0:訊息更新失敗 1:訊息更新成功"
+        assert self.MsgStatus in [0, 1], "MsgStatus should be 0~1; 0:訊息更新失敗 1:訊息更新成功"

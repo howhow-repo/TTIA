@@ -45,6 +45,6 @@ class OpReportUpdateMsgTagDownlink(OpPayloadBase):
         self.MsgChangeDelay = 1
 
     def self_assert(self):
-        assert self.MsgPriority in range(0,2), "訊息設定重要性 0:一般 1:重要 2:緊急"
-        assert self.MsgType in range(0, 2), "訊息類別 0:一般 1:分區 2:交通管制"
+        assert self.MsgPriority in range(0,2), "MsgPriority should be 0~2; 0:一般 1:重要 2:緊急"
+        assert self.MsgType in range(0, 2), "MsgType should be 0~2; 0:一般 1:分區 2:交通管制"
 

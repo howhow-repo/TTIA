@@ -101,8 +101,8 @@ class ReportAbnormalUplink(PayloadBase):
         self.RcvSecond = 0
 
     def self_assert(self):
-        assert self.StatusCode in [0, 1, 2], "站牌錯誤代碼 0:正常 1:站牌斷線 2:字幕機斷線"
-        assert self.Type in [1, 2], "訊息種類 1:定期 2:非定期"
+        assert self.StatusCode in [0, 1, 2], "StatusCode should be 0~2; 0:正常 1:站牌斷線 2:字幕機斷線"
+        assert self.Type in [1, 2], "Type should be 1~2; 1:定期 2:非定期"
         assert 1 <= self.TransMonth <= 12
         assert 1 <= self.TransDay <= 31
         assert 0 <= self.TransHour <= 23

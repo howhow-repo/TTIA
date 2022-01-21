@@ -39,4 +39,4 @@ class ReportAbnormalDownlink(PayloadBase):
         self.Reserved = 0
 
     def self_assert(self):
-        assert self.MsgStatus in [0, 1], "Wrong MsgStatus. 0:fail 1:success"
+        assert self.MsgStatus in [0, 1], "MsgStatus should be 0~1; 0:fail 1:success"
