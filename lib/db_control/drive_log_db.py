@@ -1,5 +1,5 @@
-from .mongo_handler import MongoHandler
+from .mongo_handler import MongoDB
 
 
-class StationCenter(MongoHandler):
+class DriveLogDB(MongoDB):
     pass
