@@ -13,3 +13,7 @@ class RouteInfo:
         for item in self.__dict__:
             if item in setting_config.keys():
                 self.__setattr__(item, setting_config[item])
+
+    def to_dict(self):
+        r = self.__dict__
+        return r

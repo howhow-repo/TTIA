@@ -3,22 +3,20 @@ from .mysql_handler import MySqlHandler
 
 def pack_e_stop_data(dict_like_data):
     e_stop_data_template = {
-        "id": dict_like_data["id"],
-        "imsi": dict_like_data["imsi"],
-        "name": dict_like_data["name"],
-        "ename": dict_like_data["ename"],
-        "gid": dict_like_data["gid"],
-        "boottime": dict_like_data["boottime"],
-        "shutdowntime": dict_like_data["shutdowntime"],
-        "idlemessage": dict_like_data["idlemessage"],
-        "displaymode": dict_like_data["displaymode"],
-        "textrollingspeed": dict_like_data["textrollingspeed"],
-        "distancefunctionmode": dict_like_data["distancefunctionmode"],
-        "reportperiod": dict_like_data["reportperiod"],
-        'seqno': dict_like_data["seqno"],
-        'dir': dict_like_data["dir"],
-        'tid': dict_like_data["tid"],
-        'vid': dict_like_data["vid"],
+        "StopID": dict_like_data["id"],
+        "IMSI": dict_like_data["imsi"],
+        "StopCName": dict_like_data["name"],
+        "StopEName": dict_like_data["ename"],
+        "MessageGroupID": dict_like_data["gid"],
+        "BootTime": dict_like_data["boottime"],
+        "ShutdownTime": dict_like_data["shutdowntime"],
+        "IdleMessage": dict_like_data["idlemessage"],
+        "DisplayMode": dict_like_data["displaymode"],
+        "TextRollingSpeed": dict_like_data["textrollingspeed"],
+        "DistanceFunctionMode": dict_like_data["distancefunctionmode"],
+        "ReportPeriod": dict_like_data["reportperiod"],
+        'TypeID': dict_like_data["tid"],
+        'Provider': dict_like_data["vid"],
         'routelist': []
     }
     return e_stop_data_template
@@ -102,16 +100,23 @@ class StationCenter(MySqlHandler):
         """
 
         raw_data = self._get_table_in_dict(cmd)
-        e_stops = {}
+        e_stops_dict = {}
         for s in raw_data:
-            if s['id'] not in e_stops:
-                e_stops.update({s['id']: pack_e_stop_data(s)})
-            e_stops[s['id']]['routelist'].append(pack_route_data(s))
+            if s['id'] not in e_stops_dict:
+                e_stops_dict.update({s['id']: pack_e_stop_data(s)})
+            e_stops_dict[s['id']]['routelist'].append(pack_route_data(s))
 
-        return e_stops
+        return e_stops_dict
 
-    def get_e_stop_router(self):
+    def get_e_stop_by_id(self, ids: list):
+        """
+            return like get_e_stop, but with data only stop_ids that requested.
+        """
+        ids = tuple(ids)
         condition = ''
+        if len(ids) > 0:
+            condition = f'where estop.id IN {ids} '
+
         cmd = f"""
             SELECT 
                 estop.id AS id,
@@ -145,4 +150,11 @@ class StationCenter(MySqlHandler):
                 {condition}
             ORDER BY id
         """
-        return self._get_table_in_dict(cmd)
+        raw_data = self._get_table_in_dict(cmd)
+        e_stops_dict = {}
+        for s in raw_data:
+            if s['id'] not in e_stops_dict:
+                e_stops_dict.update({s['id']: pack_e_stop_data(s)})
+            e_stops_dict[s['id']]['routelist'].append(pack_route_data(s))
+
+        return e_stops_dict
