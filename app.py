@@ -9,9 +9,8 @@ from apscheduler.schedulers.background import BackgroundScheduler
 from lib import EStopObjCacher
 from views.api import httpapi
 
-TIMEZONE = "Asia/Taipei"
-
-sql_config = {
+TIMEZONE = config('TIMEZONE', default="Asia/Taipei")
+SQL_CONFIG = {
     "host": config('SQL_HOST'),
     "port": int(config('SQL_PORT')),
     "user": config('SQL_USER'),
@@ -19,14 +18,11 @@ sql_config = {
     "db": config('SQL_DB')
 }
 
-app = Flask(__name__)
-app.config['SWAGGER'] = SWAGGER_CONFIG
-swagger = Swagger(app, template=SWAGGER_CONTEXT)
-app.register_blueprint(httpapi)
-
-estop_cacher = EStopObjCacher(sql_config)
+#  init cacher
+estop_cacher = EStopObjCacher(SQL_CONFIG)
 estop_cacher.load_from_sql()
 
+#  init scheduler
 scheduler = BackgroundScheduler(timezone=TIMEZONE)
 scheduler.add_job(func=estop_cacher.load_from_sql,
                   trigger=CronTrigger(
@@ -39,6 +35,12 @@ scheduler.add_job(func=estop_cacher.load_from_sql,
                   replace_existing=True,)
 scheduler.start()
 atexit.register(lambda: scheduler.shutdown())
+
+#  init http server
+app = Flask(__name__)
+app.config['SWAGGER'] = SWAGGER_CONFIG
+swagger = Swagger(app, template=SWAGGER_CONTEXT)
+app.register_blueprint(httpapi)
 
 
 @app.route("/", methods=['GET'])

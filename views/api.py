@@ -1,6 +1,10 @@
 from flask import Blueprint, jsonify, request
 from lib import EStopObjCacher
 
+"""
+    Features in swagger page 
+"""
+
 httpapi = Blueprint('httpapi', __name__)
 
 
