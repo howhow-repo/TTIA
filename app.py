@@ -1,11 +1,14 @@
+import atexit
+from apscheduler.triggers.cron import CronTrigger
 from decouple import config
 from flask import Flask, jsonify, request, redirect
 from flasgger import Swagger
+from apscheduler.schedulers.background import BackgroundScheduler
 
 from lib import EStopObjCacher
 
-app = Flask(__name__)
-swagger = Swagger(app)
+
+TIMEZONE = "Asia/Taipei"
 
 sql_config = {
     "host": config('SQL_HOST'),
@@ -15,8 +18,24 @@ sql_config = {
     "db": config('SQL_DB')
 }
 
+app = Flask(__name__)
+swagger = Swagger(app)
+
 estop_cacher = EStopObjCacher(sql_config)
 estop_cacher.load_from_sql()
+
+scheduler = BackgroundScheduler(timezone=TIMEZONE)
+scheduler.add_job(func=estop_cacher.load_from_sql,
+                  trigger=CronTrigger(
+                      hour="00",
+                      minute="01",
+                      timezone=TIMEZONE
+                  ),
+                  id='cache_daily_reload',
+                  max_instances=1,
+                  replace_existing=True,)
+scheduler.start()
+atexit.register(lambda: scheduler.shutdown())
 
 
 @app.route("/", methods=['GET'])
@@ -130,4 +149,10 @@ def do_operation():
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    """
+        WARNING! Please keep the use_reloader=False
+        using use_reloader may cause unknown bug in BackgroundScheduler.
+        (every task will execute twice with no reason.)
+        (check https://stackify.dev/288431-apscheduler-in-flask-executes-twice)
+    """
+    app.run(use_reloader=False, debug=True)
