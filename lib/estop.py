@@ -37,8 +37,8 @@ class EStop:
         self.WeekDay = None
 
         # customise properties
-        self.routelist = []
-        self.address = None
+        self.routelist = []  # routes that pass through this stop
+        self.address = None  # To keep the stop's ip address
         self.ready = False
         self.update_intent = None
 
@@ -56,7 +56,7 @@ class EStop:
             del setting_config['routelist']
 
     def to_dict(self):
-        r = self.__dict__
+        r = self.__dict__.copy()
         r['routelist'] = [route_info.to_dict() for route_info in self.routelist]
         return r
 

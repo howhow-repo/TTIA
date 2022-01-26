@@ -15,5 +15,5 @@ class RouteInfo:
                 self.__setattr__(item, setting_config[item])
 
     def to_dict(self):
-        r = self.__dict__
+        r = self.__dict__.copy()
         return r

@@ -7,41 +7,48 @@ class EStopObjCacher:
     estop_cache = {}
     station = None
 
-    def __init__(self, mysql_config: dict):
+    @classmethod
+    def __init__(cls, mysql_config: dict):
         check_config_items(mysql_config)
         try:
-            self.station = StationCenter(mysql_config=mysql_config)
+            cls.station = StationCenter(mysql_config=mysql_config)
         except Exception as err:
             raise ConnectionError(f"Can not init mysql database. \n {err}")
 
-    def load_from_sql(self):
-        self.station.connect()
-        estops_dict = self.station.get_e_stops()
-        self.station.disconnect()
+    @classmethod
+    def load_from_sql(cls):
+        cls.station.connect()
+        estops_dict = cls.station.get_e_stops()
+        cls.station.disconnect()
 
-        self.pack_come_in_data(estops_dict)
+        cls.__pack_come_in_data(estops_dict)
 
-    def load_from_sql_by_estop_ids(self, ids: list):
-        self.station.connect()
-        estops_dict = self.station.get_e_stop_by_id(ids)
-        self.station.disconnect()
+    @classmethod
+    def load_from_sql_by_estop_ids(cls, ids: list):
+        cls.station.connect()
+        estops_dict = cls.station.get_e_stop_by_id(ids)
+        cls.station.disconnect()
 
-        self.pack_come_in_data(estops_dict)
+        cls.__pack_come_in_data(estops_dict)
 
-    def pack_come_in_data(self, new_dict: dict):
+    @classmethod
+    def __pack_come_in_data(cls, new_dict: dict):
         for es in new_dict:
             es_obj = EStop(new_dict[es])
-            if es_obj.StopID in self.estop_cache:
-                self.estop_cache[es].update(es_obj)
+            if es_obj.StopID in cls.estop_cache:
+                cls.estop_cache[es].from_dict(new_dict[es])
             else:
-                self.estop_cache[es] = es_obj
+                cls.estop_cache[es] = es_obj
 
-    def update_addr(self, stop_id: int, addr):
-        self.update_info(stop_id, 'address', addr)
+    @classmethod
+    def update_addr(cls, stop_id: int, addr):
+        cls.update_info(stop_id, 'address', addr)
 
-    def update_info(self, stop_id: int, prop_name: str, payload):
-        if stop_id in self.estop_cache:
-            self.estop_cache[stop_id].__setattr__(prop_name, payload)
+    @classmethod
+    def update_info(cls, stop_id: int, prop_name: str, payload):
+        if stop_id in cls.estop_cache:
+            cls.estop_cache[stop_id].__setattr__(prop_name, payload)
 
-    def erase_cache(self):
-        self.estop_cache = {}
+    @classmethod
+    def erase_cache(cls):
+        cls.estop_cache = {}
