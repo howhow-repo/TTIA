@@ -63,9 +63,8 @@ class MySqlHandler:
 
     def test_connection(self):
         try:
-            cursor = self.__query('SELECT VERSION()')
-            data = cursor.fetchone()
-            print("Database version : %s " % data)
+            ver = self.get_single_data('SELECT VERSION()')
+            print(f"Test Connecting success; MySQL version : {ver} ")
         except Exception as err:
             self.disconnect()
             raise ConnectionError(f"ebus center mysql test connection fail.\n {err}")

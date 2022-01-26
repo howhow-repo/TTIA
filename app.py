@@ -3,6 +3,7 @@ from apscheduler.triggers.cron import CronTrigger
 from decouple import config
 from flask import Flask, jsonify, request, redirect
 from flasgger import Swagger
+from swagger_page_context import SWAGGER_CONTEXT, SWAGGER_CONFIG
 from apscheduler.schedulers.background import BackgroundScheduler
 
 from lib import EStopObjCacher
@@ -19,7 +20,8 @@ sql_config = {
 }
 
 app = Flask(__name__)
-swagger = Swagger(app)
+app.config['SWAGGER'] = SWAGGER_CONFIG
+swagger = Swagger(app,template=SWAGGER_CONTEXT)
 
 estop_cacher = EStopObjCacher(sql_config)
 estop_cacher.load_from_sql()
@@ -40,7 +42,7 @@ atexit.register(lambda: scheduler.shutdown())
 
 @app.route("/", methods=['GET'])
 def redirect_to_apidocs():
-    return redirect("/apidocs")
+    return redirect("/docs")
 
 
 @app.route("/stopapi/v1/get_cache", methods=['GET'])
