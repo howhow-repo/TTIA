@@ -115,7 +115,10 @@ class StationCenter(MySqlHandler):
         ids = tuple(ids)
         condition = ''
         if len(ids) > 0:
-            condition = f'where estop.id IN {ids} '
+            if len(ids) == 1:
+                condition = f' where estop.id = {ids[0]} '
+            else:
+                condition = f' where estop.id IN {ids} '
 
         cmd = f"""
             SELECT 

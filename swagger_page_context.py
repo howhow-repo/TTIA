@@ -16,8 +16,7 @@ SWAGGER_CONTEXT = {
         },
         "version": "0.1.1"
     },
-    "host": "localhost:5000",
-    "basePath": "/apidocs",  # base bash for blueprint registration
+    "host": "127.0.0.1:5000",
     "schemes": [
         "http",
         "https"
