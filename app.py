@@ -7,7 +7,7 @@ from swagger_page_context import SWAGGER_CONTEXT, SWAGGER_CONFIG
 from apscheduler.schedulers.background import BackgroundScheduler
 
 from lib import EStopObjCacher
-from views.api import httpapi
+from views.api import flasgger_page
 
 TIMEZONE = config('TIMEZONE', default="Asia/Taipei")
 SQL_CONFIG = {
@@ -40,7 +40,7 @@ atexit.register(lambda: scheduler.shutdown())
 app = Flask(__name__)
 app.config['SWAGGER'] = SWAGGER_CONFIG
 swagger = Swagger(app, template=SWAGGER_CONTEXT)
-app.register_blueprint(httpapi)
+app.register_blueprint(flasgger_page)
 
 
 @app.route("/", methods=['GET'])

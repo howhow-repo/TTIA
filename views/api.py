@@ -5,13 +5,15 @@ from lib import EStopObjCacher
     Features in swagger page 
 """
 
-httpapi = Blueprint('httpapi', __name__)
+flasgger_page = Blueprint('flasgger_page', __name__)
 
 
-@httpapi.route("/stopapi/v1/get_cache", methods=['GET'])
+@flasgger_page.route("/stopapi/v1/get_cache", methods=['GET'])
 def get_all_cache():
     """get all e stop current info in json.
     ---
+    tags:
+      - name: TTIA estop
     responses:
       200:
         description: Return the current cache of estops
@@ -22,10 +24,12 @@ def get_all_cache():
     return jsonify(r)
 
 
-@httpapi.route("/stopapi/v1/get_cache/<stop_id>", methods=['GET'])
+@flasgger_page.route("/stopapi/v1/get_cache/<stop_id>", methods=['GET'])
 def get_cache_by_id(stop_id):
     """get specific e stop current info in json by stop id.
     ---
+    tags:
+      - name: TTIA estop
     parameters:
       - name: stop_id
         in: path
@@ -40,21 +44,22 @@ def get_cache_by_id(stop_id):
 
 
 class OperationResponse:
-    def __init__(self, resault: str = 'success', error_code: int = 0, message: str = ''):
+    def __init__(self, result: str = 'success', error_code: int = 0, message: str = None):
         r = {
-            'resault': resault,
+            'result': result,
             'error_code': error_code,
-            'message': message,
         }
-        if r['message'] == '':
-            del r['message']
+        if message is not None:
+            r['message'] = message
         self.response = r
 
 
-@httpapi.route("/stopapi/v1/operate/", methods=['POST'])
+@flasgger_page.route("/stopapi/v1/operate/", methods=['POST'])
 def do_operation():
-    """Force chche to reload from mysql.
+    """Force cacher to reload from mysql. See more parameter description in Models below.
     ---
+    tags:
+      - name: TTIA estop
     parameters:
       - name: action
         in: body
@@ -85,7 +90,7 @@ def do_operation():
         try:
             EStopObjCacher.load_from_sql()
         except Exception as err:
-            return jsonify(OperationResponse(resault="fail",
+            return jsonify(OperationResponse(result="fail",
                                              error_code=2,
                                              message=f"fail reload estop, {err}").response)
 
@@ -93,7 +98,7 @@ def do_operation():
         try:
             EStopObjCacher.load_from_sql_by_estop_ids(post_body['ids'])
         except Exception as err:
-            return jsonify(OperationResponse(resault="fail",
+            return jsonify(OperationResponse(result="fail",
                                              error_code=2,
                                              message=f"fail reload estop of {post_body['ids']}, {err}").response)
 
@@ -101,12 +106,12 @@ def do_operation():
         try:
             raise NotImplementedError
         except Exception as err:
-            return jsonify(OperationResponse(resault="fail",
+            return jsonify(OperationResponse(result="fail",
                                              error_code=2,
                                              message=f"fail rebooting estop of {post_body['ids']}, {err}").response)
 
     else:
-        return jsonify(OperationResponse(resault="fail",
+        return jsonify(OperationResponse(result="fail",
                                          error_code=1,
                                          message=f"No that kind of action.").response)
 
