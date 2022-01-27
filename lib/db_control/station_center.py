@@ -47,7 +47,7 @@ class StationCenter(MySqlHandler):
         """
             return a dict with estops's info as format below:
             {
-                <stop_id>:{
+                <stop_id: int>:{
                     "id": <stop_id>,
                     ... ,
                     ...(some stop configs)...,
@@ -60,7 +60,7 @@ class StationCenter(MySqlHandler):
                     ]
                 },
                 ...
-                <multipul stops>
+                <multiple stops>
                 ...
 
             }
