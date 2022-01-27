@@ -17,6 +17,8 @@ def pack_e_stop_data(dict_like_data):
         "ReportPeriod": dict_like_data["reportperiod"],
         'TypeID': dict_like_data["tid"],
         'Provider': dict_like_data["vid"],
+        'Latitude': dict_like_data["lat"],
+        'Longitude': dict_like_data["lon"],
         'routelist': []
     }
     return e_stop_data_template
@@ -80,6 +82,8 @@ class StationCenter(MySqlHandler):
                 estop.textrollingspeed,
                 estop.distancefunctionmode,
                 estop.reportperiod,
+                estop.lat AS lat,
+                estop.lon AS lon,
                 routestop.rid AS rrid,
                 routestop.id AS sid,
                 routestop.seqno AS seqno,
@@ -134,6 +138,8 @@ class StationCenter(MySqlHandler):
                 estop.textrollingspeed,
                 estop.distancefunctionmode,
                 estop.reportperiod,
+                estop.lat AS lat,
+                estop.lon AS lon,
                 routestop.rid AS rrid,
                 routestop.id AS sid,
                 routestop.seqno AS seqno,

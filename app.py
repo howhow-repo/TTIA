@@ -15,9 +15,10 @@ from views.index import index_pade
 
 #  init constants
 TIMEZONE = config('TIMEZONE', default="Asia/Taipei")
+TTIA_UDP_PORT = config('TTIA_UDP_PORT', cast=int, default=50000)
 SQL_CONFIG = {
     "host": config('SQL_HOST'),
-    "port": int(config('SQL_PORT')),
+    "port": config('SQL_PORT', cast=int),
     "user": config('SQL_USER'),
     "password": config('SQL_PW'),
     "db": config('SQL_DB')
@@ -39,6 +40,11 @@ scheduler.add_job(func=EStopObjCacher.load_from_sql,
                   id='cache_daily_reload',
                   max_instances=1,
                   replace_existing=True,)
+
+scheduler.add_job(func=TTIAStopUdpServer.expire_timeout_section,
+                  trigger='interval',
+                  id='expire_timeout_section',
+                  seconds=TTIAStopUdpServer.section_lifetime)
 scheduler.start()
 atexit.register(lambda: scheduler.shutdown())
 
@@ -52,7 +58,7 @@ app.register_blueprint(flasgger_page)
 
 
 #  init http server
-estop_udp_server = TTIAStopUdpServer(host="localhost", port=7000)
+estop_udp_server = TTIAStopUdpServer(host="localhost", port=TTIA_UDP_PORT, )
 
 
 if __name__ == '__main__':

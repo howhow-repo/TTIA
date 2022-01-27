@@ -52,3 +52,10 @@ class EStopObjCacher:
     @classmethod
     def erase_cache(cls):
         cls.estop_cache = {}
+
+    @classmethod
+    def get_estop_by_imsi(cls, imsi) -> EStop:
+        for estop in cls.estop_cache.values():
+            if estop.IMSI == imsi:
+                return estop
+        return None

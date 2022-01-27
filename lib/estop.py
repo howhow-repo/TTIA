@@ -1,6 +1,14 @@
 from .route_info import RouteInfo
 
 
+def deg_to_dms(deg):
+    d = int(deg)
+    md = abs(deg - d) * 60
+    m = int(md)
+    sd = (md - m) * 60
+    return [d, m, sd]
+
+
 class EStop:
     def __init__(self, setting_config: dict):
 
@@ -58,5 +66,8 @@ class EStop:
     def to_dict(self):
         r = self.__dict__.copy()
         r['routelist'] = [route_info.to_dict() for route_info in self.routelist]
+        # TODO: format Longitude Latitude to Du Fen Miao
+        r['LongitudeDu'] = int(abs(self.Longitude))
+        r['LatitudeDu'] = int(abs(self.Latitude))
         return r
 
