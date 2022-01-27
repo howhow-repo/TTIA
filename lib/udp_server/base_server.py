@@ -53,30 +53,3 @@ class UDPServer:
             self.sock.sendto(b"echo: " + data, client_address)
         else:
             raise NotImplementedError
-
-    @classmethod
-    def expire_timeout_section(cls):
-        now = datetime.now()
-        should_be_del = []
-        for section_id in cls.sections:
-            if (now - cls.sections[section_id].start_time).seconds > UDPWorkingSection.lifetime:
-                should_be_del.append(section_id)
-        for section_id in should_be_del:
-            del cls.sections[section_id]
-
-    @classmethod
-    def section_or_none(cls, stop_id):
-        """
-        :param stop_id:
-        :return:
-            :return section if section if found
-            :return None if section not found
-        """
-        for section_id in cls.sections:
-            if section_id == stop_id:
-                return cls.sections[section_id]
-        return None
-
-    @classmethod
-    def remove_from_sections(cls, stop_id):
-        del cls.sections[stop_id]
