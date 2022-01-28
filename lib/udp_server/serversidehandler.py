@@ -17,7 +17,7 @@ class ServerSideHandler(SectionServer):
             self.recv_period_report(msg_obj, section)
         elif msg_obj.header.MessageID == 0x09:  # 異常回報
             self.recv_abnormal(msg_obj, section)
-        elif msg_obj.header.MessageID == 0x11:  # 重開通知訊息
+        elif msg_obj.header.MessageID == 0x11:  # 重開通知訊息 TODO: 重開通知訊息能夠單向發送？
             self.recv_reboot_check(msg_obj, section)
 
         # """ 異常處理 """
@@ -102,7 +102,7 @@ class ServerSideHandler(SectionServer):
     def recv_abnormal(self, msg_obj: TTIABusStopMessage, section: UDPWorkingSection):  # 0x09
         raise NotImplementedError
 
-    def recv_abnormal_check(self, msg_obj: TTIABusStopMessage, section: UDPWorkingSection):  # 0x0A
+    def send_abnormal_check(self, msg_obj: TTIABusStopMessage, section: UDPWorkingSection):  # 0x0A
         raise NotImplementedError
 
     def send_update_route_info(self, msg_obj: TTIABusStopMessage, section: UDPWorkingSection):  # 0x0B

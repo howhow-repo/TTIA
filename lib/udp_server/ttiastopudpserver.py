@@ -17,7 +17,7 @@ class TTIAStopUdpServer(ServerSideHandler):
         """
         基本資料程序查詢註冊
         """
-        logger.info(f"Start registration for stop id: {msg_obj.header.StopID}")
+        print(f"Start registration for stop id: {msg_obj.header.StopID}")
         resp_msg = TTIABusStopMessage(1, 'default')
         resp_msg.payload.Result = 0
         estop = EStopObjCacher.get_estop_by_imsi(msg_obj.payload.IMSI)
@@ -33,8 +33,12 @@ class TTIAStopUdpServer(ServerSideHandler):
         elif msg_obj.header.StopID != estop.StopID:
             logger.error("Fail to match data: StopID & IMSI does not match")
 
-        self.sock.sendto(resp_msg.to_pdu(), section.client_addr)
-        section.logs.append(resp_msg.header.MessageID)
+        self.send_registration_info(resp_msg, section)
+
+    def send_registration_info(self, msg_obj: TTIABusStopMessage, section: UDPWorkingSection):  # 0x01
+        self.sock.sendto(msg_obj.to_pdu(), section.client_addr)
+        section.logs.append(msg_obj.header.MessageID)
+        raise NotImplementedError
 
     def recv_registration_check(self, msg_obj: TTIABusStopMessage, section: UDPWorkingSection):
         """
@@ -57,6 +61,7 @@ class TTIAStopUdpServer(ServerSideHandler):
         """ 接收定時回報訊息 0x03 """
         print(f"0x03 period report recv from stop: {msg_obj.header.StopID}")
         print(msg_obj.to_dict())
+        resp_msg = TTIABusStopMessage(0x04, 'default')
         estop = EStopObjCacher.get_estop_by_id(msg_obj.header.StopID)
         if estop and estop.ready:
             estop.address = section.client_addr
@@ -64,8 +69,10 @@ class TTIAStopUdpServer(ServerSideHandler):
             estop.RecvCount = msg_obj.payload.RecvCount
             estop.lasttime = datetime.now()
 
-            resp_msg = TTIABusStopMessage(0x04, 'default')
-            self.sock.sendto(resp_msg.to_pdu(), section.client_addr)
+        self.send_period_report_check(resp_msg, section)
+
+    def send_period_report_check(self, msg_obj: TTIABusStopMessage, section: UDPWorkingSection):
+        self.sock.sendto(msg_obj.to_pdu(), section.client_addr)
         self.remove_from_sections(section.stop_id)
 
     def recv_abnormal(self, msg_obj: TTIABusStopMessage, section: UDPWorkingSection):
@@ -80,4 +87,8 @@ class TTIAStopUdpServer(ServerSideHandler):
         else:
             resp_msg.payload.MsgStatus = 0
 
-        self.sock.sendto(resp_msg.to_pdu(), section.client_addr)
+        self.send_abnormal_check(resp_msg, section)
+
+    def send_abnormal_check(self, msg_obj: TTIABusStopMessage, section: UDPWorkingSection):
+        self.sock.sendto(msg_obj.to_pdu(), section.client_addr)
+        self.remove_from_sections(section.stop_id)
