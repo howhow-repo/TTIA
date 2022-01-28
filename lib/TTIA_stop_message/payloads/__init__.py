@@ -2,8 +2,8 @@ from .payload_base import PayloadBase
 
 from .RegUplink import RegUplink  # 0x00
 from .RegDownlink import RegDownlink  # 0x01
-
 from .ReportBaseMsgTagUplink import ReportBaseMsgTagUplink  # 0x02
+
 from .ReportMsgcountUplink import ReportMsgcountUplink  # 0x03
 from .ReportMsgcountDownlink import ReportMsgcountDownlink  # 0x04
 

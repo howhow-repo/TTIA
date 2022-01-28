@@ -31,6 +31,8 @@ class EStop:
         self.DistanceFunctionMode = 0
         self.ReportPeriod = 0
         self.LightSet = 0
+        self.SentCount = 0
+        self.RecvCount = 0
 
         # setting optional properties (check TTIA estop message id 0x01)
         self.MessageGroupZoneID = None
@@ -47,8 +49,9 @@ class EStop:
         # customise properties
         self.routelist = []  # routes that pass through this stop
         self.address = None  # To keep the stop's ip address
+        self.lasttime = None  # last report time
         self.ready = False
-        self.update_intent = None
+        self.abnormal_log = []
 
         self.from_dict(setting_config)
 
@@ -66,6 +69,7 @@ class EStop:
     def to_dict(self):
         r = self.__dict__.copy()
         r['routelist'] = [route_info.to_dict() for route_info in self.routelist]
+
         # TODO: format Longitude Latitude to Du Fen Miao
         r['LongitudeDu'] = int(abs(self.Longitude))
         r['LatitudeDu'] = int(abs(self.Latitude))

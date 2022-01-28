@@ -1,5 +1,6 @@
 import atexit
 import threading
+import logging
 
 from apscheduler.triggers.cron import CronTrigger
 from decouple import config
@@ -14,6 +15,8 @@ from views.index import index_pade
 
 
 #  init constants
+
+logger = logging.getLogger(__name__)
 TIMEZONE = config('TIMEZONE', default="Asia/Taipei")
 TTIA_UDP_PORT = config('TTIA_UDP_PORT', cast=int, default=50000)
 SQL_CONFIG = {
@@ -44,7 +47,7 @@ scheduler.add_job(func=EStopObjCacher.load_from_sql,
 scheduler.add_job(func=TTIAStopUdpServer.expire_timeout_section,
                   trigger='interval',
                   id='expire_timeout_section',
-                  seconds=TTIAStopUdpServer.section_lifetime)
+                  seconds=TTIAStopUdpServer.section_lifetime/2)
 scheduler.start()
 atexit.register(lambda: scheduler.shutdown())
 
@@ -68,6 +71,9 @@ if __name__ == '__main__':
         (every task will execute twice with no reason.)
         (check https://stackify.dev/288431-apscheduler-in-flask-executes-twice)
     """
-
+    logging.basicConfig(filename='myapp.log', level=logging.DEBUG)
+    logger.info("info")
+    logger.warning("warning")
+    logger.error("error")
     http_thread = threading.Thread(target=lambda: app.run(use_reloader=False, debug=True)).start()
     udp_thread = threading.Thread(target=estop_udp_server.start()).start()

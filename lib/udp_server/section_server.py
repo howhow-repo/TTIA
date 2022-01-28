@@ -1,4 +1,4 @@
-from .base_server import UDPServer, UDPWorkingSection
+from .base_server import UDPServer
 from lib import TTIABusStopMessage
 from datetime import datetime
 import logging
@@ -14,7 +14,20 @@ def decode_msg(data):
         return False
 
 
+class UDPWorkingSection:
+    lifetime = 15  # second
+
+    def __init__(self, stop_id, client_addr, process_id):
+        self.client_addr = client_addr
+        self.stop_id = stop_id
+        self.start_time = datetime.now()
+        self.process_id = process_id
+        self.logs = [process_id]
+
+
 class SectionServer(UDPServer):
+    section_lifetime = UDPWorkingSection.lifetime
+    sections = {}
 
     def __init__(self, host, port):
         super().__init__(host, port)
@@ -32,7 +45,6 @@ class SectionServer(UDPServer):
     @classmethod
     def section_or_none(cls, stop_id):
         """
-        :param stop_id:
         :return:
             :return section if section if found
             :return None if section not found
@@ -43,7 +55,7 @@ class SectionServer(UDPServer):
         return None
 
     @classmethod
-    def new_section(cls, stop_id, client_address, message_id):
+    def create_new_section(cls, stop_id, client_address, message_id):
         section = UDPWorkingSection(stop_id, client_address, message_id)
         cls.sections[stop_id] = section
         return section
@@ -60,45 +72,22 @@ class SectionServer(UDPServer):
         section = self.section_or_none(msg_obj.header.StopID)
 
         if not section:
-            section = self.new_section(msg_obj.header.StopID, client_address, msg_obj.header.MessageID)
+            section = self.create_new_section(msg_obj.header.StopID, client_address, msg_obj.header.MessageID)
             self.handle_new_section(msg_obj, section)
 
         else:  # old section
             self.handle_old_section(msg_obj, section)
 
     def handle_new_section(self, msg_obj: TTIABusStopMessage, section: UDPWorkingSection):
-        if msg_obj.header.MessageID == 0x00:  # 基本資料程序
-            self.do_registration(msg_obj, section)
-        elif msg_obj.header.MessageID == 0x02:  # 基本資料程序
-            self.wrong_communicate_order(section)
-        elif msg_obj.header.MessageID == 0x03:  # 定時回報程序
-            self.recv_period_report()
-        else:
-            print("drop new_section unknown message id.")
-            self.remove_from_sections(section.stop_id)
-            self.sock.sendto(b"echo: unknown msg id\n", section.client_addr)
+        raise NotImplementedError
 
     def handle_old_section(self, msg_obj: TTIABusStopMessage, section: UDPWorkingSection):
-        section.start_time = datetime.now()
-        if msg_obj.header.MessageID == 0x00:  # 基本資料程序
-            self.wrong_communicate_order(section)
-
-        elif msg_obj.header.MessageID == 0x02:  # 基本資料程序
-            self.do_registration_check(msg_obj, section)
-        else:
-            logger.error("drop old_section unknown message id.")
-            self.remove_from_sections(msg_obj.header.StopID)
-            self.sock.sendto(b"echo: unknown msg id\n", section.client_addr)
+        raise NotImplementedError
 
     def wrong_communicate_order(self, section: UDPWorkingSection):
         logger.error(f"Wong communicate order. expire section of stop id: {section.stop_id}")
         self.remove_from_sections(section.stop_id)
 
-    def do_registration(self, msg_obj: TTIABusStopMessage, section: UDPWorkingSection):  # 0x00
-        raise NotImplementedError
-
-    def do_registration_check(self, msg_obj: TTIABusStopMessage, section: UDPWorkingSection):  # 0x02
-        raise NotImplementedError
-
-    def recv_period_report(self, msg_obj: TTIABusStopMessage, section: UDPWorkingSection): # 0x04
-        raise NotImplementedError
+    def unaccepted_cmd(self, section: UDPWorkingSection):
+        logger.error(f"Command unaccepted. expire section of stop id: {section.stop_id}")
+        self.remove_from_sections(section.stop_id)

@@ -4,6 +4,10 @@ from ..estop import EStop
 
 
 class EStopObjCacher:
+    """
+        estop_cache data:
+        {<StopID: int>:{<estop obj>}, <StopID: int>:{<estop obj>},....}
+    """
     estop_cache = {}
     station = None
 
@@ -52,6 +56,12 @@ class EStopObjCacher:
     @classmethod
     def erase_cache(cls):
         cls.estop_cache = {}
+
+    @classmethod
+    def get_estop_by_id(cls, id) -> EStop:
+        if id in cls.estop_cache:
+            return cls.estop_cache[id]
+        return None
 
     @classmethod
     def get_estop_by_imsi(cls, imsi) -> EStop:

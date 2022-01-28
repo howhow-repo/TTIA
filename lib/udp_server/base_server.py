@@ -6,22 +6,9 @@ from datetime import datetime
 logger = logging.getLogger(__name__)
 
 
-class UDPWorkingSection:
-    lifetime = 15  # second
-
-    def __init__(self, stop_id, client_addr, process_id):
-        self.client_addr = client_addr
-        self.stop_id = stop_id
-        self.start_time = datetime.now()
-        self.process_id = process_id
-        self.logs = [process_id]
-
-
 class UDPServer:
     """ A simple UDP Server """
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    section_lifetime = UDPWorkingSection.lifetime
-    sections = {}
     EchoMode = False
 
     def __init__(self, host, port):
