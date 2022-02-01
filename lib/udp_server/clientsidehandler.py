@@ -49,7 +49,7 @@ class ClientSideHandler(UDPServer):
             print("drop msg with unknown message id.")
 
     #### TTIA estop behaviors
-    def send_registration(self, msg_obj: TTIABusStopMessage):  # 0x00
+    def send_registration(self):  # 0x00
         raise NotImplementedError
 
     def recv_registration_info(self, msg_obj: TTIABusStopMessage):  # 0x01
@@ -58,7 +58,7 @@ class ClientSideHandler(UDPServer):
     def send_registration_info_check(self, msg_obj: TTIABusStopMessage):  # 0x02
         raise NotImplementedError
 
-    def send_period_report(self, msg_obj: TTIABusStopMessage):  # 0x03
+    def send_period_report(self):  # 0x03
         raise NotImplementedError
 
     def recv_period_report_check(self, msg_obj: TTIABusStopMessage):  # 0x04

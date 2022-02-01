@@ -3,16 +3,112 @@ from lib import TTIABusStopMessage
 from lib import EStop
 
 
-
 class TTIAEStopUdpClient(ClientSideHandler):
     def __init__(self, host, port, estop: EStop, server_host, server_port):
+        super().__init__(host, port)
         self.estop = estop
         self.server_addr = (server_host, server_port)
-        super().__init__(host, port)
 
-    def send_registration(self, msg_obj: TTIABusStopMessage):
-        msg = TTIABusStopMessage(0, 'default')
+    def create_defaule_msg(self, msg_id: int):
+        msg = TTIABusStopMessage(msg_id, 'default')
         msg.header.StopID = self.estop.StopID
+        return msg
+
+    def send_registration(self):
+        msg = self.create_defaule_msg(0)
         msg.payload.IMSI = self.estop.IMSI
         msg.payload.IMEI = self.estop.IMEI
+        self.sock.sendto(msg.to_pdu(), self.server_addr)
+
+    def recv_registration_info(self, msg_obj: TTIABusStopMessage):
+        print("recv_registration_info: ", msg_obj.payload.to_dict())
+        resp_msg = self.create_defaule_msg(2)
+        if msg_obj.payload.Result == 1:
+            self.estop.from_dict(msg_obj.payload.to_dict())
+            resp_msg.payload.MsgStatus = 1
+        self.send_registration_info_check(resp_msg)
+
+    def send_registration_info_check(self, msg_obj: TTIABusStopMessage):
+        assert msg_obj.header.MessageID == 0x02
+        print("send registration_info_check")
+        self.sock.sendto(msg_obj.to_pdu(), self.server_addr)
+
+    def send_period_report(self):
+        msg = self.create_defaule_msg(0x03)
+        self.estop.SentCount += 1
+        msg.payload.SentCount = self.estop.SentCount
+        msg.payload.RevCount = self.estop.RevCount
+        self.sock.sendto(msg.to_pdu(), self.server_addr)
+
+    def recv_period_report_check(self, msg_obj: TTIABusStopMessage):
+        print("recv_period_report_check: ", msg_obj.payload.to_dict())
+        self.estop.RevCount += 1
+
+    def recv_update_msg_tag(self, msg_obj: TTIABusStopMessage):
+        print("recv_update_msg_tag: ", msg_obj.payload.to_dict())
+        resp_msg = self.create_defaule_msg(0x06)
+        resp_msg.payload.MsgTag = msg_obj.payload.MsgTag
+        resp_msg.payload.MsgNo = msg_obj.payload.MsgNo
+        resp_msg.payload.MsgStatus = 1
+        self.send_update_msg_tag_check(resp_msg)
+
+    def send_update_msg_tag_check(self, msg_obj: TTIABusStopMessage):
+        assert msg_obj.header.MessageID == 0x06
+        self.sock.sendto(msg_obj.to_pdu(), self.server_addr)
+
+    def recv_update_bus_info(self, msg_obj: TTIABusStopMessage):
+        print("recv_update_bus_info: ", msg_obj.payload.to_dict())
+        resp_msg = self.create_defaule_msg(0x08)
+        resp_msg.payload.MsgStatus = 1
+        self.send_update_bus_info_check(resp_msg)
+
+    def send_update_bus_info_check(self, msg_obj: TTIABusStopMessage):
+        assert msg_obj.header.MessageID == 0x08
+        self.sock.sendto(msg_obj.to_pdu(), self.server_addr)
+
+    def send_abnormal(self, msg_obj: TTIABusStopMessage):
+        assert msg_obj.header.MessageID == 0x09
+        self.sock.sendto(msg_obj.to_pdu(), self.server_addr)
+
+    def recv_abnormal_check(self, msg_obj: TTIABusStopMessage):
+        print('recv_abnormal_check: ', msg_obj.payload.to_dict())
+
+    def recv_update_route_info(self, msg_obj: TTIABusStopMessage):
+        print("recv_update_route_info: ", msg_obj.payload.to_dict())
+        resp_msg = self.create_defaule_msg(0x0C)
+        resp_msg.payload.MsgStatus = 1
+        self.send_update_route_info_check(resp_msg)
+
+    def send_update_route_info_check(self, msg_obj: TTIABusStopMessage):
+        assert msg_obj.header.MessageID == 0x0C
+        self.sock.sendto(msg_obj.to_pdu(), self.server_addr)
+
+    def recv_set_brightness(self, msg_obj: TTIABusStopMessage):
+        print("recv_set_brightness: ", msg_obj.payload.to_dict())
+        self.estop.LightSet = msg_obj.payload.LightSet
+        resp_msg = self.create_defaule_msg(0x0E)
+        self.send_set_brightness_check(resp_msg)
+
+    def send_set_brightness_check(self, msg_obj: TTIABusStopMessage):
+        assert msg_obj.header.MessageID == 0x0E
+        self.sock.sendto(msg_obj.to_pdu(), self.server_addr)
+
+    def recv_reboot(self, msg_obj: TTIABusStopMessage):
+        print("recv_reboot: ", msg_obj.payload.to_dict())
+        msg = self.create_defaule_msg(0x11)
+        self.send_reboot_check(msg)
+        print("do some reboot...")
+
+    def send_reboot_check(self, msg_obj: TTIABusStopMessage):
+        assert msg_obj.header.MessageID == 0x11
+        self.sock.sendto(msg_obj.to_pdu(), self.server_addr)
+
+    def recv_update_gif(self, msg_obj: TTIABusStopMessage):
+        print("recv_update_gif: ", msg_obj.payload.to_dict())
+        self.estop.LightSet = msg_obj.payload.LightSet
+        resp_msg = self.create_defaule_msg(0x12)
+        self.send_update_gif_check(resp_msg)
+
+    def send_update_gif_check(self, msg_obj: TTIABusStopMessage):
+        assert msg_obj.header.MessageID == 0x12
         self.sock.sendto(msg_obj.to_pdu(), self.server_addr)

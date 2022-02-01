@@ -12,25 +12,25 @@ class ReportMsgcountUplink(PayloadBase):
     def from_pdu(self, pdu: bytes):
         header = struct.unpack_from('<HH', pdu)
         self.SentCount = header[0]
-        self.RecvCount = header[1]
+        self.RevCount = header[1]
 
     def to_pdu(self) -> bytes:
-        return struct.pack('<HH', self.SentCount, self.RecvCount)
+        return struct.pack('<HH', self.SentCount, self.RevCount)
 
     def from_dict(self, input_dict: dict):
         self.SentCount = input_dict['SentCount']
-        self.RecvCount = input_dict['RecvCount']
+        self.RevCount = input_dict['RecvCount']
 
     def to_dict(self) -> dict:
         r = {
             'SentCount': self.SentCount,
-            'RecvCount': self.RecvCount,
+            'RevCount': self.RevCount,
         }
         return r
 
     def from_default(self):
         self.SentCount = 0
-        self.RecvCount = 0
+        self.RevCount = 0
 
     def self_assert(self):
         pass

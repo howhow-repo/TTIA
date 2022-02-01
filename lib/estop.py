@@ -1,3 +1,5 @@
+import datetime
+
 from .route_info import RouteInfo
 
 
@@ -19,8 +21,8 @@ class EStop:
         self.IMEI = ""
         self.StopCName = ""
         self.StopEName = ""
-        self.Latitude = None
-        self.Longitude = None
+        self.Latitude = 0
+        self.Longitude = 0
         self.TypeID = None
         self.BootTime = None
         self.ShutdownTime = None
@@ -30,9 +32,17 @@ class EStop:
         self.TextRollingSpeed = 0
         self.DistanceFunctionMode = 0
         self.ReportPeriod = 0
+
+        # dynamic setting
         self.LightSet = 0
         self.SentCount = 0
-        self.RecvCount = 0
+        self.RevCount = 0
+        self.MsgTag = None
+        self.MsgNo = None
+        self.MsgContent = ''
+        self.MsgPriority = 0
+        self.MsgType = 0
+
 
         # setting optional properties (check TTIA estop message id 0x01)
         self.MessageGroupZoneID = None
@@ -75,3 +85,10 @@ class EStop:
         r['LatitudeDu'] = int(abs(self.Latitude))
         return r
 
+    def to_json(self):
+        r = self.to_dict()
+        if self.BootTime:
+            r['BootTime'] = f"{self.BootTime.hour}:{self.BootTime.min}"
+        if self.ShutdownTime:
+            r['ShutdownTime'] = f"{self.ShutdownTime.hour}:{self.ShutdownTime.min}"
+        return r

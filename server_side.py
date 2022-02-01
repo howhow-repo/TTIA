@@ -10,7 +10,7 @@ from swagger_page_context import SWAGGER_CONTEXT, SWAGGER_CONFIG
 from apscheduler.schedulers.background import BackgroundScheduler
 
 from lib import EStopObjCacher, TTIAStopUdpServer
-from views.api import flasgger_page
+from views.serversideapi import flasgger_server
 from views.index import index_pade
 
 
@@ -18,7 +18,7 @@ from views.index import index_pade
 
 logger = logging.getLogger(__name__)
 TIMEZONE = config('TIMEZONE', default="Asia/Taipei")
-TTIA_UDP_PORT = config('TTIA_UDP_PORT', cast=int, default=50000)
+TTIA_UDP_PORT = config('TTIA_UDP_SERVER_PORT', cast=int, default=50000)
 SQL_CONFIG = {
     "host": config('SQL_HOST'),
     "port": config('SQL_PORT', cast=int),
@@ -57,7 +57,7 @@ app = Flask(__name__)
 app.config['SWAGGER'] = SWAGGER_CONFIG
 swagger = Swagger(app, template=SWAGGER_CONTEXT)
 app.register_blueprint(index_pade)
-app.register_blueprint(flasgger_page)
+app.register_blueprint(flasgger_server)
 
 
 #  init http server

@@ -5,10 +5,10 @@ from lib import EStopObjCacher
     Features in swagger page 
 """
 
-flasgger_page = Blueprint('flasgger_page', __name__)
+flasgger_server = Blueprint('flasgger_server', __name__)
 
 
-@flasgger_page.route("/stopapi/v1/get_cache", methods=['GET'])
+@flasgger_server.route("/stopapi/v1/get_cache", methods=['GET'])
 def get_all_cache():
     """get all e stop current info in json.
     ---
@@ -24,7 +24,7 @@ def get_all_cache():
     return jsonify(r)
 
 
-@flasgger_page.route("/stopapi/v1/get_cache/<stop_id>", methods=['GET'])
+@flasgger_server.route("/stopapi/v1/get_cache/<stop_id>", methods=['GET'])
 def get_cache_by_id(stop_id):
     """get specific e stop current info in json by stop id.
     ---
@@ -54,7 +54,7 @@ class OperationResponse:
         self.response = r
 
 
-@flasgger_page.route("/stopapi/v1/operate/", methods=['POST'])
+@flasgger_server.route("/stopapi/v1/operate/", methods=['POST'])
 def do_operation():
     """Force cacher to reload from mysql. See more parameter description in Models below.
     ---
