@@ -59,8 +59,8 @@ class EStopObjCacher:
 
     @classmethod
     def get_estop_by_id(cls, id) -> EStop:
-        if id in cls.estop_cache:
-            return cls.estop_cache[id]
+        if int(id) in cls.estop_cache:
+            return cls.estop_cache[int(id)]
         return None
 
     @classmethod

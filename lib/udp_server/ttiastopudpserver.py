@@ -17,7 +17,7 @@ class TTIAStopUdpServer(ServerSideHandler):
         """
         基本資料程序查詢註冊
         """
-        print(f"Start registration for stop id: {msg_obj.header.StopID}")
+        logger.info(f"Start registration for stop id: {msg_obj.header.StopID}")
         resp_msg = TTIABusStopMessage(1, 'default')
         resp_msg.payload.Result = 0
         estop = EStopObjCacher.get_estop_by_imsi(msg_obj.payload.IMSI)
@@ -39,6 +39,7 @@ class TTIAStopUdpServer(ServerSideHandler):
         self.send_registration_info(resp_msg, section)
 
     def send_registration_info(self, msg_obj: TTIABusStopMessage, section: UDPWorkingSection):  # 0x01
+        logger.info("send_registration_info")
         self.sock.sendto(msg_obj.to_pdu(), section.client_addr)
         section.logs.append(msg_obj.header.MessageID)
 
@@ -46,6 +47,7 @@ class TTIAStopUdpServer(ServerSideHandler):
         """
         # 基本資料程序確認訊息
         """
+        logger.info("recv_registration_check")
         if 1 not in section.logs:  # registration_check should go after do_registration
             self.wrong_communicate_order(section)
             return
@@ -53,21 +55,21 @@ class TTIAStopUdpServer(ServerSideHandler):
         if msg_obj.payload.MsgStatus == 1:  # 訊息設定成功
             EStopObjCacher.estop_cache[msg_obj.header.StopID].ready = True
             EStopObjCacher.update_addr(msg_obj.header.StopID, section.client_addr)
-            print("registration check ok")
+            logger.info(f"id {msg_obj.header.StopID} registration check ok")
 
-        elif msg_obj.payload.MsgStatus != 1:  # 訊息設定失敗
-            print("estop return fail in registration")
+        else:  # 訊息設定失敗
+            logger.warning(f"estop {msg_obj.header.StopID} return fail in registration")
 
         self.remove_from_sections(section.stop_id)
 
     def recv_period_report(self, msg_obj: TTIABusStopMessage, section: UDPWorkingSection):
         """ 接收定時回報訊息 0x03 """
-        print(f"0x03 period report recv from stop: {msg_obj.header.StopID}")
-        print(msg_obj.to_dict())
+        logger.info(f"period report recv from stop: {msg_obj.header.StopID}")
         resp_msg = TTIABusStopMessage(0x04, 'default')
         estop = EStopObjCacher.get_estop_by_id(msg_obj.header.StopID)
-        if estop and estop.ready:
+        if estop:
             estop.address = section.client_addr
+            estop.ready = True
             estop.SentCount = msg_obj.payload.SentCount
             estop.RevCount = msg_obj.payload.RevCount
             estop.lasttime = datetime.now()
@@ -80,7 +82,7 @@ class TTIAStopUdpServer(ServerSideHandler):
 
     def recv_abnormal(self, msg_obj: TTIABusStopMessage, section: UDPWorkingSection):
         """ 接收定時回報訊息 0x09 """
-        print("get abnormal report: ", msg_obj.to_dict())
+        logger.warning("get abnormal report: ", msg_obj.to_dict())
         resp_msg = TTIABusStopMessage(0x0A, 'default')
         estop = EStopObjCacher.get_estop_by_id(msg_obj.header.StopID)
         if estop:
@@ -94,3 +96,10 @@ class TTIAStopUdpServer(ServerSideHandler):
     def send_abnormal_check(self, msg_obj: TTIABusStopMessage, section: UDPWorkingSection):
         self.sock.sendto(msg_obj.to_pdu(), section.client_addr)
         self.remove_from_sections(section.stop_id)
+
+    def send_update_msg_tag(self, msg_obj: TTIABusStopMessage, section: UDPWorkingSection):
+        assert msg_obj.header.MessageID == 0x05
+        self.sock.sendto(msg_obj.to_pdu(), section.client_addr)
+
+    def recv_update_msg_tag_check(self, msg_obj: TTIABusStopMessage, section: UDPWorkingSection):
+        logger.info(f"recv_update_msg_tag_check from id: {msg_obj.header.StopID}")

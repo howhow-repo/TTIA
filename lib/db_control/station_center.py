@@ -1,7 +1,21 @@
 from .mysql_handler import MySqlHandler
+from datetime import time
 
 
 def pack_e_stop_data(dict_like_data):
+    if "BootTime" in dict_like_data.keys():
+        BootTime = str(dict_like_data['BootTime']).zfill(6)
+        time_str = [int(BootTime[i:i + 2]) for i in range(0, len(BootTime), 2)]
+        # split str every 2 char
+        dict_like_data['BootTime'] = time((time_str[0]), time_str[1], time_str[2])
+
+    if "ShutdownTime" in dict_like_data.keys():
+        ShutdownTime = str(dict_like_data['ShutdownTime']).zfill(6)
+        print("ShutdownTime: ", ShutdownTime)
+        time_str = [int(ShutdownTime[i:i + 2]) for i in range(0, len(ShutdownTime), 2)]
+        # split str every 2 char
+        dict_like_data['ShutdownTime'] = time(time_str[0], time_str[1], time_str[2])
+
     e_stop_data_template = {
         "StopID": dict_like_data["id"],
         "IMSI": dict_like_data["imsi"],

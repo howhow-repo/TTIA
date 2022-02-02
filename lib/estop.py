@@ -1,4 +1,4 @@
-import datetime
+from datetime import time
 
 from .route_info import RouteInfo
 
@@ -31,7 +31,7 @@ class EStop:
         self.MessageGroupID = None
         self.TextRollingSpeed = 0
         self.DistanceFunctionMode = 0
-        self.ReportPeriod = 0
+        self.ReportPeriod = 60
 
         # dynamic setting
         self.LightSet = 0
@@ -91,4 +91,6 @@ class EStop:
             r['BootTime'] = f"{self.BootTime.hour}:{self.BootTime.min}"
         if self.ShutdownTime:
             r['ShutdownTime'] = f"{self.ShutdownTime.hour}:{self.ShutdownTime.min}"
+        if len(self.abnormal_log) > 0:
+            r['abnormal_log'] = [l.to_dict() for l in self.abnormal_log]
         return r
