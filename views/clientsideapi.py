@@ -45,60 +45,49 @@ class OperationResponse:
         self.response = r
 
 
-@flasgger_client.route("/clientapi/v1/operate/", methods=['POST'])
-def do_operation():
-    """Force cacher to reload from mysql. See more parameter description in Models below.
+@flasgger_client.route("/clientapi/v1/send_registration/", methods=['POST'])
+def registration():
+    """Send registration to server side.
     ---
     tags:
       - name: TTIA estop client
-    parameters:
-      - name: action
-        in: body
-        type: string
-        required: true
-        schema:
-          id: operate
-          type: object
-          required:
-            - action
-          properties:
-            action:
-              type: string
-              description: send_registration or send_period_report.
-
     responses:
       200:
         description: Return dict message with op result.
     """
-    post_body = request.get_json()
-
-    if post_body['action'] == "send_registration":
-        try:
-            estop_udp_server.send_registration()
-        except Exception as err:
-            return jsonify(OperationResponse(result="fail",
-                                             error_code=2,
-                                             message=f"fail reload estop, {err}").response)
-
-    elif post_body['action'] == "send_period_report":
-        try:
-            estop_udp_server.send_period_report()
-        except Exception as err:
-            return jsonify(OperationResponse(result="fail",
-                                             error_code=2,
-                                             message=f"fail reload estop, {err}").response)
-
-    else:
+    try:
+        estop_udp_server.send_registration()
+    except Exception as err:
         return jsonify(OperationResponse(result="fail",
-                                         error_code=1,
-                                         message=f"No that kind of action.").response)
+                                         error_code=2,
+                                         message=f"fail reload estop, {err}").response)
+
+    return jsonify(OperationResponse().response)
+
+
+@flasgger_client.route("/clientapi/v1/send_period_report/", methods=['POST'])
+def period_report():
+    """Send period report to server side.
+    ---
+    tags:
+      - name: TTIA estop client
+    responses:
+      200:
+        description: Return dict message with op result.
+    """
+    try:
+        estop_udp_server.send_period_report()
+    except Exception as err:
+        return jsonify(OperationResponse(result="fail",
+                                         error_code=2,
+                                         message=f"fail reload estop, {err}").response)
 
     return jsonify(OperationResponse().response)
 
 
 @flasgger_client.route("/clientapi/v1/abnormal/", methods=['POST'])
 def abnormal_report():
-    """Force cacher to reload from mysql. See more parameter description in Models below.
+    """Send abnormal report to server via udp.
     ---
     tags:
       - name: TTIA estop client
