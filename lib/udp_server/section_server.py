@@ -17,12 +17,12 @@ def decode_msg(data):
 class UDPWorkingSection:
     lifetime = 15  # second
 
-    def __init__(self, stop_id, client_addr, process_id):
+    def __init__(self, stop_id, client_addr, msg_obj: TTIABusStopMessage):
         self.client_addr = client_addr
         self.stop_id = stop_id
         self.start_time = datetime.now()
-        self.process_id = process_id
-        self.logs = [process_id]
+        self.process_id = msg_obj.header.MessageID
+        self.logs = [msg_obj]
 
 
 class SectionServer(UDPServer):
@@ -55,8 +55,8 @@ class SectionServer(UDPServer):
         return None
 
     @classmethod
-    def create_new_section(cls, stop_id, client_address, message_id):
-        section = UDPWorkingSection(stop_id, client_address, message_id)
+    def create_new_section(cls, stop_id: int, client_address, msg_obj: TTIABusStopMessage):
+        section = UDPWorkingSection(stop_id, client_address, msg_obj)
         cls.sections[stop_id] = section
         return section
 
@@ -72,7 +72,7 @@ class SectionServer(UDPServer):
         section = self.section_or_none(msg_obj.header.StopID)
 
         if not section:
-            section = self.create_new_section(msg_obj.header.StopID, client_address, msg_obj.header.MessageID)
+            section = self.create_new_section(msg_obj.header.StopID, client_address, msg_obj)
             self.handle_new_section(msg_obj, section)
 
         else:  # old section

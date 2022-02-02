@@ -32,9 +32,9 @@ class TTIAEStopUdpClient(ClientSideHandler):
         if msg_obj.payload.Result == 1:
             self.estop.from_dict(msg_obj.payload.to_dict())
             resp_msg.payload.MsgStatus = 1
-        self.send_registration_info_check(resp_msg)
+        self.send_registration_info_ack(resp_msg)
 
-    def send_registration_info_check(self, msg_obj: TTIABusStopMessage):
+    def send_registration_info_ack(self, msg_obj: TTIABusStopMessage):
         assert msg_obj.header.MessageID == 0x02
         logger.info("send registration_info_check")
         self.sock.sendto(msg_obj.to_pdu(), self.server_addr)
@@ -47,7 +47,7 @@ class TTIAEStopUdpClient(ClientSideHandler):
         msg.payload.RevCount = self.estop.RevCount
         self.sock.sendto(msg.to_pdu(), self.server_addr)
 
-    def recv_period_report_check(self, msg_obj: TTIABusStopMessage):
+    def recv_period_report_ack(self, msg_obj: TTIABusStopMessage):
         logger.info("recv_period_report_check")
         self.estop.RevCount += 1
 
@@ -57,9 +57,9 @@ class TTIAEStopUdpClient(ClientSideHandler):
         resp_msg.payload.MsgTag = msg_obj.payload.MsgTag
         resp_msg.payload.MsgNo = msg_obj.payload.MsgNo
         resp_msg.payload.MsgStatus = 1
-        self.send_update_msg_tag_check(resp_msg)
+        self.send_update_msg_tag_ack(resp_msg)
 
-    def send_update_msg_tag_check(self, msg_obj: TTIABusStopMessage):
+    def send_update_msg_tag_ack(self, msg_obj: TTIABusStopMessage):
         assert msg_obj.header.MessageID == 0x06
         logger.info('send_update_msg_tag_check')
         self.sock.sendto(msg_obj.to_pdu(), self.server_addr)
@@ -69,9 +69,9 @@ class TTIAEStopUdpClient(ClientSideHandler):
         resp_msg = self.create_defaule_msg(0x08)
         resp_msg.payload.MsgStatus = 1
         self.estop.ready = True
-        self.send_update_bus_info_check(resp_msg)
+        self.send_update_bus_info_ack(resp_msg)
 
-    def send_update_bus_info_check(self, msg_obj: TTIABusStopMessage):
+    def send_update_bus_info_ack(self, msg_obj: TTIABusStopMessage):
         assert msg_obj.header.MessageID == 0x08
         logger.info('send_update_bus_info_check')
         self.sock.sendto(msg_obj.to_pdu(), self.server_addr)
@@ -82,16 +82,16 @@ class TTIAEStopUdpClient(ClientSideHandler):
         msg_obj.header.StopID = self.estop.StopID
         self.sock.sendto(msg_obj.to_pdu(), self.server_addr)
 
-    def recv_abnormal_check(self, msg_obj: TTIABusStopMessage):
+    def recv_abnormal_ack(self, msg_obj: TTIABusStopMessage):
         logger.info(f'recv_abnormal_check: {msg_obj.payload.to_dict()}')
 
     def recv_update_route_info(self, msg_obj: TTIABusStopMessage):
         logger.info(f"recv_update_route_info: {msg_obj.payload.to_dict()} \n {msg_obj.option_payload.to_dict()}")
         resp_msg = self.create_defaule_msg(0x0C)
         resp_msg.payload.MsgStatus = 1
-        self.send_update_route_info_check(resp_msg)
+        self.send_update_route_info_ack(resp_msg)
 
-    def send_update_route_info_check(self, msg_obj: TTIABusStopMessage):
+    def send_update_route_info_ack(self, msg_obj: TTIABusStopMessage):
         assert msg_obj.header.MessageID == 0x0C
         logger.info('send_update_route_info_check')
         self.sock.sendto(msg_obj.to_pdu(), self.server_addr)
@@ -100,9 +100,9 @@ class TTIAEStopUdpClient(ClientSideHandler):
         logger.info(f"recv_set_brightness: {msg_obj.payload.to_dict()}")
         self.estop.LightSet = msg_obj.payload.LightSet
         resp_msg = self.create_defaule_msg(0x0E)
-        self.send_set_brightness_check(resp_msg)
+        self.send_set_brightness_ack(resp_msg)
 
-    def send_set_brightness_check(self, msg_obj: TTIABusStopMessage):
+    def send_set_brightness_ack(self, msg_obj: TTIABusStopMessage):
         assert msg_obj.header.MessageID == 0x0E
         logger.info('send_set_brightness_check')
         self.sock.sendto(msg_obj.to_pdu(), self.server_addr)
@@ -110,10 +110,10 @@ class TTIAEStopUdpClient(ClientSideHandler):
     def recv_reboot(self, msg_obj: TTIABusStopMessage):
         logger.info(f"recv_reboot: {msg_obj.payload.to_dict()}")
         msg = self.create_defaule_msg(0x11)
-        self.send_reboot_check(msg)
+        self.send_reboot_ack(msg)
         logger.info("do some reboot...")
 
-    def send_reboot_check(self, msg_obj: TTIABusStopMessage):
+    def send_reboot_ack(self, msg_obj: TTIABusStopMessage):
         assert msg_obj.header.MessageID == 0x11
         logger.info('send_reboot_check')
         self.sock.sendto(msg_obj.to_pdu(), self.server_addr)
@@ -122,9 +122,9 @@ class TTIAEStopUdpClient(ClientSideHandler):
         logger.info(f"recv_update_gif: {msg_obj.payload.to_dict()} \n {msg_obj.option_payload.to_dict()}")
         self.estop.LightSet = msg_obj.payload.LightSet
         resp_msg = self.create_defaule_msg(0x12)
-        self.send_update_gif_check(resp_msg)
+        self.send_update_gif_ack(resp_msg)
 
-    def send_update_gif_check(self, msg_obj: TTIABusStopMessage):
+    def send_update_gif_ack(self, msg_obj: TTIABusStopMessage):
         assert msg_obj.header.MessageID == 0x12
         logger.info('send_update_gif_check')
         self.sock.sendto(msg_obj.to_pdu(), self.server_addr)

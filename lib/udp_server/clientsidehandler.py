@@ -29,13 +29,13 @@ class ClientSideHandler(UDPServer):
         elif msg_obj.header.MessageID == 0x01:
             self.recv_registration_info(msg_obj)
         elif msg_obj.header.MessageID == 0x04:
-            self.recv_period_report_check(msg_obj)
+            self.recv_period_report_ack(msg_obj)
         elif msg_obj.header.MessageID == 0x05:
             self.recv_update_msg_tag(msg_obj)
         elif msg_obj.header.MessageID == 0x07:
             self.recv_update_bus_info(msg_obj)
         elif msg_obj.header.MessageID == 0x0A:
-            self.recv_abnormal_check(msg_obj)
+            self.recv_abnormal_ack(msg_obj)
         elif msg_obj.header.MessageID == 0x0B:
             self.recv_update_route_info(msg_obj)
         elif msg_obj.header.MessageID == 0x0D:
@@ -55,53 +55,53 @@ class ClientSideHandler(UDPServer):
     def recv_registration_info(self, msg_obj: TTIABusStopMessage):  # 0x01
         raise NotImplementedError
 
-    def send_registration_info_check(self, msg_obj: TTIABusStopMessage):  # 0x02
+    def send_registration_info_ack(self, msg_obj: TTIABusStopMessage):  # 0x02
         raise NotImplementedError
 
     def send_period_report(self):  # 0x03
         raise NotImplementedError
 
-    def recv_period_report_check(self, msg_obj: TTIABusStopMessage):  # 0x04
+    def recv_period_report_ack(self, msg_obj: TTIABusStopMessage):  # 0x04
         raise NotImplementedError
 
     def recv_update_msg_tag(self, msg_obj: TTIABusStopMessage):  # 0x05
         raise NotImplementedError
 
-    def send_update_msg_tag_check(self, msg_obj: TTIABusStopMessage):  # 0x06
+    def send_update_msg_tag_ack(self, msg_obj: TTIABusStopMessage):  # 0x06
         raise NotImplementedError
 
     def recv_update_bus_info(self, msg_obj: TTIABusStopMessage):  # 0x07
         raise NotImplementedError
 
-    def send_update_bus_info_check(self, msg_obj: TTIABusStopMessage):  # 0x08
+    def send_update_bus_info_ack(self, msg_obj: TTIABusStopMessage):  # 0x08
         raise NotImplementedError
 
     def send_abnormal(self, msg_obj: TTIABusStopMessage):  # 0x09
         raise NotImplementedError
 
-    def recv_abnormal_check(self, msg_obj: TTIABusStopMessage):  # 0x0A
+    def recv_abnormal_ack(self, msg_obj: TTIABusStopMessage):  # 0x0A
         raise NotImplementedError
 
     def recv_update_route_info(self, msg_obj: TTIABusStopMessage):  # 0x0B
         raise NotImplementedError
 
-    def send_update_route_info_check(self, msg_obj: TTIABusStopMessage):  # 0x0C
+    def send_update_route_info_ack(self, msg_obj: TTIABusStopMessage):  # 0x0C
         raise NotImplementedError
 
     def recv_set_brightness(self, msg_obj: TTIABusStopMessage):  # 0x0B
         raise NotImplementedError
 
-    def send_set_brightness_check(self, msg_obj: TTIABusStopMessage):  # 0x0C
+    def send_set_brightness_ack(self, msg_obj: TTIABusStopMessage):  # 0x0C
         raise NotImplementedError
 
     def recv_reboot(self, msg_obj: TTIABusStopMessage):  # 0x0B
         raise NotImplementedError
 
-    def send_reboot_check(self, msg_obj: TTIABusStopMessage):  # 0x0C
+    def send_reboot_ack(self, msg_obj: TTIABusStopMessage):  # 0x0C
         raise NotImplementedError
 
     def recv_update_gif(self, msg_obj: TTIABusStopMessage):  # 0x0B
         raise NotImplementedError
 
-    def send_update_gif_check(self, msg_obj: TTIABusStopMessage):  # 0x0C
+    def send_update_gif_ack(self, msg_obj: TTIABusStopMessage):  # 0x0C
         raise NotImplementedError

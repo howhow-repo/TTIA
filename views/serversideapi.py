@@ -158,11 +158,11 @@ def set_msg(stop_id):
     stop_id = int(stop_id)
     estop = EStopObjCacher.get_estop_by_id(stop_id)
     if estop and estop.ready and estop.address:
-        section = estop_udp_server.create_new_section(stop_id, estop.address, 0x05)
         msg = TTIABusStopMessage(0x05, 'default')
         msg.header.StopID = stop_id
         msg.payload.from_dict(post_body)
         msg.option_payload.from_dict(post_body)
+        section = estop_udp_server.create_new_section(stop_id, estop.address, msg)
         estop_udp_server.send_update_msg_tag(msg_obj=msg, section=section)
 
     elif not estop:
@@ -199,7 +199,7 @@ def set_bus_info(stop_id):
         required: true
         schema:
           id: bus_info
-          type: string
+          type: object
           required:
             - RouteID
             - BusID
@@ -328,12 +328,81 @@ def set_bus_info(stop_id):
     stop_id = int(stop_id)
     estop = EStopObjCacher.get_estop_by_id(stop_id)
     if estop and estop.ready and estop.address:
-        section = estop_udp_server.create_new_section(stop_id, estop.address, 0x07)
         msg = TTIABusStopMessage(0x07, 'default')
         msg.header.StopID = stop_id
         msg.payload.from_dict(post_body)
         msg.option_payload.from_dict(post_body)
+        section = estop_udp_server.create_new_section(stop_id, estop.address, msg)
         estop_udp_server.send_update_bus_info(msg_obj=msg, section=section)
+
+    elif not estop:
+        return jsonify(OperationResponse(result="fail",
+                                         error_code=2,
+                                         message=f"estop id {stop_id} is not found in cache.").response)
+    elif not estop.ready:
+        return jsonify(OperationResponse(result="fail",
+                                         error_code=2,
+                                         message=f"estop id {stop_id} is not ready yet.").response)
+    elif not estop.address:
+        return jsonify(OperationResponse(result="fail",
+                                         error_code=2,
+                                         message=f"can not find addr of estop id {stop_id}.").response)
+
+    return jsonify(OperationResponse().response)
+
+
+@flasgger_server.route("/stopapi/v1/set_route_info/<stop_id>", methods=['POST'])
+def set_route_info(stop_id):
+    """Update route info to estop.
+    ---
+    tags:
+      - name: TTIA estop
+    parameters:
+      - name: stop_id
+        in: path
+        type: number
+        required: true
+
+      - name: route_info
+        in: body
+        type: string
+        required: true
+        schema:
+          id: route_info
+          type: object
+          required:
+            - RouteID
+            - PathCName
+            - PathEName
+            - Sequence
+          properties:
+            RouteID:
+              type: number
+              description: 路線代碼
+            PathCName:
+              type: string
+              description: 路線中文名稱
+            PathEName:
+              type: string
+              description: 路線英文名稱
+            Sequence:
+              type: number
+              description: 顯示順序
+
+    responses:
+      200:
+        description: Return dict message with op result.
+    """
+    post_body = request.get_json()
+    stop_id = int(stop_id)
+    estop = EStopObjCacher.get_estop_by_id(stop_id)
+    if estop and estop.ready and estop.address:
+        msg = TTIABusStopMessage(0x0B, 'default')
+        msg.header.StopID = stop_id
+        msg.payload.from_dict(post_body)
+        msg.option_payload.from_dict(post_body)
+        section = estop_udp_server.create_new_section(stop_id, estop.address, msg)
+        estop_udp_server.send_update_route_info(msg_obj=msg, section=section)
 
     elif not estop:
         return jsonify(OperationResponse(result="fail",
