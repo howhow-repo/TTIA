@@ -2,7 +2,6 @@ import atexit
 import threading
 import logging
 
-from apscheduler.triggers.cron import CronTrigger
 from decouple import config
 from flask import Flask
 from flasgger import Swagger

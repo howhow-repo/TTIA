@@ -88,9 +88,9 @@ class EStop:
     def to_json(self):
         r = self.to_dict()
         if self.BootTime:
-            r['BootTime'] = f"{self.BootTime.hour}:{self.BootTime.min}"
+            r['BootTime'] = f"{self.BootTime.hour}:{self.BootTime.minute}:{self.BootTime.second}"
         if self.ShutdownTime:
-            r['ShutdownTime'] = f"{self.ShutdownTime.hour}:{self.ShutdownTime.min}"
+            r['ShutdownTime'] = f"{self.ShutdownTime.hour}:{self.ShutdownTime.minute}:{self.BootTime.second}"
         if len(self.abnormal_log) > 0:
-            r['abnormal_log'] = [l.to_dict() for l in self.abnormal_log]
+            r['abnormal_log'] = [log.to_dict() for log in self.abnormal_log]
         return r

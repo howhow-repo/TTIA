@@ -80,6 +80,20 @@ class TTIAStopUdpServer(ServerSideHandler):
         self.sock.sendto(msg_obj.to_pdu(), section.client_addr)
         self.remove_from_sections(section.stop_id)
 
+    def send_update_msg_tag(self, msg_obj: TTIABusStopMessage, section: UDPWorkingSection):
+        assert msg_obj.header.MessageID == 0x05
+        self.sock.sendto(msg_obj.to_pdu(), section.client_addr)
+
+    def recv_update_msg_tag_check(self, msg_obj: TTIABusStopMessage, section: UDPWorkingSection):
+        logger.info(f"recv_update_msg_tag_check from id: {msg_obj.header.StopID}")
+
+    def send_update_bus_info(self, msg_obj: TTIABusStopMessage, section: UDPWorkingSection):
+        assert msg_obj.header.MessageID == 0x07
+        self.sock.sendto(msg_obj.to_pdu(), section.client_addr)
+
+    def recv_update_bus_info_check(self, msg_obj: TTIABusStopMessage, section: UDPWorkingSection):
+        logger.info(f"recv_update_msg_tag_check from id: {msg_obj.header.StopID}")
+
     def recv_abnormal(self, msg_obj: TTIABusStopMessage, section: UDPWorkingSection):
         """ 接收定時回報訊息 0x09 """
         logger.warning("get abnormal report: ", msg_obj.to_dict())
@@ -97,9 +111,4 @@ class TTIAStopUdpServer(ServerSideHandler):
         self.sock.sendto(msg_obj.to_pdu(), section.client_addr)
         self.remove_from_sections(section.stop_id)
 
-    def send_update_msg_tag(self, msg_obj: TTIABusStopMessage, section: UDPWorkingSection):
-        assert msg_obj.header.MessageID == 0x05
-        self.sock.sendto(msg_obj.to_pdu(), section.client_addr)
 
-    def recv_update_msg_tag_check(self, msg_obj: TTIABusStopMessage, section: UDPWorkingSection):
-        logger.info(f"recv_update_msg_tag_check from id: {msg_obj.header.StopID}")

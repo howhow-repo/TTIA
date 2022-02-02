@@ -27,7 +27,7 @@ class TTIAEStopUdpClient(ClientSideHandler):
         self.sock.sendto(msg.to_pdu(), self.server_addr)
 
     def recv_registration_info(self, msg_obj: TTIABusStopMessage):
-        logger.info(f"recv_registration_info: {msg_obj.payload.to_dict()}")
+        logger.info(f"recv_registration_info: {msg_obj.payload.to_dict()} \n {msg_obj.option_payload.to_dict()}")
         resp_msg = self.create_defaule_msg(2)
         if msg_obj.payload.Result == 1:
             self.estop.from_dict(msg_obj.payload.to_dict())
@@ -52,7 +52,7 @@ class TTIAEStopUdpClient(ClientSideHandler):
         self.estop.RevCount += 1
 
     def recv_update_msg_tag(self, msg_obj: TTIABusStopMessage):
-        logger.info(f"recv_update_msg_tag: {msg_obj.payload.to_dict()}")
+        logger.info(f"recv_update_msg_tag: {msg_obj.payload.to_dict()} \n {msg_obj.option_payload.to_dict()}")
         resp_msg = self.create_defaule_msg(0x06)
         resp_msg.payload.MsgTag = msg_obj.payload.MsgTag
         resp_msg.payload.MsgNo = msg_obj.payload.MsgNo
@@ -65,7 +65,7 @@ class TTIAEStopUdpClient(ClientSideHandler):
         self.sock.sendto(msg_obj.to_pdu(), self.server_addr)
 
     def recv_update_bus_info(self, msg_obj: TTIABusStopMessage):
-        logger.info(f"recv_update_bus_info: {msg_obj.payload.to_dict()}")
+        logger.info(f"recv_update_bus_info: {msg_obj.payload.to_dict()} \n {msg_obj.option_payload.to_dict()}")
         resp_msg = self.create_defaule_msg(0x08)
         resp_msg.payload.MsgStatus = 1
         self.estop.ready = True
@@ -86,7 +86,7 @@ class TTIAEStopUdpClient(ClientSideHandler):
         logger.info(f'recv_abnormal_check: {msg_obj.payload.to_dict()}')
 
     def recv_update_route_info(self, msg_obj: TTIABusStopMessage):
-        logger.info(f"recv_update_route_info: {msg_obj.payload.to_dict()}")
+        logger.info(f"recv_update_route_info: {msg_obj.payload.to_dict()} \n {msg_obj.option_payload.to_dict()}")
         resp_msg = self.create_defaule_msg(0x0C)
         resp_msg.payload.MsgStatus = 1
         self.send_update_route_info_check(resp_msg)
@@ -119,7 +119,7 @@ class TTIAEStopUdpClient(ClientSideHandler):
         self.sock.sendto(msg_obj.to_pdu(), self.server_addr)
 
     def recv_update_gif(self, msg_obj: TTIABusStopMessage):
-        logger.info(f"recv_update_gif: {msg_obj.payload.to_dict()}")
+        logger.info(f"recv_update_gif: {msg_obj.payload.to_dict()} \n {msg_obj.option_payload.to_dict()}")
         self.estop.LightSet = msg_obj.payload.LightSet
         resp_msg = self.create_defaule_msg(0x12)
         self.send_update_gif_check(resp_msg)

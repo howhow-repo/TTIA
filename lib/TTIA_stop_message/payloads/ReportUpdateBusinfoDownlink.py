@@ -26,14 +26,14 @@ class ReportUpdateBusinfoDownlink(PayloadBase):
         self.TransMonth = payload[10]
         self.TransDay = payload[11]
         self.TransHour = payload[12]
-        self.TransMinute  = payload[13]
-        self.TransSecond = payload[14]
+        self.TransMin  = payload[13]
+        self.TransSec = payload[14]
         self.RcvYear = payload[15] + 2000
         self.RcvMonth = payload[16]
         self.RcvDay = payload[17]
         self.RcvHour = payload[18]
-        self.RcvMinute = payload[19]
-        self.RcvSecond = payload[20]
+        self.RcvMin = payload[19]
+        self.RcvSec = payload[20]
         self.Reserved = payload[21]
         self.self_assert()
 
@@ -43,9 +43,9 @@ class ReportUpdateBusinfoDownlink(PayloadBase):
                            self.DestinationStop, self.IsLastBus, self.EstimateTime, self.StopDistance,
                            self.Direction,
                            self.Type, self.TransYear - 2000, self.TransMonth, self.TransDay, self.TransHour,
-                           self.TransMinute, self.TransSecond,
-                           self.RcvYear - 2000, self.RcvMonth, self.RcvDay, self.RcvHour, self.RcvMinute,
-                           self.RcvSecond, self.Reserved,)
+                           self.TransMin, self.TransSec,
+                           self.RcvYear - 2000, self.RcvMonth, self.RcvDay, self.RcvHour, self.RcvMin,
+                           self.RcvSec, self.Reserved,)
 
     def from_dict(self, input_dict: dict):
         self.RouteID = input_dict['RouteID']
@@ -61,14 +61,14 @@ class ReportUpdateBusinfoDownlink(PayloadBase):
         self.TransMonth = input_dict['TransMonth']
         self.TransDay = input_dict['TransDay']
         self.TransHour = input_dict['TransHour']
-        self.TransMinute = input_dict['TransMinute']
-        self.TransSecond = input_dict['TransSecond']
+        self.TransMin = input_dict['TransMin']
+        self.TransSec = input_dict['TransSec']
         self.RcvYear = input_dict['RcvYear']
         self.RcvMonth = input_dict['RcvMonth']
         self.RcvDay = input_dict['RcvDay']
         self.RcvHour = input_dict['RcvHour']
-        self.RcvMinute = input_dict['RcvMinute']
-        self.RcvSecond = input_dict['RcvSecond']
+        self.RcvMin = input_dict['RcvMin']
+        self.RcvSec = input_dict['RcvSec']
         self.Reserved = input_dict['Reserved']
         self.self_assert()
 
@@ -88,14 +88,14 @@ class ReportUpdateBusinfoDownlink(PayloadBase):
             'TransMonth': self.TransMonth,
             'TransDay': self.TransDay,
             'TransHour': self.TransHour,
-            'TransMinute': self.TransMinute,
-            'TransSecond': self.TransSecond,
+            'TransMin': self.TransMin,
+            'TransSec': self.TransSec,
             'RcvYear': self.RcvYear,
             'RcvMonth': self.RcvMonth,
             'RcvDay': self.RcvDay,
             'RcvHour': self.RcvHour,
-            'RcvMinute': self.RcvMinute,
-            'RcvSecond': self.RcvSecond,
+            'RcvMin': self.RcvMin,
+            'RcvSec': self.RcvSec,
             'Reserved': self.Reserved,
         }
         return r
@@ -114,14 +114,14 @@ class ReportUpdateBusinfoDownlink(PayloadBase):
         self.TransMonth = 1
         self.TransDay = 1
         self.TransHour = 0
-        self.TransMinute = 0
-        self.TransSecond = 0
+        self.TransMin = 0
+        self.TransSec = 0
         self.RcvYear = 2000
         self.RcvMonth = 1
         self.RcvDay = 1
         self.RcvHour = 0
-        self.RcvMinute = 0
-        self.RcvSecond = 0
+        self.RcvMin = 0
+        self.RcvSec = 0
         self.Reserved = 0
         self.min = 0
 
@@ -129,13 +129,15 @@ class ReportUpdateBusinfoDownlink(PayloadBase):
         assert self.IsLastBus in [0, 1], "IsLastBus should be 0~1; 0:非末班車 1:末班車"
         assert self.Direction in range(0, 3), "Direction should be 0~3; 0:去程 1:返程 2:尚未發車 3:末班已離駛"
         assert self.Type in [1, 2], "Type should be 1~2; 1:定期 2:非定期"
+        assert 2000 <= self.TransYear
         assert 1 <= self.TransMonth <= 12
         assert 1 <= self.TransDay <= 31
         assert 0 <= self.TransHour <= 23
-        assert 0 <= self.TransMinute <= 59
-        assert 0 <= self.TransSecond <= 59
+        assert 0 <= self.TransMin <= 59
+        assert 0 <= self.TransSec <= 59
+        assert 2000 <= self.RcvYear
         assert 1 <= self.RcvMonth <= 12
         assert 1 <= self.RcvDay <= 31
         assert 0 <= self.RcvHour <= 59
-        assert 0 <= self.RcvMinute <= 59
-        assert 0 <= self.RcvSecond <= 59
+        assert 0 <= self.RcvMin <= 59
+        assert 0 <= self.RcvSec <= 59
