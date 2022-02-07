@@ -214,9 +214,9 @@ def set_msg(stop_id):
     """
     post_body = request.get_json()
     try:
-        assert 'MsgTag' in post_body
-        assert 'MsgNo' in post_body
-        assert 'MsgContent' in post_body
+        assert 'MsgTag' in post_body, "key 'MsgTag' missing"
+        assert 'MsgNo' in post_body, "key 'MsgNo' missing"
+        assert 'MsgContent' in post_body, "key 'MsgContent' missing"
     except AssertionError as e:
         return jsonify(OperationResponse(result="fail",
                                          error_code=3,
@@ -370,28 +370,28 @@ def set_bus_info(stop_id):
     """
     post_body = request.get_json()
     try:
-        assert 'RouteID' in post_body
-        assert 'BusID' in post_body
-        assert 'CurrentStop' in post_body
-        assert 'DestinationStop' in post_body
-        assert 'IsLastBus' in post_body
-        assert 'EstimateTime' in post_body
-        assert 'StopDistance' in post_body
-        assert 'Direction' in post_body
-        assert 'Type' in post_body
-        assert 'TransYear' in post_body
-        assert 'TransMonth' in post_body
-        assert 'TransDay' in post_body
-        assert 'TransHour' in post_body
-        assert 'TransMin' in post_body
-        assert 'TransSec' in post_body
-        assert 'RcvYear' in post_body
-        assert 'RcvMonth' in post_body
-        assert 'RcvDay' in post_body
-        assert 'RcvHour' in post_body
-        assert 'RcvMin' in post_body
-        assert 'RcvSec' in post_body
-        assert 'Reserved' in post_body
+        assert 'RouteID' in post_body, "key 'RouteID' missing"
+        assert 'BusID' in post_body, "key 'BusID' missing"
+        assert 'CurrentStop' in post_body, "key 'CurrentStop' missing"
+        assert 'DestinationStop' in post_body, "key 'DestinationStop' missing"
+        assert 'IsLastBus' in post_body, "key 'IsLastBus' missing"
+        assert 'EstimateTime' in post_body, "key 'EstimateTime' missing"
+        assert 'StopDistance' in post_body, "key 'StopDistance' missing"
+        assert 'Direction' in post_body, "key 'Direction' missing"
+        assert 'Type' in post_body, "key 'Type' missing"
+        assert 'TransYear' in post_body, "key 'TransYear' missing"
+        assert 'TransMonth' in post_body, "key 'TransMonth' missing"
+        assert 'TransDay' in post_body, "key 'TransDay' missing"
+        assert 'TransHour' in post_body, "key 'TransHour' missing"
+        assert 'TransMin' in post_body, "key 'TransMin' missing"
+        assert 'TransSec' in post_body, "key 'TransSec' missing"
+        assert 'RcvYear' in post_body, "key 'RcvYear' missing"
+        assert 'RcvMonth' in post_body, "key 'RcvMonth' missing"
+        assert 'RcvDay' in post_body, "key 'RcvDay' missing"
+        assert 'RcvHour' in post_body, "key 'RcvHour' missing"
+        assert 'RcvMin' in post_body, "key 'RcvMin' missing"
+        assert 'RcvSec' in post_body, "key 'RcvSec' missing"
+        assert 'Reserved' in post_body, "key 'Reserved' missing"
     except AssertionError as e:
         return jsonify(OperationResponse(result="fail",
                                          error_code=3,
@@ -444,10 +444,10 @@ def set_route_info(stop_id):
     """
     post_body = request.get_json()
     try:
-        assert 'RouteID' in post_body
-        assert 'PathCName' in post_body
-        assert 'PathEName' in post_body
-        assert 'Sequence' in post_body
+        assert 'RouteID' in post_body, "key 'RouteID' missing"
+        assert 'PathCName' in post_body, "key 'PathCName' missing"
+        assert 'PathEName' in post_body, "key 'PathEName' missing"
+        assert 'Sequence' in post_body, "key 'Sequence' missing"
     except AssertionError as e:
         return jsonify(OperationResponse(result="fail",
                                          error_code=3,
@@ -488,7 +488,7 @@ def set_brightness(stop_id):
     """
     post_body = request.get_json()
     try:
-        assert ('LightSet' in post_body)
+        assert 'LightSet' in post_body, "key 'LightSet' missing"
     except AssertionError as e:
         return jsonify(OperationResponse(result="fail",
                                          error_code=3,
@@ -499,7 +499,7 @@ def set_brightness(stop_id):
 
 @flasgger_server.route("/stopapi/v1/reboot/<stop_id>", methods=['POST'])
 def set_reboot(stop_id):
-    """Update route info to estop.
+    """reboot the stop by stop id.
     ---
     tags:
       - name: TTIA estop
@@ -517,7 +517,7 @@ def set_reboot(stop_id):
 
 @flasgger_server.route("/stopapi/v1/update_gif/<stop_id>", methods=['POST'])
 def set_gif(stop_id):
-    """Update route info to estop.
+    """Update gif info to estop.
     ---
     tags:
       - name: TTIA estop
@@ -559,10 +559,10 @@ def set_gif(stop_id):
     """
     post_body = request.get_json()
     try:
-        assert 'PicNo' in post_body
-        assert 'PicNum' in post_body
-        assert 'PicURL' in post_body
-        assert 'MsgContent' in post_body
+        assert 'PicNo' in post_body, "key 'PicNo' missing"
+        assert 'PicNum' in post_body, "key 'PicNum' missing"
+        assert 'PicURL' in post_body, "key 'PicURL' missing"
+        assert 'MsgContent' in post_body, "key 'MsgContent' missing"
     except AssertionError as e:
         return jsonify(OperationResponse(result="fail",
                                          error_code=3,
