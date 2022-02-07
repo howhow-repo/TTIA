@@ -12,6 +12,50 @@ TTIA_UDP_PORT = config('TTIA_UDP_SERVER_PORT', cast=int, default=50000)
 estop_udp_server = TTIAStopUdpServer(host="localhost", port=TTIA_UDP_PORT)
 
 
+def send(post_body, message_id: int, stop_id: int):
+    estop = EStopObjCacher.get_estop_by_id(stop_id)
+    if estop and estop.ready and estop.address:
+        try:
+            msg = TTIABusStopMessage(message_id, 'default')
+            msg.header.StopID = stop_id
+            msg.payload.from_dict(post_body)
+            msg.option_payload.from_dict(post_body)
+            section = estop_udp_server.create_new_section(stop_id, estop.address, msg)
+
+            if message_id == 0x05:
+                estop_udp_server.send_update_msg_tag(msg_obj=msg, section=section)
+            elif message_id == 0x07:
+                estop_udp_server.send_update_bus_info(msg_obj=msg, section=section)
+            elif message_id == 0x0B:
+                estop_udp_server.send_update_route_info(msg_obj=msg, section=section)
+            elif message_id == 0x0D:
+                estop_udp_server.send_set_brightness(msg_obj=msg, section=section)
+            elif message_id == 0x10:
+                estop_udp_server.send_reboot(msg_obj=msg, section=section)
+            elif message_id == 0x12:
+                estop_udp_server.send_update_gif(msg_obj=msg, section=section)
+
+        except AssertionError as e:
+            return jsonify(OperationResponse(result="fail",
+                                             error_code=3,
+                                             message=f"AssertionError: {e}").response)
+
+    elif not estop:
+        return jsonify(OperationResponse(result="fail",
+                                         error_code=2,
+                                         message=f"estop id {stop_id} is not found in cache.").response)
+    elif not estop.ready:
+        return jsonify(OperationResponse(result="fail",
+                                         error_code=2,
+                                         message=f"estop id {stop_id} is not ready yet.").response)
+    elif not estop.address:
+        return jsonify(OperationResponse(result="fail",
+                                         error_code=2,
+                                         message=f"can not find addr of estop id {stop_id}.").response)
+
+    return jsonify(OperationResponse().response)
+
+
 class OperationResponse:
     def __init__(self, result: str = 'success', error_code: int = 0, message: str = None):
         r = {
@@ -37,6 +81,20 @@ def get_all_cache():
     for es in EStopObjCacher.estop_cache:
         r[es] = EStopObjCacher.estop_cache[es].to_json()
     return jsonify(r)
+
+
+@flasgger_server.route("/stopapi/v1/get_cache/ready", methods=['GET'])
+def get_cache_ready():
+    """get estops those are ready registered.
+    ---
+    tags:
+      - name: TTIA estop
+    responses:
+      200:
+        description: Return the current cache of estop id
+    """
+    estops_json = [stop.to_json() for stop in EStopObjCacher.estop_cache.values() if stop.ready]
+    return jsonify(estops_json)
 
 
 @flasgger_server.route("/stopapi/v1/get_cache/<stop_id>", methods=['GET'])
@@ -155,30 +213,16 @@ def set_msg(stop_id):
         description: Return dict message with op result.
     """
     post_body = request.get_json()
-    stop_id = int(stop_id)
-    estop = EStopObjCacher.get_estop_by_id(stop_id)
-    if estop and estop.ready and estop.address:
-        msg = TTIABusStopMessage(0x05, 'default')
-        msg.header.StopID = stop_id
-        msg.payload.from_dict(post_body)
-        msg.option_payload.from_dict(post_body)
-        section = estop_udp_server.create_new_section(stop_id, estop.address, msg)
-        estop_udp_server.send_update_msg_tag(msg_obj=msg, section=section)
+    try:
+        assert 'MsgTag' in post_body
+        assert 'MsgNo' in post_body
+        assert 'MsgContent' in post_body
+    except AssertionError as e:
+        return jsonify(OperationResponse(result="fail",
+                                         error_code=3,
+                                         message=f"AssertionError: {e}").response)
 
-    elif not estop:
-        return jsonify(OperationResponse(result="fail",
-                                         error_code=2,
-                                         message=f"estop id {stop_id} is not found in cache.").response)
-    elif not estop.ready:
-        return jsonify(OperationResponse(result="fail",
-                                         error_code=2,
-                                         message=f"estop id {stop_id} is not ready yet.").response)
-    elif not estop.address:
-        return jsonify(OperationResponse(result="fail",
-                                         error_code=2,
-                                         message=f"can not find addr of estop id {stop_id}.").response)
-
-    return jsonify(OperationResponse().response)
+    return send(post_body, 0x05, int(stop_id))
 
 
 @flasgger_server.route("/stopapi/v1/set_bus_info/<stop_id>", methods=['POST'])
@@ -325,30 +369,35 @@ def set_bus_info(stop_id):
         description: Return dict message with op result.
     """
     post_body = request.get_json()
-    stop_id = int(stop_id)
-    estop = EStopObjCacher.get_estop_by_id(stop_id)
-    if estop and estop.ready and estop.address:
-        msg = TTIABusStopMessage(0x07, 'default')
-        msg.header.StopID = stop_id
-        msg.payload.from_dict(post_body)
-        msg.option_payload.from_dict(post_body)
-        section = estop_udp_server.create_new_section(stop_id, estop.address, msg)
-        estop_udp_server.send_update_bus_info(msg_obj=msg, section=section)
+    try:
+        assert 'RouteID' in post_body
+        assert 'BusID' in post_body
+        assert 'CurrentStop' in post_body
+        assert 'DestinationStop' in post_body
+        assert 'IsLastBus' in post_body
+        assert 'EstimateTime' in post_body
+        assert 'StopDistance' in post_body
+        assert 'Direction' in post_body
+        assert 'Type' in post_body
+        assert 'TransYear' in post_body
+        assert 'TransMonth' in post_body
+        assert 'TransDay' in post_body
+        assert 'TransHour' in post_body
+        assert 'TransMin' in post_body
+        assert 'TransSec' in post_body
+        assert 'RcvYear' in post_body
+        assert 'RcvMonth' in post_body
+        assert 'RcvDay' in post_body
+        assert 'RcvHour' in post_body
+        assert 'RcvMin' in post_body
+        assert 'RcvSec' in post_body
+        assert 'Reserved' in post_body
+    except AssertionError as e:
+        return jsonify(OperationResponse(result="fail",
+                                         error_code=3,
+                                         message=f"AssertionError: {e}").response)
 
-    elif not estop:
-        return jsonify(OperationResponse(result="fail",
-                                         error_code=2,
-                                         message=f"estop id {stop_id} is not found in cache.").response)
-    elif not estop.ready:
-        return jsonify(OperationResponse(result="fail",
-                                         error_code=2,
-                                         message=f"estop id {stop_id} is not ready yet.").response)
-    elif not estop.address:
-        return jsonify(OperationResponse(result="fail",
-                                         error_code=2,
-                                         message=f"can not find addr of estop id {stop_id}.").response)
-
-    return jsonify(OperationResponse().response)
+    return send(post_body, 0x07, int(stop_id))
 
 
 @flasgger_server.route("/stopapi/v1/set_route_info/<stop_id>", methods=['POST'])
@@ -394,27 +443,128 @@ def set_route_info(stop_id):
         description: Return dict message with op result.
     """
     post_body = request.get_json()
-    stop_id = int(stop_id)
-    estop = EStopObjCacher.get_estop_by_id(stop_id)
-    if estop and estop.ready and estop.address:
-        msg = TTIABusStopMessage(0x0B, 'default')
-        msg.header.StopID = stop_id
-        msg.payload.from_dict(post_body)
-        msg.option_payload.from_dict(post_body)
-        section = estop_udp_server.create_new_section(stop_id, estop.address, msg)
-        estop_udp_server.send_update_route_info(msg_obj=msg, section=section)
+    try:
+        assert 'RouteID' in post_body
+        assert 'PathCName' in post_body
+        assert 'PathEName' in post_body
+        assert 'Sequence' in post_body
+    except AssertionError as e:
+        return jsonify(OperationResponse(result="fail",
+                                         error_code=3,
+                                         message=f"AssertionError: {e}").response)
 
-    elif not estop:
-        return jsonify(OperationResponse(result="fail",
-                                         error_code=2,
-                                         message=f"estop id {stop_id} is not found in cache.").response)
-    elif not estop.ready:
-        return jsonify(OperationResponse(result="fail",
-                                         error_code=2,
-                                         message=f"estop id {stop_id} is not ready yet.").response)
-    elif not estop.address:
-        return jsonify(OperationResponse(result="fail",
-                                         error_code=2,
-                                         message=f"can not find addr of estop id {stop_id}.").response)
+    return send(post_body, 0x0B, int(stop_id))
 
-    return jsonify(OperationResponse().response)
+
+@flasgger_server.route("/stopapi/v1/set_brightness/<stop_id>", methods=['POST'])
+def set_brightness(stop_id):
+    """Update route info to estop.
+    ---
+    tags:
+      - name: TTIA estop
+    parameters:
+      - name: stop_id
+        in: path
+        type: number
+        required: true
+
+      - name: brightness
+        in: body
+        type: string
+        required: true
+        schema:
+          id: route_info
+          type: object
+          required:
+            - LightSet
+          properties:
+            LightSet:
+              type: number
+              description: 亮度設定 0:最暗 15:最亮
+
+    responses:
+      200:
+        description: Return dict message with op result.
+    """
+    post_body = request.get_json()
+    try:
+        assert ('LightSet' in post_body)
+    except AssertionError as e:
+        return jsonify(OperationResponse(result="fail",
+                                         error_code=3,
+                                         message=f"AssertionError: {e}").response)
+
+    return send(post_body, 0x0D, int(stop_id))
+
+
+@flasgger_server.route("/stopapi/v1/reboot/<stop_id>", methods=['POST'])
+def set_reboot(stop_id):
+    """Update route info to estop.
+    ---
+    tags:
+      - name: TTIA estop
+    parameters:
+      - name: stop_id
+        in: path
+        type: number
+        required: true
+    responses:
+      200:
+        description: Return dict message with op result.
+    """
+    return send(request.get_json(), 0x10, int(stop_id))
+
+
+@flasgger_server.route("/stopapi/v1/update_gif/<stop_id>", methods=['POST'])
+def set_gif(stop_id):
+    """Update route info to estop.
+    ---
+    tags:
+      - name: TTIA estop
+    parameters:
+      - name: stop_id
+        in: path
+        type: number
+        required: true
+
+      - name: update_gif
+        in: body
+        type: string
+        required: true
+        schema:
+          id: update_gif
+          type: object
+          required:
+            - PicNo
+            - PicNum
+            - PicURL
+            - MsgContent
+          properties:
+            PicNo:
+              type: number
+              description: 路線代碼
+            PicNum:
+              type: number
+              description: 路線中文名稱
+            PicURL:
+              type: string
+              description: 路線英文名稱
+            MsgContent:
+              type: string
+              description: 顯示順序
+
+    responses:
+      200:
+        description: Return dict message with op result.
+    """
+    post_body = request.get_json()
+    try:
+        assert 'PicNo' in post_body
+        assert 'PicNum' in post_body
+        assert 'PicURL' in post_body
+        assert 'MsgContent' in post_body
+    except AssertionError as e:
+        return jsonify(OperationResponse(result="fail",
+                                         error_code=3,
+                                         message=f"AssertionError: {e}").response)
+    return send(post_body, 0x12, int(stop_id))

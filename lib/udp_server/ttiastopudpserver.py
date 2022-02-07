@@ -10,7 +10,7 @@ logger = logging.getLogger(__name__)
 
 class TTIAStopUdpServer(ServerSideHandler):
 
-    def __init__(self, host, port):
+    def __init__(cls, host, port):
         super().__init__(host, port)
 
     def recv_registration(self, msg_obj: TTIABusStopMessage, section: UDPWorkingSection):
