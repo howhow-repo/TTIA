@@ -41,15 +41,15 @@ class ServerSideHandler(SectionServer):
     def handle_old_section(self, msg_obj: TTIABusStopMessage, section: UDPWorkingSection):
         section.start_time = datetime.now()
 
-        if msg_obj.header.MessageID == 0x02:  # 基本資料程序ok
-            self.recv_registration_check(msg_obj, section)
-        elif msg_obj.header.MessageID == 0x06:  # 更新站牌文字ok
+        if msg_obj.header.MessageID == 0x02:  # 基本資料程序ack
+            self.recv_registration_ack(msg_obj, section)
+        elif msg_obj.header.MessageID == 0x06:  # 更新站牌文字ack
             self.recv_update_msg_tag_ack(msg_obj, section)
-        elif msg_obj.header.MessageID == 0x0C:  # 更新站牌文字ok
+        elif msg_obj.header.MessageID == 0x0C:  # 更新站牌文字ack
             self.recv_update_route_info_ack(msg_obj, section)
-        elif msg_obj.header.MessageID == 0x0E:  # 更新站牌文字ok
+        elif msg_obj.header.MessageID == 0x0E:  # 更新站牌文字ack
             self.recv_set_brightness_ack(msg_obj, section)
-        elif msg_obj.header.MessageID == 0x13:  # 更新站牌文字ok
+        elif msg_obj.header.MessageID == 0x13:  # 更新站牌文字ack
             self.recv_update_gif_ack(msg_obj, section)
 
         # """ 異常處理 """
@@ -78,7 +78,7 @@ class ServerSideHandler(SectionServer):
     def send_registration_info(self, msg_obj: TTIABusStopMessage, section: UDPWorkingSection):  # 0x01
         raise NotImplementedError
 
-    def recv_registration_check(self, msg_obj: TTIABusStopMessage, section: UDPWorkingSection):  # 0x02
+    def recv_registration_ack(self, msg_obj: TTIABusStopMessage, section: UDPWorkingSection):  # 0x02
         raise NotImplementedError
 
     def recv_period_report(self, msg_obj: TTIABusStopMessage, section: UDPWorkingSection):  # 0x03

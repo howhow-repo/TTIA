@@ -15,6 +15,17 @@ estop_udp_server = TTIAEStopUdpClient(host="localhost", port=TTIA_UDP_PORT, esto
                                       server_host='localhost', server_port=50000)
 
 
+class OperationResponse:
+    def __init__(self, result: str = 'success', error_code: int = 0, message: str = None):
+        r = {
+            'result': result,
+            'error_code': error_code,
+        }
+        if message is not None:
+            r['message'] = message
+        self.response = r
+
+
 @flasgger_client.route("/clientapi/v1/info", methods=['GET'])
 def get_self_info():
     """get self estop client current info.
@@ -34,19 +45,8 @@ def get_self_info():
                                          message=f"fail get estop info, {err}").response)
 
 
-class OperationResponse:
-    def __init__(self, result: str = 'success', error_code: int = 0, message: str = None):
-        r = {
-            'result': result,
-            'error_code': error_code,
-        }
-        if message is not None:
-            r['message'] = message
-        self.response = r
-
-
 @flasgger_client.route("/clientapi/v1/send_registration/", methods=['POST'])
-def registration():
+def registrate_estop():
     """Send registration to server side.
     ---
     tags:
@@ -113,7 +113,17 @@ def abnormal_report():
       200:
         description: Return dict message with op result.
     """
+
     post_body = request.get_json()
+
+    try:
+        assert 'StatusCode' in post_body, "key 'StatusCode' missing"
+        assert 'Type' in post_body, "key 'Type' missing"
+    except AssertionError as e:
+        return jsonify(OperationResponse(result="fail",
+                                         error_code=3,
+                                         message=f"AssertionError: {e}").response)
+
     msg = TTIABusStopMessage(0x09, 'default')
     msg.payload.StatusCode = post_body['StatusCode']
     msg.payload.Type = post_body['Type']

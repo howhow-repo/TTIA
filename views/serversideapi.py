@@ -93,7 +93,7 @@ def get_cache_ready():
       200:
         description: Return the current cache of estop id
     """
-    estops_json = [stop.to_json() for stop in EStopObjCacher.estop_cache.values() if stop.ready]
+    estops_json = [stop_obj.to_json() for stop_obj in EStopObjCacher.estop_cache.values() if stop_obj.ready]
     return jsonify(estops_json)
 
 

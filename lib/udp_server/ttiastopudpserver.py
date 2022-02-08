@@ -43,19 +43,19 @@ class TTIAStopUdpServer(ServerSideHandler):
         self.sock.sendto(msg_obj.to_pdu(), section.client_addr)
         section.logs.append(msg_obj)
 
-    def recv_registration_check(self, msg_obj: TTIABusStopMessage, section: UDPWorkingSection):
+    def recv_registration_ack(self, msg_obj: TTIABusStopMessage, section: UDPWorkingSection):
         """
         # 基本資料程序確認訊息
         """
-        logger.info("recv_registration_check")
-        if section.logs[-1].header.MessageID != 1:  # registration_check should go after do_registration
+        logger.info("recv_registration_ack")
+        if section.logs[-1].header.MessageID != 1:  # registration_ack should go after do_registration
             self.wrong_communicate_order(section)
             return
 
         if msg_obj.payload.MsgStatus == 1:  # 訊息設定成功
             EStopObjCacher.estop_cache[msg_obj.header.StopID].ready = True
             EStopObjCacher.update_addr(msg_obj.header.StopID, section.client_addr)
-            logger.info(f"id {msg_obj.header.StopID} registration check ok")
+            logger.info(f"id {msg_obj.header.StopID} registration ack ok")
 
         else:  # 訊息設定失敗
             logger.warning(f"estop {msg_obj.header.StopID} return fail in registration")
@@ -85,14 +85,14 @@ class TTIAStopUdpServer(ServerSideHandler):
         self.sock.sendto(msg_obj.to_pdu(), section.client_addr)
 
     def recv_update_msg_tag_ack(self, msg_obj: TTIABusStopMessage, section: UDPWorkingSection):
-        logger.info(f"recv_update_msg_tag_check from id: {msg_obj.header.StopID}")
+        logger.info(f"recv_update_msg_tag_ack from id: {msg_obj.header.StopID}")
 
     def send_update_bus_info(self, msg_obj: TTIABusStopMessage, section: UDPWorkingSection):
         assert msg_obj.header.MessageID == 0x07
         self.sock.sendto(msg_obj.to_pdu(), section.client_addr)
 
     def recv_update_bus_info_ack(self, msg_obj: TTIABusStopMessage, section: UDPWorkingSection):
-        logger.info(f"recv_update_msg_tag_check from id: {msg_obj.header.StopID}")
+        logger.info(f"recv_update_msg_tag_ack from id: {msg_obj.header.StopID}")
 
     def recv_abnormal(self, msg_obj: TTIABusStopMessage, section: UDPWorkingSection):
         """ 接收定時回報訊息 0x09 """
@@ -116,25 +116,25 @@ class TTIAStopUdpServer(ServerSideHandler):
         self.sock.sendto(msg_obj.to_pdu(), section.client_addr)
 
     def recv_update_route_info_ack(self, msg_obj: TTIABusStopMessage, section: UDPWorkingSection):
-        logger.info(f"recv_update_msg_tag_check from id: {msg_obj.header.StopID}")
+        logger.info(f"recv_update_msg_tag_ack from id: {msg_obj.header.StopID}")
 
     def send_set_brightness(self, msg_obj: TTIABusStopMessage, section: UDPWorkingSection):
         assert msg_obj.header.MessageID == 0x0D
         self.sock.sendto(msg_obj.to_pdu(), section.client_addr)
 
     def recv_set_brightness_ack(self, msg_obj: TTIABusStopMessage, section: UDPWorkingSection):
-        logger.info(f"recv_update_msg_tag_check from id: {msg_obj.header.StopID}")
+        logger.info(f"recv_update_msg_tag_ack from id: {msg_obj.header.StopID}")
 
     def send_reboot(self, msg_obj: TTIABusStopMessage, section: UDPWorkingSection):
         assert msg_obj.header.MessageID == 0x10
         self.sock.sendto(msg_obj.to_pdu(), section.client_addr)
 
     def recv_reboot_ack(self, msg_obj: TTIABusStopMessage, section: UDPWorkingSection):
-        logger.info(f"recv_update_msg_tag_check from id: {msg_obj.header.StopID}")
+        logger.info(f"recv_update_msg_tag_ack from id: {msg_obj.header.StopID}")
 
     def send_update_gif(self, msg_obj: TTIABusStopMessage, section: UDPWorkingSection):
         assert msg_obj.header.MessageID == 0x12
         self.sock.sendto(msg_obj.to_pdu(), section.client_addr)
 
     def recv_update_gif_ack(self, msg_obj: TTIABusStopMessage, section: UDPWorkingSection):
-        logger.info(f"recv_update_msg_tag_check from id: {msg_obj.header.StopID}")
+        logger.info(f"recv_update_msg_tag_ack from id: {msg_obj.header.StopID}")
