@@ -125,7 +125,7 @@ class StationCenter(MySqlHandler):
 
         return e_stops_dict
 
-    def get_e_stop_by_id(self, ids: list):
+    def get_e_stop_by_ids(self, ids: list):
         """
             return like get_e_stop, but with data only stop_ids that requested.
         """

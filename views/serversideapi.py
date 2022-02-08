@@ -1,6 +1,10 @@
 from flask import Blueprint, jsonify, request
 from lib import EStopObjCacher, TTIAStopUdpServer, TTIABusStopMessage
 from decouple import config
+import logging
+
+
+logger = logging.getLogger(__name__)
 
 """
     Features in swagger page 
@@ -142,22 +146,24 @@ def reload_caches():
         description: Return dict message with op result.
     """
     post_body = request.get_json()
-    if len(post_body['ids']) == 0:
-        try:
-            EStopObjCacher.load_from_sql()
-        except Exception as err:
-            return jsonify(OperationResponse(result="fail",
-                                             error_code=2,
-                                             message=f"fail reload estop, {err}").response)
-    elif len(post_body['ids']) > 0:
+    if post_body and len(post_body.get('ids')) > 0:
         try:
             EStopObjCacher.load_from_sql_by_estop_ids(post_body['ids'])
+            logger.info(f"estop cache reloaded by id: {post_body['ids']}")
+            return jsonify(OperationResponse(message=f"estop cache reloaded by id: [{post_body['ids']}]").response)
         except Exception as err:
             return jsonify(OperationResponse(result="fail",
                                              error_code=2,
                                              message=f"fail reload estop of {post_body['ids']}, {err}").response)
-
-    return jsonify(OperationResponse().response)
+    else:
+        try:
+            EStopObjCacher.load_from_sql()
+            logger.info("estop cache total reloaded")
+            return jsonify(OperationResponse(message="estop cache total reloaded").response)
+        except Exception as err:
+            return jsonify(OperationResponse(result="fail",
+                                             error_code=2,
+                                             message=f"fail reload estop, {err}").response)
 
 
 @flasgger_server.route("/stopapi/v1/set_msg/<stop_id>", methods=['POST'])
@@ -214,6 +220,7 @@ def set_msg(stop_id):
     """
     post_body = request.get_json()
     try:
+        assert post_body, "post body should be in json."
         assert 'MsgTag' in post_body, "key 'MsgTag' missing"
         assert 'MsgNo' in post_body, "key 'MsgNo' missing"
         assert 'MsgContent' in post_body, "key 'MsgContent' missing"
@@ -370,6 +377,7 @@ def set_bus_info(stop_id):
     """
     post_body = request.get_json()
     try:
+        assert post_body, "post body should be in json."
         assert 'RouteID' in post_body, "key 'RouteID' missing"
         assert 'BusID' in post_body, "key 'BusID' missing"
         assert 'CurrentStop' in post_body, "key 'CurrentStop' missing"
@@ -444,6 +452,7 @@ def set_route_info(stop_id):
     """
     post_body = request.get_json()
     try:
+        assert post_body, "post body should be in json."
         assert 'RouteID' in post_body, "key 'RouteID' missing"
         assert 'PathCName' in post_body, "key 'PathCName' missing"
         assert 'PathEName' in post_body, "key 'PathEName' missing"
@@ -488,6 +497,7 @@ def set_brightness(stop_id):
     """
     post_body = request.get_json()
     try:
+        assert post_body, "post body should be in json."
         assert 'LightSet' in post_body, "key 'LightSet' missing"
     except AssertionError as e:
         return jsonify(OperationResponse(result="fail",
@@ -559,6 +569,7 @@ def set_gif(stop_id):
     """
     post_body = request.get_json()
     try:
+        assert post_body, "post body should be in json."
         assert 'PicNo' in post_body, "key 'PicNo' missing"
         assert 'PicNum' in post_body, "key 'PicNum' missing"
         assert 'PicURL' in post_body, "key 'PicURL' missing"

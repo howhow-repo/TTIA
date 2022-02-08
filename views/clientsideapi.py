@@ -117,6 +117,7 @@ def abnormal_report():
     post_body = request.get_json()
 
     try:
+        assert post_body, "post body should be in json."
         assert 'StatusCode' in post_body, "key 'StatusCode' missing"
         assert 'Type' in post_body, "key 'Type' missing"
     except AssertionError as e:

@@ -30,7 +30,7 @@ class EStopObjCacher:
     @classmethod
     def load_from_sql_by_estop_ids(cls, ids: list):
         cls.station.connect()
-        estops_dict = cls.station.get_e_stop_by_id(ids)
+        estops_dict = cls.station.get_e_stop_by_ids(ids)
         cls.station.disconnect()
 
         cls.__pack_come_in_data(estops_dict)
