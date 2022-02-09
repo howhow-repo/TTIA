@@ -57,7 +57,7 @@ def send_update_gif(msg):
         logger.error(f"{e}, fail to send_update_gif")
 
 
-def add_update_job(post_body, message_id: int, stop_id: int, update_time: datetime):
+def add_launch_job(post_body, message_id: int, stop_id: int, trigger_time: datetime):
     msg = TTIABusStopMessage(message_id, 'default')
     msg.header.StopID = int(stop_id)
     msg.payload.from_dict(post_body)
@@ -67,19 +67,19 @@ def add_update_job(post_body, message_id: int, stop_id: int, update_time: dateti
     if estop and estop.ready:
         if message_id == 0x05:
             scheduler.add_job(func=lambda: send_update_msg_tag(msg),
-                              next_run_time=update_time,
+                              next_run_time=trigger_time,
                               max_instances=1, )
         elif message_id == 0x07:
             scheduler.add_job(func=lambda: send_update_bus_info(msg),
-                              next_run_time=update_time,
+                              next_run_time=trigger_time,
                               max_instances=1, )
         elif message_id == 0x0B:
             scheduler.add_job(func=lambda: send_update_route_info(msg),
-                              next_run_time=update_time,
+                              next_run_time=trigger_time,
                               max_instances=1, )
         elif message_id == 0x12:
             scheduler.add_job(func=lambda: send_update_gif(msg),
-                              next_run_time=update_time,
+                              next_run_time=trigger_time,
                               max_instances=1, )
         else:
             raise NotImplementedError("Message id not implement yet.")
@@ -138,7 +138,7 @@ def del_job():
     post_body = request.get_json()
     try:
         assert post_body, "post body should be in json."
-        assert 'job_id' in post_body, "key 'UpdateTime' missing"
+        assert 'job_id' in post_body, "key 'job_id' missing"
         assert post_body['job_id'] != "expire_timeout_section", "you can not remove server's period job."
         assert post_body['job_id'] != "cache_daily_reload", "you can not remove server's period job."
     except AssertionError as e:
@@ -184,12 +184,12 @@ def add_update_msg(stop_id):
           id: msg_update_schedule
           type: object
           required:
-            - UpdateTime
+            - LaunchTime
             - MsgTag
             - MsgNo
             - MsgContent
           properties:
-            UpdateTime:
+            LaunchTime:
               type: string
               description: "%Y/%m/%d, %H:%M:%S"
               example: 2022/2/08, 15:00:00
@@ -225,7 +225,7 @@ def add_update_msg(stop_id):
     try:
         stop_id = int(stop_id)
         assert post_body, "post body should be in json."
-        assert 'UpdateTime' in post_body, "key 'UpdateTime' missing"
+        assert 'LaunchTime' in post_body, "key 'LaunchTime' missing"
         assert 'MsgTag' in post_body, "key 'MsgTag' missing"
         assert 'MsgNo' in post_body, "key 'MsgNo' missing"
         assert 'MsgContent' in post_body, "key 'MsgContent' missing"
@@ -239,14 +239,14 @@ def add_update_msg(stop_id):
                                         message=f"ValueError: {e}").response)
 
     try:
-        update_time = datetime.strptime(post_body['UpdateTime'], dateFormatter)
-        del post_body['UpdateTime']
+        update_time = datetime.strptime(post_body['LaunchTime'], dateFormatter)
+        del post_body['LaunchTime']
     except ValueError as e:
         return jsonify(FlasggerResponse(result="fail",
                                         error_code=3,
                                         message=f"ValueError: {e}").response)
 
-    return add_update_job(post_body, 0x05, stop_id, update_time)
+    return add_launch_job(post_body, 0x05, stop_id, update_time)
 
 
 @scheduler_api.route("/stopapi/v1/update_bus_info_schedule/<stop_id>", methods=['POST'])
@@ -270,7 +270,7 @@ def add_update_bus_info(stop_id):
           id: bus_info_update_schedule
           type: object
           required:
-            - UpdateTime
+            - LaunchTime
             - RouteID
             - BusID
             - CurrentStop
@@ -294,7 +294,7 @@ def add_update_bus_info(stop_id):
             - RcvSec
             - Reserved
           properties:
-            UpdateTime:
+            LaunchTime:
               type: string
               description: "%Y/%m/%d, %H:%M:%S"
               example: 2022/2/08, 15:00:00
@@ -401,7 +401,7 @@ def add_update_bus_info(stop_id):
     try:
         stop_id = int(stop_id)
         assert post_body, "post body should be in json."
-        assert 'UpdateTime' in post_body, "key 'UpdateTime' missing"
+        assert 'LaunchTime' in post_body, "key 'LaunchTime' missing"
         assert 'RouteID' in post_body, "key 'RouteID' missing"
         assert 'BusID' in post_body, "key 'BusID' missing"
         assert 'CurrentStop' in post_body, "key 'CurrentStop' missing"
@@ -434,13 +434,13 @@ def add_update_bus_info(stop_id):
                                         message=f"ValueError: {e}").response)
 
     try:
-        update_time = datetime.strptime(post_body['UpdateTime'], dateFormatter)
+        update_time = datetime.strptime(post_body['LaunchTime'], dateFormatter)
     except ValueError as e:
         return jsonify(FlasggerResponse(result="fail",
                                         error_code=3,
                                         message=f"ValueError: {e}").response)
 
-    return add_update_job(post_body, 0x07, stop_id, update_time)
+    return add_launch_job(post_body, 0x07, stop_id, update_time)
 
 
 @scheduler_api.route("/stopapi/v1/route_info_update_schedule/<stop_id>", methods=['POST'])
@@ -464,13 +464,13 @@ def add_update_route_info(stop_id):
           id: route_update_schedule
           type: object
           required:
-            - UpdateTime
+            - LaunchTime
             - RouteID
             - PathCName
             - PathEName
             - Sequence
           properties:
-            UpdateTime:
+            LaunchTime:
               type: string
               description: "%Y/%m/%d, %H:%M:%S"
               example: 2022/2/08, 15:00:00
@@ -495,7 +495,7 @@ def add_update_route_info(stop_id):
     try:
         stop_id = int(stop_id)
         assert post_body, "post body should be in json."
-        assert 'UpdateTime' in post_body, "key 'UpdateTime' missing"
+        assert 'LaunchTime' in post_body, "key 'LaunchTime' missing"
         assert 'RouteID' in post_body, "key 'RouteID' missing"
         assert 'PathCName' in post_body, "key 'PathCName' missing"
         assert 'PathEName' in post_body, "key 'PathEName' missing"
@@ -510,13 +510,13 @@ def add_update_route_info(stop_id):
                                         message=f"ValueError: {e}").response)
 
     try:
-        update_time = datetime.strptime(post_body['UpdateTime'], dateFormatter)
+        update_time = datetime.strptime(post_body['LaunchTime'], dateFormatter)
     except ValueError as e:
         return jsonify(FlasggerResponse(result="fail",
                                         error_code=3,
                                         message=f"ValueError: {e}").response)
 
-    return add_update_job(post_body, 0x0B, stop_id, update_time)
+    return add_launch_job(post_body, 0x0B, stop_id, update_time)
 
 
 @scheduler_api.route("/stopapi/v1/gif_update_schedule/<stop_id>", methods=['POST'])
@@ -540,13 +540,13 @@ def add_update_gif(stop_id):
           id: route_update_gif
           type: object
           required:
-            - UpdateTime
+            - LaunchTime
             - PicNo
             - PicNum
             - PicURL
             - MsgContent
           properties:
-            UpdateTime:
+            LaunchTime:
               type: string
               description: "%Y/%m/%d, %H:%M:%S"
               example: 2022/2/08, 15:00:00
@@ -571,7 +571,7 @@ def add_update_gif(stop_id):
     try:
         stop_id = int(stop_id)
         assert post_body, "post body should be in json."
-        assert 'UpdateTime' in post_body, "key 'UpdateTime' missing"
+        assert 'LaunchTime' in post_body, "key 'LaunchTime' missing"
         assert 'PicNo' in post_body, "key 'PicNo' missing"
         assert 'PicNum' in post_body, "key 'PicNum' missing"
         assert 'PicURL' in post_body, "key 'PicURL' missing"
@@ -586,10 +586,10 @@ def add_update_gif(stop_id):
                                         message=f"ValueError: {e}").response)
 
     try:
-        update_time = datetime.strptime(post_body['UpdateTime'], dateFormatter)
+        update_time = datetime.strptime(post_body['LaunchTime'], dateFormatter)
     except ValueError as e:
         return jsonify(FlasggerResponse(result="fail",
                                         error_code=3,
                                         message=f"ValueError: {e}").response)
 
-    return add_update_job(post_body, 0x012, stop_id, update_time)
+    return add_launch_job(post_body, 0x012, stop_id, update_time)

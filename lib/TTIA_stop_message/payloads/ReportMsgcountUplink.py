@@ -19,7 +19,7 @@ class ReportMsgcountUplink(PayloadBase):
 
     def from_dict(self, input_dict: dict):
         self.SentCount = input_dict['SentCount']
-        self.RevCount = input_dict['RecvCount']
+        self.RevCount = input_dict['RevCount']
 
     def to_dict(self) -> dict:
         r = {
