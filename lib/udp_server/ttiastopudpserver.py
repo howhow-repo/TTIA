@@ -80,19 +80,23 @@ class TTIAStopUdpServer(ServerSideHandler):
         self.sock.sendto(msg_obj.to_pdu(), section.client_addr)
         self.remove_from_sections(section.stop_id)
 
-    def send_update_msg_tag(self, msg_obj: TTIABusStopMessage, addr: tuple):
+    def send_update_msg_tag(self, msg_obj: TTIABusStopMessage):
         assert msg_obj.header.MessageID == 0x05
-        self.create_new_section(msg_obj.header.StopID, addr, msg_obj)
-        self.sock.sendto(msg_obj.to_pdu(), addr)
+        estop = EStopObjCacher.get_estop_by_id(msg_obj.header.StopID)
+        assert estop.address is not None, f"Can not find client {msg_obj.header.StopID} address"
+        self.create_new_section(msg_obj.header.StopID, estop.address, msg_obj)
+        self.sock.sendto(msg_obj.to_pdu(), estop.address)
         logger.info(f"send_update_msg_tag: {msg_obj.header.StopID} ")
 
     def recv_update_msg_tag_ack(self, msg_obj: TTIABusStopMessage, section: UDPWorkingSection):
         logger.info(f"recv_update_msg_tag_ack from id: {msg_obj.header.StopID}")
 
-    def send_update_bus_info(self, msg_obj: TTIABusStopMessage, addr: tuple):
+    def send_update_bus_info(self, msg_obj: TTIABusStopMessage):
         assert msg_obj.header.MessageID == 0x07
-        self.create_new_section(msg_obj.header.StopID, addr, msg_obj)
-        self.sock.sendto(msg_obj.to_pdu(), addr)
+        estop = EStopObjCacher.get_estop_by_id(msg_obj.header.StopID)
+        assert estop.address is not None, f"Can not find client {msg_obj.header.StopID} address"
+        self.create_new_section(msg_obj.header.StopID, estop.address, msg_obj)
+        self.sock.sendto(msg_obj.to_pdu(), estop.address)
         logger.info(f"send_update_bus_info: {msg_obj.header.StopID} ")
 
     def recv_update_bus_info_ack(self, msg_obj: TTIABusStopMessage, section: UDPWorkingSection):
@@ -116,38 +120,46 @@ class TTIAStopUdpServer(ServerSideHandler):
         self.sock.sendto(msg_obj.to_pdu(), section.client_addr)
         self.remove_from_sections(section.stop_id)
 
-    def send_update_route_info(self, msg_obj: TTIABusStopMessage, addr: tuple):
-        assert msg_obj.header.MessageID == 0x0B
-        self.create_new_section(msg_obj.header.StopID, addr, msg_obj)
-        self.sock.sendto(msg_obj.to_pdu(), addr)
+    def send_update_route_info(self, msg_obj: TTIABusStopMessage):
+        assert msg_obj.header.MessageID == 0x0B, "uncorrect message id"
+        estop = EStopObjCacher.get_estop_by_id(msg_obj.header.StopID)
+        assert estop.address is not None, f"Can not find client {msg_obj.header.StopID} address"
+        self.create_new_section(msg_obj.header.StopID, estop.address, msg_obj)
+        self.sock.sendto(msg_obj.to_pdu(), estop.address)
         logger.info(f"send_update_route_info: {msg_obj.header.StopID} ")
 
     def recv_update_route_info_ack(self, msg_obj: TTIABusStopMessage, section: UDPWorkingSection):
-        logger.info(f"recv_update_msg_tag_ack from id: {msg_obj.header.StopID}")
+        logger.info(f"recv_update_route_info_ack from id: {msg_obj.header.StopID}")
 
-    def send_set_brightness(self, msg_obj: TTIABusStopMessage, addr: tuple):
-        assert msg_obj.header.MessageID == 0x0D
-        self.create_new_section(msg_obj.header.StopID, addr, msg_obj)
-        self.sock.sendto(msg_obj.to_pdu(), addr)
+    def send_set_brightness(self, msg_obj: TTIABusStopMessage):
+        assert msg_obj.header.MessageID == 0x0D, "uncorrect message id"
+        estop = EStopObjCacher.get_estop_by_id(msg_obj.header.StopID)
+        assert estop.address is not None, f"Can not find client {msg_obj.header.StopID} address"
+        self.create_new_section(msg_obj.header.StopID,  estop.address, msg_obj)
+        self.sock.sendto(msg_obj.to_pdu(),  estop.address)
         logger.info(f"send_set_brightness: {msg_obj.header.StopID} ")
 
     def recv_set_brightness_ack(self, msg_obj: TTIABusStopMessage, section: UDPWorkingSection):
-        logger.info(f"recv_update_msg_tag_ack from id: {msg_obj.header.StopID}")
+        logger.info(f"recv_set_brightness from id: {msg_obj.header.StopID}")
 
-    def send_reboot(self, msg_obj: TTIABusStopMessage, addr: tuple):
-        assert msg_obj.header.MessageID == 0x10
-        self.create_new_section(msg_obj.header.StopID, addr, msg_obj)
-        self.sock.sendto(msg_obj.to_pdu(), addr)
+    def send_reboot(self, msg_obj: TTIABusStopMessage):
+        assert msg_obj.header.MessageID == 0x10, "uncorrect message id"
+        estop = EStopObjCacher.get_estop_by_id(msg_obj.header.StopID)
+        assert estop.address is not None, f"Can not find client {msg_obj.header.StopID} address"
+        self.create_new_section(msg_obj.header.StopID,  estop.address, msg_obj)
+        self.sock.sendto(msg_obj.to_pdu(),  estop.address)
         logger.info(f"send_reboot: {msg_obj.header.StopID} ")
 
     def recv_reboot_ack(self, msg_obj: TTIABusStopMessage, section: UDPWorkingSection):
-        logger.info(f"recv_update_msg_tag_ack from id: {msg_obj.header.StopID}")
+        logger.info(f"recv_reboot_ack from id: {msg_obj.header.StopID}")
 
-    def send_update_gif(self, msg_obj: TTIABusStopMessage, addr: tuple):
-        assert msg_obj.header.MessageID == 0x12
-        self.create_new_section(msg_obj.header.StopID, addr, msg_obj)
-        self.sock.sendto(msg_obj.to_pdu(), addr)
+    def send_update_gif(self, msg_obj: TTIABusStopMessage):
+        assert msg_obj.header.MessageID == 0x12, "uncorrect message id"
+        estop = EStopObjCacher.get_estop_by_id(msg_obj.header.StopID)
+        assert estop.address is not None, f"Can not find client {msg_obj.header.StopID} address"
+        self.create_new_section(msg_obj.header.StopID, estop.address, msg_obj)
+        self.sock.sendto(msg_obj.to_pdu(), estop.address)
         logger.info(f"send_update_gif: {msg_obj.header.StopID} ")
 
     def recv_update_gif_ack(self, msg_obj: TTIABusStopMessage, section: UDPWorkingSection):
-        logger.info(f"recv_update_msg_tag_ack from id: {msg_obj.header.StopID}")
+        logger.info(f"recv_update_gif_ack from id: {msg_obj.header.StopID}")

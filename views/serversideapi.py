@@ -27,17 +27,17 @@ def send(post_body, message_id: int, stop_id: int):
             msg.option_payload.from_dict(post_body)
 
             if message_id == 0x05:
-                estop_udp_server.send_update_msg_tag(msg_obj=msg, addr=estop.address)
+                estop_udp_server.send_update_msg_tag(msg_obj=msg)
             elif message_id == 0x07:
-                estop_udp_server.send_update_bus_info(msg_obj=msg, addr=estop.address)
+                estop_udp_server.send_update_bus_info(msg_obj=msg)
             elif message_id == 0x0B:
-                estop_udp_server.send_update_route_info(msg_obj=msg, addr=estop.address)
+                estop_udp_server.send_update_route_info(msg_obj=msg)
             elif message_id == 0x0D:
-                estop_udp_server.send_set_brightness(msg_obj=msg, addr=estop.address)
+                estop_udp_server.send_set_brightness(msg_obj=msg)
             elif message_id == 0x10:
-                estop_udp_server.send_reboot(msg_obj=msg, addr=estop.address)
+                estop_udp_server.send_reboot(msg_obj=msg)
             elif message_id == 0x12:
-                estop_udp_server.send_update_gif(msg_obj=msg, addr=estop.address)
+                estop_udp_server.send_update_gif(msg_obj=msg)
 
         except AssertionError as e:
             return jsonify(FlasggerResponse(result="fail",

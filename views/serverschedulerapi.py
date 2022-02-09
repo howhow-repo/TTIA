@@ -8,7 +8,6 @@ from .serversideapi import estop_udp_server
 from lib import EStopObjCacher, TTIAStopUdpServer, TTIABusStopMessage
 from lib import FlasggerResponse
 
-
 logger = logging.getLogger(__name__)
 scheduler_api = Blueprint('scheduler_api', __name__)
 
@@ -30,6 +29,74 @@ scheduler.add_job(func=TTIAStopUdpServer.expire_timeout_section,
                   seconds=TTIAStopUdpServer.section_lifetime / 2)
 
 
+def send_update_msg_tag(msg):
+    try:
+        estop_udp_server.send_update_msg_tag(msg)
+    except AssertionError as e:
+        logger.error(f"{e}, fail to send_update_msg_tag")
+
+
+def send_update_bus_info(msg):
+    try:
+        estop_udp_server.send_update_bus_info(msg)
+    except AssertionError as e:
+        logger.error(f"{e}, fail to send_update_bus_info")
+
+
+def send_update_route_info(msg):
+    try:
+        estop_udp_server.send_update_route_info(msg)
+    except AssertionError as e:
+        logger.error(f"{e}, fail to send_update_route_info")
+
+
+def send_update_gif(msg):
+    try:
+        estop_udp_server.send_update_gif(msg)
+    except AssertionError as e:
+        logger.error(f"{e}, fail to send_update_gif")
+
+
+def add_update_job(post_body, message_id: int, stop_id: int, update_time: datetime):
+    msg = TTIABusStopMessage(message_id, 'default')
+    msg.header.StopID = int(stop_id)
+    msg.payload.from_dict(post_body)
+    msg.option_payload.from_dict(post_body)
+    estop = EStopObjCacher.get_estop_by_id(stop_id)
+
+    if estop:
+        try:
+            if message_id == 0x05:
+                scheduler.add_job(func=lambda: send_update_msg_tag(msg),
+                                  next_run_time=update_time,
+                                  max_instances=1, )
+            elif message_id == 0x07:
+                scheduler.add_job(func=lambda: send_update_bus_info(msg),
+                                  next_run_time=update_time,
+                                  max_instances=1, )
+            elif message_id == 0x0B:
+                scheduler.add_job(func=lambda: send_update_route_info(msg),
+                                  next_run_time=update_time,
+                                  max_instances=1, )
+            elif message_id == 0x12:
+                scheduler.add_job(func=lambda: send_update_gif(msg),
+                                  next_run_time=update_time,
+                                  max_instances=1, )
+            else:
+                raise NotImplementedError("Message id not implement yet.")
+        except Exception as e:
+            logger.error(f"{e}")
+    else:
+        return jsonify(FlasggerResponse(result="fail",
+                                        error_code=3,
+                                        message=f"StatusError: The estop is not found or not ready yet.").response)
+
+    return jsonify(
+        [f"id: {job.id}, name: {job.name}, trigger: {job.trigger}, next: {job.next_run_time}" for job in
+         scheduler.get_jobs()]
+    )
+
+
 @scheduler_api.route("/stopapi/v1/get_jobs/", methods=['GET'])
 def get_jobs():
     """get jobs from background scheduler.
@@ -41,7 +108,8 @@ def get_jobs():
         description: Return the current cache of estop id
     """
     return jsonify(
-        [f"id: {job.id}, name: {job.name}, trigger: {job.trigger}, next: {job.next_run_time}" for job in scheduler.get_jobs()]
+        [f"id: {job.id}, name: {job.name}, trigger: {job.trigger}, next: {job.next_run_time}" for job in
+         scheduler.get_jobs()]
     )
 
 
@@ -93,7 +161,8 @@ def del_job():
                                         message=f"StatusError: did not find job id.").response)
 
     return jsonify(
-        [f"id: {job.id}, name: {job.name}, trigger: {job.trigger}, next: {job.next_run_time}" for job in scheduler.get_jobs()]
+        [f"id: {job.id}, name: {job.name}, trigger: {job.trigger}, next: {job.next_run_time}" for job in
+         scheduler.get_jobs()]
     )
 
 
@@ -174,29 +243,13 @@ def add_update_msg(stop_id):
 
     try:
         update_time = datetime.strptime(post_body['UpdateTime'], dateFormatter)
+        del post_body['UpdateTime']
     except ValueError as e:
         return jsonify(FlasggerResponse(result="fail",
                                         error_code=3,
                                         message=f"ValueError: {e}").response)
 
-    msg = TTIABusStopMessage(0x05, 'default')
-    msg.header.StopID = int(stop_id)
-    msg.payload.from_dict(post_body)
-    msg.option_payload.from_dict(post_body)
-    estop = EStopObjCacher.get_estop_by_id(stop_id)
-
-    if estop and estop.ready and estop.address:
-        scheduler.add_job(func=lambda: estop_udp_server.send_update_msg_tag(msg, estop.address),
-                          next_run_time=update_time,
-                          max_instances=1,)
-    else:
-        return jsonify(FlasggerResponse(result="fail",
-                                        error_code=3,
-                                        message=f"StatusError: The estop is not found or not ready yet.").response)
-
-    return jsonify(
-        [f"id: {job.id}, name: {job.name}, trigger: {job.trigger}, next: {job.next_run_time}" for job in scheduler.get_jobs()]
-    )
+    return add_update_job(post_body, 0x05, stop_id, update_time)
 
 
 @scheduler_api.route("/stopapi/v1/update_bus_info_schedule/<stop_id>", methods=['POST'])
@@ -390,24 +443,7 @@ def add_update_bus_info(stop_id):
                                         error_code=3,
                                         message=f"ValueError: {e}").response)
 
-    msg = TTIABusStopMessage(0x07, 'default')
-    msg.header.StopID = int(stop_id)
-    msg.payload.from_dict(post_body)
-    msg.option_payload.from_dict(post_body)
-    estop = EStopObjCacher.get_estop_by_id(stop_id)
-
-    if estop and estop.ready and estop.address:
-        scheduler.add_job(func=lambda: estop_udp_server.send_update_bus_info(msg, estop.address),
-                          next_run_time=update_time,
-                          max_instances=1,)
-    else:
-        return jsonify(FlasggerResponse(result="fail",
-                                        error_code=3,
-                                        message=f"StatusError: The estop is not found or not ready yet.").response)
-
-    return jsonify(
-        [f"id: {job.id}, name: {job.name}, trigger: {job.trigger}, next: {job.next_run_time}" for job in scheduler.get_jobs()]
-    )
+    return add_update_job(post_body, 0x07, stop_id, update_time)
 
 
 @scheduler_api.route("/stopapi/v1/route_info_update_schedule/<stop_id>", methods=['POST'])
@@ -483,24 +519,7 @@ def add_update_route_info(stop_id):
                                         error_code=3,
                                         message=f"ValueError: {e}").response)
 
-    msg = TTIABusStopMessage(0x0B, 'default')
-    msg.header.StopID = int(stop_id)
-    msg.payload.from_dict(post_body)
-    msg.option_payload.from_dict(post_body)
-    estop = EStopObjCacher.get_estop_by_id(stop_id)
-
-    if estop and estop.ready and estop.address:
-        scheduler.add_job(func=lambda: estop_udp_server.send_update_msg_tag(msg, estop.address),
-                          next_run_time=update_time,
-                          max_instances=1,)
-    else:
-        return jsonify(FlasggerResponse(result="fail",
-                                        error_code=3,
-                                        message=f"StatusError: The estop is not found or not ready yet.").response)
-
-    return jsonify(
-        [f"id: {job.id}, name: {job.name}, trigger: {job.trigger}, next: {job.next_run_time}" for job in scheduler.get_jobs()]
-    )
+    return add_update_job(post_body, 0x0B, stop_id, update_time)
 
 
 @scheduler_api.route("/stopapi/v1/gif_update_schedule/<stop_id>", methods=['POST'])
@@ -576,21 +595,4 @@ def add_update_gif(stop_id):
                                         error_code=3,
                                         message=f"ValueError: {e}").response)
 
-    msg = TTIABusStopMessage(0x12, 'default')
-    msg.header.StopID = int(stop_id)
-    msg.payload.from_dict(post_body)
-    msg.option_payload.from_dict(post_body)
-    estop = EStopObjCacher.get_estop_by_id(stop_id)
-
-    if estop and estop.ready and estop.address:
-        scheduler.add_job(func=lambda: estop_udp_server.send_update_msg_tag(msg, estop.address),
-                          next_run_time=update_time,
-                          max_instances=1,)
-    else:
-        return jsonify(FlasggerResponse(result="fail",
-                                        error_code=3,
-                                        message=f"StatusError: The estop is not found or not ready yet.").response)
-
-    return jsonify(
-        [f"id: {job.id}, name: {job.name}, trigger: {job.trigger}, next: {job.next_run_time}" for job in scheduler.get_jobs()]
-    )
+    return add_update_job(post_body, 0x012, stop_id, update_time)
