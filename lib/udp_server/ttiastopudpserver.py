@@ -1,6 +1,7 @@
-from .serversidehandler import ServerSideHandler
-from .section_server import UDPWorkingSection
-from lib import EStopObjCacher, TTIABusStopMessage
+from .core import ServerSideHandler
+from .core import UDPWorkingSection
+from ..db_control import EStopObjCacher
+from ..TTIA_stop_message import TTIABusStopMessage
 from datetime import datetime, time
 import logging
 
@@ -79,6 +80,7 @@ class TTIAStopUdpServer(ServerSideHandler):
     def send_period_report_ack(self, msg_obj: TTIABusStopMessage, section: UDPWorkingSection):
         self.sock.sendto(msg_obj.to_pdu(), section.client_addr)
         self.remove_from_sections(section.stop_id)
+        logger.info(f"send_period_report_ack: {msg_obj.header.StopID} ")
 
     def send_update_msg_tag(self, msg_obj: TTIABusStopMessage):
         assert msg_obj.header.MessageID == 0x05
