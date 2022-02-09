@@ -249,7 +249,7 @@ def add_update_msg(stop_id):
     return add_launch_job(post_body, 0x05, stop_id, update_time)
 
 
-@scheduler_api.route("/stopapi/v1/update_bus_info_schedule/<stop_id>", methods=['POST'])
+@scheduler_api.route("/stopapi/v1/bus_info_update_schedule/<stop_id>", methods=['POST'])
 def add_update_bus_info(stop_id):
     """add update bus_info mission to server.
     ---
