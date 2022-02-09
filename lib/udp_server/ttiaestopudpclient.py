@@ -1,5 +1,6 @@
+import datetime
 import logging
-
+from datetime import datetime
 from .clientsidehandler import ClientSideHandler
 from lib import TTIABusStopMessage
 from lib import EStop
@@ -80,9 +81,11 @@ class TTIAEStopUdpClient(ClientSideHandler):
         assert msg_obj.header.MessageID == 0x09
         logger.info(f'send_abnormal: {msg_obj.payload.to_dict()}')
         msg_obj.header.StopID = self.estop.StopID
+        self.estop.abnormal_log.append(msg_obj.payload)
         self.sock.sendto(msg_obj.to_pdu(), self.server_addr)
 
     def recv_abnormal_ack(self, msg_obj: TTIABusStopMessage):
+        self.estop.abnormal_log[-1].set_Rcv_time(datetime.now())
         logger.info(f'recv_abnormal_ack: {msg_obj.payload.to_dict()}')
 
     def recv_update_route_info(self, msg_obj: TTIABusStopMessage):

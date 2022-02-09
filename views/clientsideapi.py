@@ -2,11 +2,13 @@ from flask import Blueprint, jsonify, request
 from lib import TTIAEStopUdpClient, TTIABusStopMessage
 from lib import EStop
 from decouple import config
+import logging
 
 """
     Features in swagger page 
 """
 
+logger = logging.getLogger(__name__)
 flasgger_client = Blueprint('flasgger_client', __name__)
 
 TTIA_UDP_PORT = config('TTIA_UDP_CLIENT_PORT', cast=int, default=50000)
@@ -36,8 +38,8 @@ def get_self_info():
       200:
         description: Return the current syayus of estops
     """
-    print(estop.to_json())
     try:
+        logger.info(f"Get self estop info: {estop.to_json()}")
         return jsonify(estop.to_json())
     except Exception as err:
         return jsonify(OperationResponse(result="fail",
@@ -131,7 +133,7 @@ def abnormal_report():
 
     try:
         estop_udp_server.send_abnormal(msg)
-        estop_udp_server.estop.abnormal_log.append(msg.payload.to_dict())
+        logger.info(f"abnormal msg sent: {msg.payload.to_dict()}")
 
     except Exception as err:
         return jsonify(OperationResponse(result="fail",

@@ -1,6 +1,6 @@
 import struct
 from .payload_base import PayloadBase
-
+from datetime import datetime
 
 class ReportAbnormalUplink(PayloadBase):
     message_id = 0x09
@@ -85,14 +85,15 @@ class ReportAbnormalUplink(PayloadBase):
         return r
 
     def from_default(self):
+        now = datetime.now()
         self.StatusCode = 0
         self.Type = 1
-        self.TransYear = 2000
-        self.TransMonth = 1
-        self.TransDay = 1
-        self.TransHour = 0
-        self.TransMinute = 0
-        self.TransSecond = 0
+        self.TransYear = now.year
+        self.TransMonth = now.month
+        self.TransDay = now.day
+        self.TransHour = now.hour
+        self.TransMinute = now.minute
+        self.TransSecond = now.second
         self.RcvYear = 2000
         self.RcvMonth = 1
         self.RcvDay = 1
@@ -113,3 +114,19 @@ class ReportAbnormalUplink(PayloadBase):
         assert 0 <= self.RcvHour <= 59
         assert 0 <= self.RcvMinute <= 59
         assert 0 <= self.RcvSecond <= 59
+
+    def set_Trans_time(self, t:datetime):
+        self.TransYear = t.year
+        self.TransMonth = t.month
+        self.TransDay = t.day
+        self.TransHour = t.hour
+        self.TransMinute = t.minute
+        self.TransSecond = t.second
+
+    def set_Rcv_time(self, t:datetime):
+        self.RcvYear = t.year
+        self.RcvMonth = t.month
+        self.RcvDay = t.day
+        self.RcvHour = t.hour
+        self.RcvMinute = t.minute
+        self.RcvSecond = t.second

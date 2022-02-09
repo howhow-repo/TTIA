@@ -1,15 +1,16 @@
 from flask import Blueprint, jsonify, request
 from lib import EStopObjCacher, TTIAStopUdpServer, TTIABusStopMessage
+from lib import FlasggerResponse
 from decouple import config
 import logging
 
-
-logger = logging.getLogger(__name__)
 
 """
     Features in swagger page 
 """
 
+
+logger = logging.getLogger(__name__)
 flasgger_server = Blueprint('flasgger_server', __name__)
 
 TTIA_UDP_PORT = config('TTIA_UDP_SERVER_PORT', cast=int, default=50000)
@@ -24,51 +25,39 @@ def send(post_body, message_id: int, stop_id: int):
             msg.header.StopID = stop_id
             msg.payload.from_dict(post_body)
             msg.option_payload.from_dict(post_body)
-            section = estop_udp_server.create_new_section(stop_id, estop.address, msg)
 
             if message_id == 0x05:
-                estop_udp_server.send_update_msg_tag(msg_obj=msg, section=section)
+                estop_udp_server.send_update_msg_tag(msg_obj=msg, addr=estop.address)
             elif message_id == 0x07:
-                estop_udp_server.send_update_bus_info(msg_obj=msg, section=section)
+                estop_udp_server.send_update_bus_info(msg_obj=msg, addr=estop.address)
             elif message_id == 0x0B:
-                estop_udp_server.send_update_route_info(msg_obj=msg, section=section)
+                estop_udp_server.send_update_route_info(msg_obj=msg, addr=estop.address)
             elif message_id == 0x0D:
-                estop_udp_server.send_set_brightness(msg_obj=msg, section=section)
+                estop_udp_server.send_set_brightness(msg_obj=msg, addr=estop.address)
             elif message_id == 0x10:
-                estop_udp_server.send_reboot(msg_obj=msg, section=section)
+                estop_udp_server.send_reboot(msg_obj=msg, addr=estop.address)
             elif message_id == 0x12:
-                estop_udp_server.send_update_gif(msg_obj=msg, section=section)
+                estop_udp_server.send_update_gif(msg_obj=msg, addr=estop.address)
 
         except AssertionError as e:
-            return jsonify(OperationResponse(result="fail",
-                                             error_code=3,
-                                             message=f"AssertionError: {e}").response)
+            return jsonify(FlasggerResponse(result="fail",
+                                            error_code=3,
+                                            message=f"AssertionError: {e}").response)
 
     elif not estop:
-        return jsonify(OperationResponse(result="fail",
-                                         error_code=2,
-                                         message=f"estop id {stop_id} is not found in cache.").response)
+        return jsonify(FlasggerResponse(result="fail",
+                                        error_code=2,
+                                        message=f"estop id {stop_id} is not found in cache.").response)
     elif not estop.ready:
-        return jsonify(OperationResponse(result="fail",
-                                         error_code=2,
-                                         message=f"estop id {stop_id} is not ready yet.").response)
+        return jsonify(FlasggerResponse(result="fail",
+                                        error_code=2,
+                                        message=f"estop id {stop_id} is not ready yet.").response)
     elif not estop.address:
-        return jsonify(OperationResponse(result="fail",
-                                         error_code=2,
-                                         message=f"can not find addr of estop id {stop_id}.").response)
+        return jsonify(FlasggerResponse(result="fail",
+                                        error_code=2,
+                                        message=f"can not find addr of estop id {stop_id}.").response)
 
-    return jsonify(OperationResponse().response)
-
-
-class OperationResponse:
-    def __init__(self, result: str = 'success', error_code: int = 0, message: str = None):
-        r = {
-            'result': result,
-            'error_code': error_code,
-        }
-        if message is not None:
-            r['message'] = message
-        self.response = r
+    return jsonify(FlasggerResponse().response)
 
 
 @flasgger_server.route("/stopapi/v1/get_cache", methods=['GET'])
@@ -150,20 +139,20 @@ def reload_caches():
         try:
             EStopObjCacher.load_from_sql_by_estop_ids(post_body['ids'])
             logger.info(f"estop cache reloaded by id: {post_body['ids']}")
-            return jsonify(OperationResponse(message=f"estop cache reloaded by id: [{post_body['ids']}]").response)
+            return jsonify(FlasggerResponse(message=f"estop cache reloaded by id: [{post_body['ids']}]").response)
         except Exception as err:
-            return jsonify(OperationResponse(result="fail",
-                                             error_code=2,
-                                             message=f"fail reload estop of {post_body['ids']}, {err}").response)
+            return jsonify(FlasggerResponse(result="fail",
+                                            error_code=2,
+                                            message=f"fail reload estop of {post_body['ids']}, {err}").response)
     else:
         try:
             EStopObjCacher.load_from_sql()
             logger.info("estop cache total reloaded")
-            return jsonify(OperationResponse(message="estop cache total reloaded").response)
+            return jsonify(FlasggerResponse(message="estop cache total reloaded").response)
         except Exception as err:
-            return jsonify(OperationResponse(result="fail",
-                                             error_code=2,
-                                             message=f"fail reload estop, {err}").response)
+            return jsonify(FlasggerResponse(result="fail",
+                                            error_code=2,
+                                            message=f"fail reload estop, {err}").response)
 
 
 @flasgger_server.route("/stopapi/v1/set_msg/<stop_id>", methods=['POST'])
@@ -225,9 +214,9 @@ def set_msg(stop_id):
         assert 'MsgNo' in post_body, "key 'MsgNo' missing"
         assert 'MsgContent' in post_body, "key 'MsgContent' missing"
     except AssertionError as e:
-        return jsonify(OperationResponse(result="fail",
-                                         error_code=3,
-                                         message=f"AssertionError: {e}").response)
+        return jsonify(FlasggerResponse(result="fail",
+                                        error_code=3,
+                                        message=f"AssertionError: {e}").response)
 
     return send(post_body, 0x05, int(stop_id))
 
@@ -401,9 +390,9 @@ def set_bus_info(stop_id):
         assert 'RcvSec' in post_body, "key 'RcvSec' missing"
         assert 'Reserved' in post_body, "key 'Reserved' missing"
     except AssertionError as e:
-        return jsonify(OperationResponse(result="fail",
-                                         error_code=3,
-                                         message=f"AssertionError: {e}").response)
+        return jsonify(FlasggerResponse(result="fail",
+                                        error_code=3,
+                                        message=f"AssertionError: {e}").response)
 
     return send(post_body, 0x07, int(stop_id))
 
@@ -458,9 +447,9 @@ def set_route_info(stop_id):
         assert 'PathEName' in post_body, "key 'PathEName' missing"
         assert 'Sequence' in post_body, "key 'Sequence' missing"
     except AssertionError as e:
-        return jsonify(OperationResponse(result="fail",
-                                         error_code=3,
-                                         message=f"AssertionError: {e}").response)
+        return jsonify(FlasggerResponse(result="fail",
+                                        error_code=3,
+                                        message=f"AssertionError: {e}").response)
 
     return send(post_body, 0x0B, int(stop_id))
 
@@ -500,9 +489,9 @@ def set_brightness(stop_id):
         assert post_body, "post body should be in json."
         assert 'LightSet' in post_body, "key 'LightSet' missing"
     except AssertionError as e:
-        return jsonify(OperationResponse(result="fail",
-                                         error_code=3,
-                                         message=f"AssertionError: {e}").response)
+        return jsonify(FlasggerResponse(result="fail",
+                                        error_code=3,
+                                        message=f"AssertionError: {e}").response)
 
     return send(post_body, 0x0D, int(stop_id))
 
@@ -575,7 +564,7 @@ def set_gif(stop_id):
         assert 'PicURL' in post_body, "key 'PicURL' missing"
         assert 'MsgContent' in post_body, "key 'MsgContent' missing"
     except AssertionError as e:
-        return jsonify(OperationResponse(result="fail",
-                                         error_code=3,
-                                         message=f"AssertionError: {e}").response)
+        return jsonify(FlasggerResponse(result="fail",
+                                        error_code=3,
+                                        message=f"AssertionError: {e}").response)
     return send(post_body, 0x12, int(stop_id))

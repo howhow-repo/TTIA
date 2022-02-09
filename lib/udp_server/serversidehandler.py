@@ -87,13 +87,13 @@ class ServerSideHandler(SectionServer):
     def send_period_report_ack(self, msg_obj: TTIABusStopMessage, section: UDPWorkingSection):  # 0x04
         raise NotImplementedError
 
-    def send_update_msg_tag(self, msg_obj: TTIABusStopMessage, section: UDPWorkingSection):  # 0x05
+    def send_update_msg_tag(self, msg_obj: TTIABusStopMessage, addr: tuple):  # 0x05
         raise NotImplementedError
 
     def recv_update_msg_tag_ack(self, msg_obj: TTIABusStopMessage, section: UDPWorkingSection):  # 0x06
         raise NotImplementedError
 
-    def send_update_bus_info(self, msg_obj: TTIABusStopMessage, section: UDPWorkingSection):  # 0x07
+    def send_update_bus_info(self, msg_obj: TTIABusStopMessage, addr: tuple):  # 0x07
         raise NotImplementedError
 
     def recv_update_bus_info_ack(self, msg_obj: TTIABusStopMessage, section: UDPWorkingSection):  # 0x08
@@ -105,25 +105,25 @@ class ServerSideHandler(SectionServer):
     def send_abnormal_ack(self, msg_obj: TTIABusStopMessage, section: UDPWorkingSection):  # 0x0A
         raise NotImplementedError
 
-    def send_update_route_info(self, msg_obj: TTIABusStopMessage, section: UDPWorkingSection):  # 0x0B
+    def send_update_route_info(self, msg_obj: TTIABusStopMessage, addr: tuple):  # 0x0B
         raise NotImplementedError
 
     def recv_update_route_info_ack(self, msg_obj: TTIABusStopMessage, section: UDPWorkingSection):  # 0x0C
         raise NotImplementedError
 
-    def send_set_brightness(self, msg_obj: TTIABusStopMessage, section: UDPWorkingSection):  # 0x0B
+    def send_set_brightness(self, msg_obj: TTIABusStopMessage, addr: tuple):  # 0x0B
         raise NotImplementedError
 
     def recv_set_brightness_ack(self, msg_obj: TTIABusStopMessage, section: UDPWorkingSection):  # 0x0C
         raise NotImplementedError
 
-    def send_reboot(self, msg_obj: TTIABusStopMessage, section: UDPWorkingSection):  # 0x0B
+    def send_reboot(self, msg_obj: TTIABusStopMessage, addr: tuple):  # 0x0B
         raise NotImplementedError
 
     def recv_reboot_ack(self, msg_obj: TTIABusStopMessage, section: UDPWorkingSection):  # 0x0C
         raise NotImplementedError
 
-    def send_update_gif(self, msg_obj: TTIABusStopMessage, section: UDPWorkingSection):  # 0x0B
+    def send_update_gif(self, msg_obj: TTIABusStopMessage, addr: tuple):  # 0x0B
         raise NotImplementedError
 
     def recv_update_gif_ack(self, msg_obj: TTIABusStopMessage, section: UDPWorkingSection):  # 0x0C

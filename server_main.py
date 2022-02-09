@@ -2,15 +2,14 @@ import atexit
 import threading
 import logging
 
-from apscheduler.triggers.cron import CronTrigger
 from decouple import config
 from flask import Flask
 from flasgger import Swagger
 from swagger_page_context import SWAGGER_CONTEXT, SWAGGER_CONFIG
-from apscheduler.schedulers.background import BackgroundScheduler
 
-from lib import EStopObjCacher, TTIAStopUdpServer
+from lib import EStopObjCacher
 from views.serversideapi import flasgger_server, estop_udp_server
+from views.serverschedulerapi import scheduler, scheduler_api
 from views.index import index_pade
 
 
@@ -32,21 +31,6 @@ EStopObjCacher(SQL_CONFIG).load_from_sql()
 
 
 #  init scheduler
-scheduler = BackgroundScheduler(timezone=TIMEZONE)
-scheduler.add_job(func=EStopObjCacher.load_from_sql,
-                  trigger=CronTrigger(
-                      hour="00",
-                      minute="01",
-                      timezone=TIMEZONE
-                  ),
-                  id='cache_daily_reload',
-                  max_instances=1,
-                  replace_existing=True,)
-
-scheduler.add_job(func=TTIAStopUdpServer.expire_timeout_section,
-                  trigger='interval',
-                  id='expire_timeout_section',
-                  seconds=TTIAStopUdpServer.section_lifetime/2)
 scheduler.start()
 atexit.register(lambda: scheduler.shutdown())
 logging.getLogger('apscheduler').setLevel(logging.ERROR)
@@ -58,6 +42,7 @@ app.config['SWAGGER'] = SWAGGER_CONFIG
 swagger = Swagger(app, template=SWAGGER_CONTEXT)
 app.register_blueprint(index_pade)
 app.register_blueprint(flasgger_server)
+app.register_blueprint(scheduler_api)
 
 
 if __name__ == '__main__':
