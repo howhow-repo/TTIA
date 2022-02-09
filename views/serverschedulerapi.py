@@ -64,28 +64,25 @@ def add_update_job(post_body, message_id: int, stop_id: int, update_time: dateti
     msg.option_payload.from_dict(post_body)
     estop = EStopObjCacher.get_estop_by_id(stop_id)
 
-    if estop:
-        try:
-            if message_id == 0x05:
-                scheduler.add_job(func=lambda: send_update_msg_tag(msg),
-                                  next_run_time=update_time,
-                                  max_instances=1, )
-            elif message_id == 0x07:
-                scheduler.add_job(func=lambda: send_update_bus_info(msg),
-                                  next_run_time=update_time,
-                                  max_instances=1, )
-            elif message_id == 0x0B:
-                scheduler.add_job(func=lambda: send_update_route_info(msg),
-                                  next_run_time=update_time,
-                                  max_instances=1, )
-            elif message_id == 0x12:
-                scheduler.add_job(func=lambda: send_update_gif(msg),
-                                  next_run_time=update_time,
-                                  max_instances=1, )
-            else:
-                raise NotImplementedError("Message id not implement yet.")
-        except Exception as e:
-            logger.error(f"{e}")
+    if estop and estop.ready:
+        if message_id == 0x05:
+            scheduler.add_job(func=lambda: send_update_msg_tag(msg),
+                              next_run_time=update_time,
+                              max_instances=1, )
+        elif message_id == 0x07:
+            scheduler.add_job(func=lambda: send_update_bus_info(msg),
+                              next_run_time=update_time,
+                              max_instances=1, )
+        elif message_id == 0x0B:
+            scheduler.add_job(func=lambda: send_update_route_info(msg),
+                              next_run_time=update_time,
+                              max_instances=1, )
+        elif message_id == 0x12:
+            scheduler.add_job(func=lambda: send_update_gif(msg),
+                              next_run_time=update_time,
+                              max_instances=1, )
+        else:
+            raise NotImplementedError("Message id not implement yet.")
     else:
         return jsonify(FlasggerResponse(result="fail",
                                         error_code=3,
