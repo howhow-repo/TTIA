@@ -399,7 +399,7 @@ def set_bus_info(stop_id):
 
 @flasgger_server.route("/stopapi/v1/set_route_info/<stop_id>", methods=['POST'])
 def set_route_info(stop_id):
-    """Update route info to estop.
+    """ Update route info to estop.
     ---
     tags:
       - name: TTIA estop
@@ -413,6 +413,7 @@ def set_route_info(stop_id):
         in: body
         type: string
         required: true
+
         schema:
           id: route_info
           type: object
@@ -434,7 +435,6 @@ def set_route_info(stop_id):
             Sequence:
               type: number
               description: 顯示順序
-
     responses:
       200:
         description: Return dict message with op result.
@@ -456,7 +456,7 @@ def set_route_info(stop_id):
 
 @flasgger_server.route("/stopapi/v1/set_brightness/<stop_id>", methods=['POST'])
 def set_brightness(stop_id):
-    """Update route info to estop.
+    """Update brightness info to estop.
     ---
     tags:
       - name: TTIA estop
@@ -471,7 +471,7 @@ def set_brightness(stop_id):
         type: string
         required: true
         schema:
-          id: route_info
+          id: brightness
           type: object
           required:
             - LightSet
