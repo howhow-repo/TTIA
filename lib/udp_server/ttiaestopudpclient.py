@@ -123,10 +123,10 @@ class TTIAEStopUdpClient(ClientSideHandler):
 
     def recv_update_gif(self, msg_obj: TTIABusStopMessage):
         logger.info(f"recv_update_gif: {msg_obj.payload.to_dict()} \n {msg_obj.option_payload.to_dict()}")
-        resp_msg = self.create_defaule_msg(0x12)
+        resp_msg = self.create_defaule_msg(0x13)
         self.send_update_gif_ack(resp_msg)
 
     def send_update_gif_ack(self, msg_obj: TTIABusStopMessage):
-        assert msg_obj.header.MessageID == 0x12
+        assert msg_obj.header.MessageID == 0x13
         logger.info('send_update_gif_ack')
         self.sock.sendto(msg_obj.to_pdu(), self.server_addr)

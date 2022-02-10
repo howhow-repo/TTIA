@@ -34,7 +34,7 @@ class ServerSideHandler(SectionServer):
             self.wrong_communicate_order(section)
 
         else:
-            print("drop new_section unknown message id.")
+            logger.warning("drop new_section unknown message id.")
             self.remove_from_sections(section.stop_id)
             self.sock.sendto(b"echo: unknown msg id\n", section.client_addr)
 
@@ -70,7 +70,7 @@ class ServerSideHandler(SectionServer):
             self.wrong_communicate_order(section)
 
         else:
-            logger.error("drop old_section unknown message id.")
+            logger.warning("drop old_section unknown message id.")
             self.remove_from_sections(section.stop_id)
             self.sock.sendto(b"echo: unknown msg id\n", section.client_addr)
 
