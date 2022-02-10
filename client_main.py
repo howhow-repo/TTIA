@@ -47,5 +47,5 @@ if __name__ == '__main__':
         (every task will execute twice with no reason.)
         (check https://stackify.dev/288431-apscheduler-in-flask-executes-twice)
     """
-    http_thread = threading.Thread(target=lambda: app.run(port=5002, use_reloader=False, debug=True)).start()
+    http_thread = threading.Thread(target=lambda: app.run(host="0.0.0.0", port=5000, use_reloader=False, debug=True)).start()
     udp_thread = threading.Thread(target=estop_udp_server.start()).start()

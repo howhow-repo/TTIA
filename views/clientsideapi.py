@@ -13,7 +13,7 @@ flasgger_client = Blueprint('flasgger_client', __name__)
 
 TTIA_UDP_PORT = config('TTIA_UDP_CLIENT_PORT', cast=int, default=50000)
 estop = EStop({"StopID": 5, "IMSI": '509894234641555'})
-estop_udp_server = TTIAEStopUdpClient(host="localhost", port=TTIA_UDP_PORT, estop=estop,
+estop_udp_server = TTIAEStopUdpClient(host="0.0.0.0", port=TTIA_UDP_PORT, estop=estop,
                                       server_host='localhost', server_port=50000)
 
 

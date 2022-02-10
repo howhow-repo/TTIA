@@ -14,7 +14,7 @@ logger = logging.getLogger(__name__)
 flasgger_server = Blueprint('flasgger_server', __name__)
 
 TTIA_UDP_PORT = config('TTIA_UDP_SERVER_PORT', cast=int, default=50000)
-estop_udp_server = TTIAStopUdpServer(host="localhost", port=TTIA_UDP_PORT)
+estop_udp_server = TTIAStopUdpServer(host="0.0.0.0", port=TTIA_UDP_PORT)
 
 
 def send(post_body, message_id: int, stop_id: int):
