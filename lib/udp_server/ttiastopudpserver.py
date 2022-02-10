@@ -78,6 +78,7 @@ class TTIAStopUdpServer(ServerSideHandler):
         self.send_period_report_ack(resp_msg, section)
 
     def send_period_report_ack(self, msg_obj: TTIABusStopMessage, section: UDPWorkingSection):
+        msg_obj.header.StopID = section.stop_id
         self.sock.sendto(msg_obj.to_pdu(), section.client_addr)
         self.remove_from_sections(section.stop_id)
         logger.info(f"send_period_report_ack: {msg_obj.header.StopID} ")
