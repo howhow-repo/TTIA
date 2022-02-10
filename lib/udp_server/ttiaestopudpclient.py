@@ -33,6 +33,8 @@ class TTIAEStopUdpClient(ClientSideHandler):
         if msg_obj.payload.Result == 1:
             self.estop.from_dict(msg_obj.payload.to_dict())
             resp_msg.payload.MsgStatus = 1
+        else:
+            logger.error("Fail to regist from server.")
         self.send_registration_info_ack(resp_msg)
 
     def send_registration_info_ack(self, msg_obj: TTIABusStopMessage):

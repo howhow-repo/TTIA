@@ -36,7 +36,7 @@ class TTIAStopUdpServer(ServerSideHandler):
                 logger.error("Fail to match data: StopID & IMSI does not match")
 
         else:
-            logger.error("Fail to get estop by imsi")
+            logger.error("Can not find estop by given IMSI")
         self.send_registration_info(resp_msg, section)
 
     def send_registration_info(self, msg_obj: TTIABusStopMessage, section: UDPWorkingSection):  # 0x01
