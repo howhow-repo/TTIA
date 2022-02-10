@@ -4,11 +4,9 @@ from lib import FlasggerResponse
 from decouple import config
 import logging
 
-
 """
     Features in swagger page 
 """
-
 
 logger = logging.getLogger(__name__)
 flasgger_server = Blueprint('flasgger_server', __name__)
@@ -17,47 +15,24 @@ TTIA_UDP_PORT = config('TTIA_UDP_SERVER_PORT', cast=int, default=50000)
 estop_udp_server = TTIAStopUdpServer(host="0.0.0.0", port=TTIA_UDP_PORT)
 
 
-def send(post_body, message_id: int, stop_id: int):
+def check_stop(stop_id: int):
     estop = EStopObjCacher.get_estop_by_id(stop_id)
     if estop and estop.ready and estop.address:
-        try:
-            msg = TTIABusStopMessage(message_id, 'default')
-            msg.header.StopID = stop_id
-            msg.payload.from_dict(post_body)
-            msg.option_payload.from_dict(post_body)
-
-            if message_id == 0x05:
-                estop_udp_server.send_update_msg_tag(msg_obj=msg)
-            elif message_id == 0x07:
-                estop_udp_server.send_update_bus_info(msg_obj=msg)
-            elif message_id == 0x0B:
-                estop_udp_server.send_update_route_info(msg_obj=msg)
-            elif message_id == 0x0D:
-                estop_udp_server.send_set_brightness(msg_obj=msg)
-            elif message_id == 0x10:
-                estop_udp_server.send_reboot(msg_obj=msg)
-            elif message_id == 0x12:
-                estop_udp_server.send_update_gif(msg_obj=msg)
-
-        except AssertionError as e:
-            return jsonify(FlasggerResponse(result="fail",
-                                            error_code=3,
-                                            message=f"AssertionError: {e}").response)
-
+        return True, "ok"
     elif not estop:
-        return jsonify(FlasggerResponse(result="fail",
-                                        error_code=2,
-                                        message=f"estop id {stop_id} is not found in cache.").response)
+        return False, f"estop id {stop_id} is not found in cache."
     elif not estop.ready:
-        return jsonify(FlasggerResponse(result="fail",
-                                        error_code=2,
-                                        message=f"estop id {stop_id} is not ready yet.").response)
+        return False, f"estop id {stop_id} is not ready yet."
     elif not estop.address:
-        return jsonify(FlasggerResponse(result="fail",
-                                        error_code=2,
-                                        message=f"can not find addr of estop id {stop_id}.").response)
+        return False, f"can not find addr of estop id {stop_id}."
 
-    return jsonify(FlasggerResponse().response)
+
+def create_msg(post_body, message_id: int, stop_id: int):
+    msg = TTIABusStopMessage(message_id, 'default')
+    msg.header.StopID = stop_id
+    msg.payload.from_dict(post_body)
+    msg.option_payload.from_dict(post_body)
+    return msg
 
 
 @flasgger_server.route("/stopapi/v1/get_cache", methods=['GET'])
@@ -213,12 +188,28 @@ def set_msg(stop_id):
         assert 'MsgTag' in post_body, "key 'MsgTag' missing"
         assert 'MsgNo' in post_body, "key 'MsgNo' missing"
         assert 'MsgContent' in post_body, "key 'MsgContent' missing"
+        msg = create_msg(post_body, 0x05, int(stop_id))
     except AssertionError as e:
         return jsonify(FlasggerResponse(result="fail",
                                         error_code=3,
                                         message=f"AssertionError: {e}").response)
+    if not check_stop(int(stop_id))[0]:
+        return jsonify(FlasggerResponse(result="fail",
+                                        error_code=3,
+                                        message=f"StatusError: {check_stop(int(stop_id))[1]}").response)
 
-    return send(post_body, 0x05, int(stop_id))
+    ack_msg = estop_udp_server.send_update_msg_tag(msg_obj=msg)
+
+    if not ack_msg:
+        return jsonify(FlasggerResponse(result="fail",
+                                        error_code=3,
+                                        message=f"TimeoutError: Did not receive ack msg.").response)
+    elif ack_msg.payload.MsgStatus != 1:
+        return jsonify(FlasggerResponse(result="fail",
+                                        error_code=3,
+                                        message=f"OperationError: Receive fail update report.").response)
+    else:
+        return jsonify(FlasggerResponse(message=f"{str(ack_msg.payload.to_dict())}").response)
 
 
 @flasgger_server.route("/stopapi/v1/set_bus_info/<stop_id>", methods=['POST'])
@@ -389,12 +380,28 @@ def set_bus_info(stop_id):
         assert 'RcvMin' in post_body, "key 'RcvMin' missing"
         assert 'RcvSec' in post_body, "key 'RcvSec' missing"
         assert 'Reserved' in post_body, "key 'Reserved' missing"
+        msg = create_msg(post_body, 0x07, int(stop_id))
     except AssertionError as e:
         return jsonify(FlasggerResponse(result="fail",
                                         error_code=3,
                                         message=f"AssertionError: {e}").response)
+    if not check_stop(int(stop_id))[0]:
+        return jsonify(FlasggerResponse(result="fail",
+                                        error_code=3,
+                                        message=f"StatusError: {check_stop(int(stop_id))[1]}").response)
 
-    return send(post_body, 0x07, int(stop_id))
+    ack_msg = estop_udp_server.send_update_bus_info(msg_obj=msg)
+
+    if not ack_msg:
+        return jsonify(FlasggerResponse(result="fail",
+                                        error_code=3,
+                                        message=f"TimeoutError: Did not receive ack msg.").response)
+    elif ack_msg.payload.MsgStatus != 1:
+        return jsonify(FlasggerResponse(result="fail",
+                                        error_code=3,
+                                        message=f"OperationError: Receive fail update report.").response)
+    else:
+        return jsonify(FlasggerResponse(message=f"{str(ack_msg.payload.to_dict())}").response)
 
 
 @flasgger_server.route("/stopapi/v1/set_route_info/<stop_id>", methods=['POST'])
@@ -446,12 +453,28 @@ def set_route_info(stop_id):
         assert 'PathCName' in post_body, "key 'PathCName' missing"
         assert 'PathEName' in post_body, "key 'PathEName' missing"
         assert 'Sequence' in post_body, "key 'Sequence' missing"
+        msg = create_msg(post_body, 0x0B, int(stop_id))
     except AssertionError as e:
         return jsonify(FlasggerResponse(result="fail",
                                         error_code=3,
                                         message=f"AssertionError: {e}").response)
+    if not check_stop(int(stop_id))[0]:
+        return jsonify(FlasggerResponse(result="fail",
+                                        error_code=3,
+                                        message=f"StatusError: {check_stop(int(stop_id))[1]}").response)
 
-    return send(post_body, 0x0B, int(stop_id))
+    ack_msg = estop_udp_server.send_update_route_info(msg_obj=msg)
+
+    if not ack_msg:
+        return jsonify(FlasggerResponse(result="fail",
+                                        error_code=3,
+                                        message=f"TimeoutError: Did not receive ack msg.").response)
+    elif ack_msg.payload.MsgStatus != 1:
+        return jsonify(FlasggerResponse(result="fail",
+                                        error_code=3,
+                                        message=f"OperationError: Receive fail update report.").response)
+    else:
+        return jsonify(FlasggerResponse(message=f"{str(ack_msg.payload.to_dict())}").response)
 
 
 @flasgger_server.route("/stopapi/v1/set_brightness/<stop_id>", methods=['POST'])
@@ -488,12 +511,25 @@ def set_brightness(stop_id):
     try:
         assert post_body, "post body should be in json."
         assert 'LightSet' in post_body, "key 'LightSet' missing"
+        msg = create_msg(post_body, 0x0D, int(stop_id))
     except AssertionError as e:
         return jsonify(FlasggerResponse(result="fail",
                                         error_code=3,
                                         message=f"AssertionError: {e}").response)
+    if not check_stop(int(stop_id))[0]:
+        return jsonify(FlasggerResponse(result="fail",
+                                        error_code=3,
+                                        message=f"StatusError: {check_stop(int(stop_id))[1]}").response)
 
-    return send(post_body, 0x0D, int(stop_id))
+    ack_msg = estop_udp_server.send_set_brightness(msg_obj=msg)
+
+    if not ack_msg:
+        return jsonify(FlasggerResponse(result="fail",
+                                        error_code=3,
+                                        message=f"TimeoutError: Did not receive ack msg.").response)
+
+    else:
+        return jsonify(FlasggerResponse(message=f"{str(ack_msg.payload.to_dict())}").response)
 
 
 @flasgger_server.route("/stopapi/v1/reboot/<stop_id>", methods=['POST'])
@@ -511,7 +547,20 @@ def set_reboot(stop_id):
       200:
         description: Return dict message with op result.
     """
-    return send(request.get_json(), 0x10, int(stop_id))
+    msg = create_msg({}, 0x10, int(stop_id))
+    if not check_stop(int(stop_id))[0]:
+        return jsonify(FlasggerResponse(result="fail",
+                                        error_code=3,
+                                        message=f"StatusError: {check_stop(int(stop_id))[1]}").response)
+
+    ack_msg = estop_udp_server.send_set_brightness(msg_obj=msg)
+
+    if not ack_msg:
+        return jsonify(FlasggerResponse(result="fail",
+                                        error_code=3,
+                                        message=f"TimeoutError: Did not receive ack msg.").response)
+    else:
+        return jsonify(FlasggerResponse(message=f"{str(ack_msg.payload.to_dict())}").response)
 
 
 @flasgger_server.route("/stopapi/v1/update_gif/<stop_id>", methods=['POST'])
@@ -563,8 +612,22 @@ def set_gif(stop_id):
         assert 'PicNum' in post_body, "key 'PicNum' missing"
         assert 'PicURL' in post_body, "key 'PicURL' missing"
         assert 'MsgContent' in post_body, "key 'MsgContent' missing"
+        msg = create_msg(post_body, 0x12, int(stop_id))
     except AssertionError as e:
         return jsonify(FlasggerResponse(result="fail",
                                         error_code=3,
                                         message=f"AssertionError: {e}").response)
-    return send(post_body, 0x12, int(stop_id))
+    if not check_stop(int(stop_id))[0]:
+        return jsonify(FlasggerResponse(result="fail",
+                                        error_code=3,
+                                        message=f"StatusError: {check_stop(int(stop_id))[1]}").response)
+
+    ack_msg = estop_udp_server.send_set_brightness(msg_obj=msg)
+
+    if not ack_msg:
+        return jsonify(FlasggerResponse(result="fail",
+                                        error_code=3,
+                                        message=f"TimeoutError: Did not receive ack msg.").response)
+
+    else:
+        return jsonify(FlasggerResponse(message=f"{str(ack_msg.payload.to_dict())}").response)

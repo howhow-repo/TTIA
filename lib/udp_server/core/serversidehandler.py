@@ -40,6 +40,7 @@ class ServerSideHandler(SectionServer):
 
     def handle_old_section(self, msg_obj: TTIABusStopMessage, section: UDPWorkingSection):
         section.start_time = datetime.now()
+        section.logs.append(msg_obj)
 
         if msg_obj.header.MessageID == 0x02:  # 基本資料程序ack
             self.recv_registration_ack(msg_obj, section)
