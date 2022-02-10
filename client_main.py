@@ -3,12 +3,13 @@ import threading
 import logging
 
 from decouple import config
+from datetime import datetime, timedelta
 from flask import Flask
 from flasgger import Swagger
 from swagger_page_context import SWAGGER_CONTEXT, SWAGGER_CONFIG
 from apscheduler.schedulers.background import BackgroundScheduler
 
-from views.clientsideapi import flasgger_client, estop_udp_server
+from views.clientsideapi import flasgger_client, estop_udp_server, registrate_estop
 from views.index import index_pade
 
 #  init constants
@@ -28,6 +29,11 @@ scheduler.add_job(func=estop_udp_server.send_period_report,
                   trigger='interval',
                   seconds=estop_udp_server.estop.ReportPeriod,
                   replace_existing=True, )
+
+scheduler.add_job(func=registrate_estop,
+                  id='registrate_estop',
+                  next_run_time=datetime.now() + timedelta(seconds=3),
+                  max_instances=1, )
 
 scheduler.start()
 atexit.register(lambda: scheduler.shutdown())
