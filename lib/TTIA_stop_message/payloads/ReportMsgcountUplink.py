@@ -7,6 +7,8 @@ class ReportMsgcountUplink(PayloadBase):
     message_cname = "定時回報訊息"
 
     def __init__(self, init_data, init_type):
+        self.SentCount = 0
+        self.RevCount = 0
         super().__init__(init_data, init_type)
 
     def from_pdu(self, pdu: bytes):
@@ -29,8 +31,7 @@ class ReportMsgcountUplink(PayloadBase):
         return r
 
     def from_default(self):
-        self.SentCount = 0
-        self.RevCount = 0
+        pass
 
     def self_assert(self):
         pass

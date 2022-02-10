@@ -6,6 +6,13 @@ class ReportUpdateGifDownlink(PayloadBase):
     message_id = 0x12
     message_cname = "動態圖示通知訊息"
 
+    def __init__(self, init_data, init_type):
+        self.PicNo = 0
+        self.PicNum = 0
+        self.PicURL = ''
+        self.MsgContent = ''
+        super().__init__(init_data, init_type)
+
     def from_pdu(self, pdu: bytes):
         payload = struct.unpack_from('<HH160s160s', pdu)
         self.PicNo = payload[0]
@@ -43,10 +50,7 @@ class ReportUpdateGifDownlink(PayloadBase):
         return r
 
     def from_default(self):
-        self.PicNo = 0
-        self.PicNum = 0
-        self.PicURL = ''
-        self.MsgContent = ''
+        pass
 
     def self_assert(self):
         pass

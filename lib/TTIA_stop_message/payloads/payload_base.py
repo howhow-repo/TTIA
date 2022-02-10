@@ -14,6 +14,7 @@ class PayloadBase(MessageBase, ABC):
         raise NotImplementedError
 
     def from_lazy_dict(self, setting_config: dict):
+        """overwrite if key exist; skip if not."""
         for item in self.__dict__:
             if item in setting_config.keys():
                 self.__setattr__(item, setting_config[item])

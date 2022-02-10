@@ -4,6 +4,7 @@ from .route_info import RouteInfo
 
 
 def deg_to_dms(deg):
+    """經緯度表示法轉換"""
     d = int(deg)
     md = abs(deg - d) * 60
     m = int(md)
@@ -42,7 +43,6 @@ class EStop:
         self.MsgContent = ''
         self.MsgPriority = 0
         self.MsgType = 0
-
 
         # setting optional properties (check TTIA estop message id 0x01)
         self.MessageGroupZoneID = None

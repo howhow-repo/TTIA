@@ -8,7 +8,29 @@ class ReportUpdateBusinfoDownlink(PayloadBase):
     message_cname = "更新即時公車資訊訊息"
 
     def __init__(self, init_data, init_type):
-        self.from_default()
+        self.RouteID = 0
+        self.BusID = 0
+        self.CurrentStop = 0
+        self.DestinationStop = 0
+        self.IsLastBus = 0
+        self.EstimateTime = 0
+        self.StopDistance = 0
+        self.Direction = 0
+        self.Type = 1
+        self.TransYear = 2000
+        self.TransMonth = 1
+        self.TransDay = 1
+        self.TransHour = 0
+        self.TransMin = 0
+        self.TransSec = 0
+        self.RcvYear = 2000
+        self.RcvMonth = 1
+        self.RcvDay = 1
+        self.RcvHour = 0
+        self.RcvMin = 0
+        self.RcvSec = 0
+        self.Reserved = 0
+        self.min = 0
         super().__init__(init_data, init_type)
 
     def from_pdu(self, pdu: bytes):
@@ -101,29 +123,7 @@ class ReportUpdateBusinfoDownlink(PayloadBase):
         return r
 
     def from_default(self):
-        self.RouteID = 0
-        self.BusID = 0
-        self.CurrentStop = 0
-        self.DestinationStop = 0
-        self.IsLastBus = 0
-        self.EstimateTime = 0
-        self.StopDistance = 0
-        self.Direction = 0
-        self.Type = 1
-        self.TransYear = 2000
-        self.TransMonth = 1
-        self.TransDay = 1
-        self.TransHour = 0
-        self.TransMin = 0
-        self.TransSec = 0
-        self.RcvYear = 2000
-        self.RcvMonth = 1
-        self.RcvDay = 1
-        self.RcvHour = 0
-        self.RcvMin = 0
-        self.RcvSec = 0
-        self.Reserved = 0
-        self.min = 0
+        pass
 
     def self_assert(self):
         assert self.IsLastBus in [0, 1], "IsLastBus should be 0~1; 0:非末班車 1:末班車"

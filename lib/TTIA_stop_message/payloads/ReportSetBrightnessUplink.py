@@ -6,6 +6,9 @@ class ReportSetBrightnessUplink(PayloadBase):
     message_id = 0x0E
     message_cname = "亮度設定確認"
 
+    def __init__(self, init_data, init_type):
+        super().__init__(init_data, init_type)
+
     def from_pdu(self, pdu: bytes):
         pass
 

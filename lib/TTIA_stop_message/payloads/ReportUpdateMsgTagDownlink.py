@@ -7,6 +7,9 @@ class ReportUpdateMsgTagDownlink(PayloadBase):
     message_cname = "更新站牌文字訊息"
 
     def __init__(self, init_data, init_type):
+        self.MsgTag = 0
+        self.MsgNo = 0
+        self.MsgContent = ''
         super().__init__(init_data, init_type)
 
     def from_pdu(self, pdu: bytes):
@@ -37,9 +40,7 @@ class ReportUpdateMsgTagDownlink(PayloadBase):
         return r
 
     def from_default(self):
-        self.MsgTag = 0
-        self.MsgNo = 0
-        self.MsgContent = ''
+        pass
 
     def self_assert(self):
         pass

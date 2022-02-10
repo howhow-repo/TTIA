@@ -7,6 +7,8 @@ class ReportAbnormalDownlink(PayloadBase):
     message_cname = "異常回報確認訊息"
 
     def __init__(self, init_data, init_type):
+        self.MsgStatus = 1
+        self.Reserved = 0
         super().__init__(init_data, init_type)
 
     def from_pdu(self, pdu: bytes):
@@ -35,8 +37,7 @@ class ReportAbnormalDownlink(PayloadBase):
         return r
 
     def from_default(self):
-        self.MsgStatus = 1
-        self.Reserved = 0
+        pass
 
     def self_assert(self):
         assert self.MsgStatus in [0, 1], "MsgStatus should be 0~1; 0:fail 1:success"

@@ -6,6 +6,13 @@ class OpReportUpdateBusinfoDownlink(OpPayloadBase):
     message_id = 0x07
 
     def __init__(self, init_data, init_type):
+        self.SpectialEstimateTime = 0
+        self.MsgCContent = ''
+        self.MsgEContent = ''
+        self.RouteMsgCContent = ''
+        self.RouteMsgEContent = ''
+        self.VoiceAlertMode = 0
+        self.Sequence = 0
         super().__init__(init_data, init_type)
 
     def from_pdu(self, pdu):
@@ -64,13 +71,7 @@ class OpReportUpdateBusinfoDownlink(OpPayloadBase):
         return r
 
     def from_default(self):
-        self.SpectialEstimateTime = 0
-        self.MsgCContent = ''
-        self.MsgEContent = ''
-        self.RouteMsgCContent = ''
-        self.RouteMsgEContent = ''
-        self.VoiceAlertMode = 0
-        self.Sequence = 0
+        pass
 
     def self_assert(self):
         assert self.SpectialEstimateTime in range(0, 8), \

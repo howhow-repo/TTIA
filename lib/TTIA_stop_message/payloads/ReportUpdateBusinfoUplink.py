@@ -7,6 +7,8 @@ class ReportUpdateBusinfoUplink(PayloadBase):
     message_cname = "更新即時公車資訊確認訊息"
 
     def __init__(self, init_data, init_type):
+        self.MsgStatus = 0
+        self.Reserved = 0
         super().__init__(init_data, init_type)
 
     def from_pdu(self, pdu: bytes):
@@ -33,8 +35,7 @@ class ReportUpdateBusinfoUplink(PayloadBase):
         return r
 
     def from_default(self):
-        self.MsgStatus = 0
-        self.Reserved = 0
+        pass
 
     def self_assert(self):
         assert self.MsgStatus in [0, 1], "MsgStatus should be 0~1; 0:訊息更新失敗 1:訊息更新成功"

@@ -6,6 +6,9 @@ class ReportUpdateGifUplink(PayloadBase):
     message_id = 0x13
     message_cname = "動態圖示確認訊息"
 
+    def __init__(self, init_data, init_type):
+        super().__init__(init_data, init_type)
+
     def from_pdu(self, pdu: bytes):
         pass
 

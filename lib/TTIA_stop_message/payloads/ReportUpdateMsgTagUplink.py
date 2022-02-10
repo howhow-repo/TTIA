@@ -6,7 +6,11 @@ class ReportUpdateMsgTagUplink(PayloadBase):
     message_id = 0x06
     message_cname = "更新站牌文字確認訊息"
 
-    def __init__(self, init_data, init_type, buff=None, offset=0):
+    def __init__(self, init_data, init_type):
+        self.MsgTag = 0
+        self.MsgNo = 0
+        self.MsgStatus = 0
+        self.Reserved = 0
         super().__init__(init_data, init_type)
 
     def from_pdu(self, pdu: bytes):
@@ -39,10 +43,7 @@ class ReportUpdateMsgTagUplink(PayloadBase):
         return r
 
     def from_default(self):
-        self.MsgTag = 0
-        self.MsgNo = 0
-        self.MsgStatus = 0
-        self.Reserved = 0
+        pass
 
     def self_assert(self):
         assert self.MsgStatus in [0, 1], "MsgStatus should be 0~1; 0:訊息更新失敗 1:訊息更新成功"

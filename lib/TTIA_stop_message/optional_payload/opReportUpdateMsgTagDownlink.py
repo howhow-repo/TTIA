@@ -6,6 +6,10 @@ class OpReportUpdateMsgTagDownlink(OpPayloadBase):
     message_id = 0x05
 
     def __init__(self, init_data, init_type):
+        self.MsgPriority = 0
+        self.MsgType = 0
+        self.MsgStopDelay = 2
+        self.MsgChangeDelay = 1
         super().__init__(init_data, init_type)
 
     def from_pdu(self, pdu):
@@ -39,10 +43,7 @@ class OpReportUpdateMsgTagDownlink(OpPayloadBase):
         return r
 
     def from_default(self):
-        self.MsgPriority = 0
-        self.MsgType = 0
-        self.MsgStopDelay = 2
-        self.MsgChangeDelay = 1
+        pass
 
     def self_assert(self):
         assert self.MsgPriority in range(0,2), "MsgPriority should be 0~2; 0:一般 1:重要 2:緊急"

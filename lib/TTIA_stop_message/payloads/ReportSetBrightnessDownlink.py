@@ -6,6 +6,10 @@ class ReportSetBrightnessDownlink(PayloadBase):
     message_id = 0x0D
     message_cname = "亮度設定"
 
+    def __init__(self, init_data, init_type):
+        self.LightSet = 15
+        super().__init__(init_data, init_type)
+
     def from_pdu(self, pdu: bytes):
         payload = struct.unpack_from('<B', pdu)
         self.LightSet = payload[0]
@@ -27,7 +31,7 @@ class ReportSetBrightnessDownlink(PayloadBase):
         return r
 
     def from_default(self):
-        self.LightSet = 15
+        pass
 
     def self_assert(self):
         assert 0 <= self.LightSet <= 15, "LightSet should be 0~15; 0:min 15:max"

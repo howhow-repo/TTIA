@@ -28,6 +28,10 @@ class RegUplink(PayloadBase):
     message_cname = "基本資料查詢訊息"
 
     def __init__(self, init_data, init_type):
+        self.IMSI = ''
+        self.IMEI = ''
+        self.FirmwareVersion = '1.00'
+        self.Reserved = 0
         super().__init__(init_data, init_type)
 
     def from_pdu(self, pdu: bytes):
@@ -63,10 +67,7 @@ class RegUplink(PayloadBase):
         return r
 
     def from_default(self):
-        self.IMSI = ''
-        self.IMEI = ''
-        self.FirmwareVersion = '1.00'
-        self.Reserved = 0
+        pass
 
     def self_assert(self):
         pass

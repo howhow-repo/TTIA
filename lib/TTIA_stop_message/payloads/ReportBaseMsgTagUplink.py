@@ -7,6 +7,9 @@ class ReportBaseMsgTagUplink(PayloadBase):
     message_cname = "基本資料設定確認訊息"
 
     def __init__(self, init_data, init_type):
+        self.MsgTag = 0
+        self.MsgStatus = 0
+        self.Reserved = 0
         super().__init__(init_data, init_type)
 
     def from_pdu(self, pdu: bytes):
@@ -36,9 +39,7 @@ class ReportBaseMsgTagUplink(PayloadBase):
         return r
 
     def from_default(self):
-        self.MsgTag = 0
-        self.MsgStatus = 0
-        self.Reserved = 0
+        pass
 
     def self_assert(self):
         assert self.MsgStatus in [0, 1], "MsgStatus should be 0~1; 0:訊息設定失敗 1:訊息設定成功"

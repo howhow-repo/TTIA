@@ -9,6 +9,31 @@ class RegDownlink(PayloadBase):
     message_cname = "基本資料設定訊息"
 
     def __init__(self, init_data, init_type):
+        self.Result = 0
+        self.MsgTag = 0
+        self.StopCName = ''
+        self.StopEName = ''
+        self.LongitudeDu = 0
+        self.LongitudeFen = 0
+        self.LongitudeMiao = 0
+        self.LatitudeDu = 0
+        self.LatitudeFen = 0
+        self.LatitudeMiao = 0
+        self.TypeID = 0
+        self.BootTime = time(0, 0, 0)
+        self.ShutdownTime = time(0, 0, 0)
+        self.MessageGroupID = 0
+        self.IdleMessage = ''
+        self.Year = 2000
+        self.Month = 0
+        self.Day = 0
+        self.Hour = 0
+        self.Minute = 0
+        self.Second = 0
+        self.DisplayMode = 0
+        self.TextRollingSpeed = 0
+        self.DistanceFunctionMode = 0
+        self.ReportPeriod = 60
         super().__init__(init_data, init_type)
 
     def from_pdu(self, pdu: bytes):
@@ -123,31 +148,7 @@ class RegDownlink(PayloadBase):
         return r
 
     def from_default(self):
-        self.Result = 0
-        self.MsgTag = 0
-        self.StopCName = ''
-        self.StopEName = ''
-        self.LongitudeDu = 0
-        self.LongitudeFen = 0
-        self.LongitudeMiao = 0
-        self.LatitudeDu = 0
-        self.LatitudeFen = 0
-        self.LatitudeMiao = 0
-        self.TypeID = 0
-        self.BootTime = time(0, 0, 0)
-        self.ShutdownTime = time(0, 0, 0)
-        self.MessageGroupID = 0
-        self.IdleMessage = ''
-        self.Year = 2000
-        self.Month = 0
-        self.Day = 0
-        self.Hour = 0
-        self.Minute = 0
-        self.Second = 0
-        self.DisplayMode = 0
-        self.TextRollingSpeed = 0
-        self.DistanceFunctionMode = 0
-        self.ReportPeriod = 60
+        pass
 
     def self_assert(self):
         assert type(self.BootTime) == time, \

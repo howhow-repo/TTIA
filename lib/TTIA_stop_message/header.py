@@ -4,6 +4,15 @@ from .message_base import MessageBase, MessageConstants
 
 
 class Header(MessageBase):
+    def __init__(self, init_data, init_type: str):
+        self.ProtocolID = MessageConstants.ProtocolID
+        self.ProtocolVer = MessageConstants.ProtocolVer
+        self.MessageID = 0
+        self.Provider = 0
+        self.StopID = 0
+        self.Sequence = 0
+        self.Len = 0
+        super().__init__(init_data, init_type)
 
     def from_pdu(self, header_pdu, offset=0):
         header = struct.unpack('<4sBBHQHH', header_pdu)
@@ -42,10 +51,4 @@ class Header(MessageBase):
         return r
 
     def from_default(self):
-        self.ProtocolID = MessageConstants.ProtocolID
-        self.ProtocolVer = MessageConstants.ProtocolVer
-        self.MessageID = 0
-        self.Provider = 0
-        self.StopID = 0
-        self.Sequence = 0
-        self.Len = 0
+        pass

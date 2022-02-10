@@ -6,6 +6,9 @@ class ReportRebootDownlink(PayloadBase):
     message_id = 0x10
     message_cname = "重開通知訊息(系統軟體重置)"
 
+    def __init__(self, init_data, init_type):
+        super().__init__(init_data, init_type)
+
     def from_pdu(self, pdu: bytes):
         pass
 

@@ -7,6 +7,16 @@ class OpRegDownlink(OpPayloadBase):
     message_id = 0x01
 
     def __init__(self, init_data, init_type):
+        self.MessageGroupZoneID = 0
+        self.MessageGroupCasID = 0
+        self.WeekendBootTime = time(0, 0, 0)
+        self.WeekendShutdownTime = time(0, 0, 0)
+        self.District = ''
+        self.MsgStopDelay = 2
+        self.BootMessage = ''
+        self.IdleTime = 300
+        self.EventReportPeriod = 300
+        self.WeekDay = 1
         super().__init__(init_data, init_type)
 
     def from_pdu(self, pdu):
@@ -72,16 +82,7 @@ class OpRegDownlink(OpPayloadBase):
         return r
 
     def from_default(self):
-        self.MessageGroupZoneID = 0
-        self.MessageGroupCasID = 0
-        self.WeekendBootTime = time(0, 0, 0)
-        self.WeekendShutdownTime = time(0, 0, 0)
-        self.District = ''
-        self.MsgStopDelay = 2
-        self.BootMessage = ''
-        self.IdleTime = 300
-        self.EventReportPeriod = 300
-        self.WeekDay = 1
+        pass
 
     def self_assert(self):
         assert self.WeekDay in range(1, 7), "WeekDay should be 1~7, in which 1 is Sunday"

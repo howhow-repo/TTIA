@@ -6,6 +6,13 @@ class ReportUpdateRouteinfoDownlink(PayloadBase):
     message_id = 0x0B
     message_cname = "路線資料設定訊息"
 
+    def __init__(self, init_data, init_type):
+        self.RouteID = 0
+        self.PathCName = ''
+        self.PathEName = ''
+        self.Sequence = 0
+        super().__init__(init_data, init_type)
+
     def from_pdu(self, pdu: bytes):
         payload = struct.unpack_from('<H12s12sH', pdu)
         self.RouteID = payload[0]
@@ -39,10 +46,7 @@ class ReportUpdateRouteinfoDownlink(PayloadBase):
         return r
 
     def from_default(self):
-        self.RouteID = 0
-        self.PathCName = ''
-        self.PathEName = ''
-        self.Sequence = 0
+        pass
 
     def self_assert(self):
         pass

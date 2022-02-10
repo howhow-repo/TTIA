@@ -2,11 +2,27 @@ import struct
 from .payload_base import PayloadBase
 from datetime import datetime
 
+
 class ReportAbnormalUplink(PayloadBase):
     message_id = 0x09
     message_cname = "異常回報訊息"
 
     def __init__(self, init_data, init_type):
+        now = datetime.now()
+        self.StatusCode = 0
+        self.Type = 1
+        self.TransYear = now.year
+        self.TransMonth = now.month
+        self.TransDay = now.day
+        self.TransHour = now.hour
+        self.TransMinute = now.minute
+        self.TransSecond = now.second
+        self.RcvYear = 2000
+        self.RcvMonth = 1
+        self.RcvDay = 1
+        self.RcvHour = 0
+        self.RcvMinute = 0
+        self.RcvSecond = 0
         super().__init__(init_data, init_type)
 
     def from_pdu(self, pdu: bytes):
@@ -85,21 +101,7 @@ class ReportAbnormalUplink(PayloadBase):
         return r
 
     def from_default(self):
-        now = datetime.now()
-        self.StatusCode = 0
-        self.Type = 1
-        self.TransYear = now.year
-        self.TransMonth = now.month
-        self.TransDay = now.day
-        self.TransHour = now.hour
-        self.TransMinute = now.minute
-        self.TransSecond = now.second
-        self.RcvYear = 2000
-        self.RcvMonth = 1
-        self.RcvDay = 1
-        self.RcvHour = 0
-        self.RcvMinute = 0
-        self.RcvSecond = 0
+        pass
 
     def self_assert(self):
         assert self.StatusCode in [0, 1, 2], "StatusCode should be 0~2; 0:正常 1:站牌斷線 2:字幕機斷線"
@@ -115,7 +117,7 @@ class ReportAbnormalUplink(PayloadBase):
         assert 0 <= self.RcvMinute <= 59
         assert 0 <= self.RcvSecond <= 59
 
-    def set_Trans_time(self, t:datetime):
+    def set_Trans_time(self, t: datetime):
         self.TransYear = t.year
         self.TransMonth = t.month
         self.TransDay = t.day
@@ -123,7 +125,7 @@ class ReportAbnormalUplink(PayloadBase):
         self.TransMinute = t.minute
         self.TransSecond = t.second
 
-    def set_Rcv_time(self, t:datetime):
+    def set_Rcv_time(self, t: datetime):
         self.RcvYear = t.year
         self.RcvMonth = t.month
         self.RcvDay = t.day
