@@ -553,7 +553,7 @@ def set_reboot(stop_id):
                                         error_code=3,
                                         message=f"StatusError: {check_stop(int(stop_id))[1]}").response)
 
-    ack_msg = estop_udp_server.send_set_brightness(msg_obj=msg)
+    ack_msg = estop_udp_server.send_reboot(msg_obj=msg)
 
     if not ack_msg:
         return jsonify(FlasggerResponse(result="fail",
@@ -622,7 +622,7 @@ def set_gif(stop_id):
                                         error_code=3,
                                         message=f"StatusError: {check_stop(int(stop_id))[1]}").response)
 
-    ack_msg = estop_udp_server.send_set_brightness(msg_obj=msg)
+    ack_msg = estop_udp_server.send_update_gif(msg_obj=msg)
 
     if not ack_msg:
         return jsonify(FlasggerResponse(result="fail",

@@ -123,7 +123,6 @@ class TTIAEStopUdpClient(ClientSideHandler):
 
     def recv_update_gif(self, msg_obj: TTIABusStopMessage):
         logger.info(f"recv_update_gif: {msg_obj.payload.to_dict()} \n {msg_obj.option_payload.to_dict()}")
-        self.estop.LightSet = msg_obj.payload.LightSet
         resp_msg = self.create_defaule_msg(0x12)
         self.send_update_gif_ack(resp_msg)
 

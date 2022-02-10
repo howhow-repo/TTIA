@@ -177,6 +177,7 @@ class TTIAStopUdpServer(ServerSideHandler):
         for i in range(5):
             if section.logs[-1].header.MessageID == expected_msg_id:
                 ack_msg =section.logs[-1]
+                print(self.sections)
                 self.remove_from_sections(section.stop_id)
                 return ack_msg
             else:

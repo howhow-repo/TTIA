@@ -25,11 +25,11 @@ class ServerSideHandler(SectionServer):
         elif msg_obj.header.MessageID in [0x01, 0x05, 0x07, 0x0B, 0x0D, 0x10, 0x12]:
             # client 不可對server做設定。
             self.unaccepted_cmd(section)
-        elif msg_obj.header.MessageID in [0x02, 0x06, 0x0C, 0x0E, 0x13]:
+        elif msg_obj.header.MessageID in [0x02, 0x06, 0x08, 0x0C, 0x0E, 0x13]:
             # client 非預期回覆
             self.wrong_communicate_order(section)
 
-        elif msg_obj.header.MessageID in [0x04, 0x0A, 0x08]:
+        elif msg_obj.header.MessageID in [0x04, 0x0A]:
             # 應由server端發出的訊息
             self.wrong_communicate_order(section)
 
@@ -46,11 +46,13 @@ class ServerSideHandler(SectionServer):
             self.recv_registration_ack(msg_obj, section)
         elif msg_obj.header.MessageID == 0x06:  # 更新站牌文字ack
             self.recv_update_msg_tag_ack(msg_obj, section)
-        elif msg_obj.header.MessageID == 0x0C:  # 更新站牌文字ack
+        elif msg_obj.header.MessageID == 0x08:  # 更新公車資訊ack
+            self.recv_update_bus_info_ack(msg_obj, section)
+        elif msg_obj.header.MessageID == 0x0C:  # 更新路線資訊ack
             self.recv_update_route_info_ack(msg_obj, section)
-        elif msg_obj.header.MessageID == 0x0E:  # 更新站牌文字ack
+        elif msg_obj.header.MessageID == 0x0E:  # 更新亮度ack
             self.recv_set_brightness_ack(msg_obj, section)
-        elif msg_obj.header.MessageID == 0x13:  # 更新站牌文字ack
+        elif msg_obj.header.MessageID == 0x13:  # 更新gifack
             self.recv_update_gif_ack(msg_obj, section)
 
         # """ 異常處理 """
@@ -63,13 +65,13 @@ class ServerSideHandler(SectionServer):
             # 新工作項目
             self.handle_new_section(msg_obj, section)
 
-        elif msg_obj.header.MessageID in [0x04, 0x08, 0x0A]:
+        elif msg_obj.header.MessageID in [0x04, 0x0A]:
             # 應由server端發出的訊息
             self.wrong_communicate_order(section)
 
         else:
             logger.error("drop old_section unknown message id.")
-            self.remove_from_sections(msg_obj.header.StopID)
+            self.remove_from_sections(section.stop_id)
             self.sock.sendto(b"echo: unknown msg id\n", section.client_addr)
 
     #### TTIA estop behaviors
