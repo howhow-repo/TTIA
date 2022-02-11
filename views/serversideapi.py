@@ -40,7 +40,7 @@ def get_all_cache():
     """get all e stop current info in json.
     ---
     tags:
-      - name: TTIA estop
+      - name: TTIA EStop Server
     responses:
       200:
         description: Return the current cache of estops
@@ -56,7 +56,7 @@ def get_cache_ready():
     """get estops those are ready registered.
     ---
     tags:
-      - name: TTIA estop
+      - name: TTIA EStop Server
     responses:
       200:
         description: Return the current cache of estop id
@@ -70,7 +70,7 @@ def get_cache_by_id(stop_id):
     """get specific e stop current info in json by stop id.
     ---
     tags:
-      - name: TTIA estop
+      - name: TTIA EStop Server
     parameters:
       - name: stop_id
         in: path
@@ -89,7 +89,7 @@ def reload_caches():
     """Force cacher to reload from mysql. See more parameter description in Models below.
     ---
     tags:
-      - name: TTIA estop
+      - name: TTIA EStop Server
     parameters:
       - name: reload_caches
         in: body
@@ -137,7 +137,7 @@ def set_msg(stop_id):
     """Update text msg to estop.
     ---
     tags:
-      - name: TTIA estop
+      - name: TTIA EStop Protocol
     parameters:
       - name: stop_id
         in: path
@@ -218,7 +218,7 @@ def set_bus_info(stop_id):
     """Update bus info to estop.
     ---
     tags:
-      - name: TTIA estop
+      - name: TTIA EStop Protocol
     parameters:
       - name: stop_id
         in: path
@@ -409,7 +409,7 @@ def set_route_info(stop_id):
     """ Update route info to estop.
     ---
     tags:
-      - name: TTIA estop
+      - name: TTIA EStop Protocol
     parameters:
       - name: stop_id
         in: path
@@ -481,7 +481,7 @@ def set_brightness(stop_id):
     """Update brightness info to estop.
     ---
     tags:
-      - name: TTIA estop
+      - name: TTIA EStop Protocol
     parameters:
       - name: stop_id
         in: path
@@ -537,7 +537,7 @@ def set_reboot(stop_id):
     """reboot the stop by stop id.
     ---
     tags:
-      - name: TTIA estop
+      - name: TTIA EStop Protocol
     parameters:
       - name: stop_id
         in: path
@@ -572,7 +572,7 @@ def set_gif(stop_id):
     """Update gif info to estop.
     ---
     tags:
-      - name: TTIA estop
+      - name: TTIA EStop Protocol
     parameters:
       - name: stop_id
         in: path
@@ -635,3 +635,40 @@ def set_gif(stop_id):
         return jsonify(FlasggerResponse(result="fail",
                                         error_code=3,
                                         message=f"{e.__class__.__name__}: {e.__str__()}").response)
+
+
+@flasgger_server.route("/stopapi/v1/update_route_info/<stop_id>", methods=['POST'])
+def update_route_info(stop_id):
+    """Update serious route info to estop from cache.
+    ---
+    tags:
+      - name: TTIA EStop helper
+    parameters:
+      - name: stop_id
+        in: path
+        type: number
+        required: true
+
+    responses:
+      200:
+        description: Return dict message with op result.
+    """
+    if not check_stop(int(stop_id))[0]:
+        return jsonify(FlasggerResponse(result="fail",
+                                        error_code=3,
+                                        message=f"StatusError: {check_stop(int(stop_id))[1]}").response)
+
+    for route_info in EStopObjCacher.estop_cache[int(stop_id)].routelist:
+        payload = {
+            "RouteID": route_info.rrid,
+            "PathCName": route_info.rname,
+            "PathEName": route_info.rename,
+            "Sequence": route_info.seqno
+        }
+        try:
+            msg = create_msg(payload, 0x0B, int(stop_id))
+            estop_udp_server.send_update_route_info(msg_obj=msg, wait_for_resp=False)
+        except Exception as e:
+            logger.error(f"Batch pdate route fail. {e}")
+
+        return jsonify(FlasggerResponse().response)

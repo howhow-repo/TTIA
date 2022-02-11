@@ -53,7 +53,7 @@ def registrate_estop():
     """Send registration to server side.
     ---
     tags:
-      - name: TTIA estop client
+      - name: TTIA EStop Protocol (client)
     responses:
       200:
         description: Return dict message with op result.
@@ -73,7 +73,7 @@ def period_report():
     """Send period report to server side.
     ---
     tags:
-      - name: TTIA estop client
+      - name: TTIA EStop Protocol (client)
     responses:
       200:
         description: Return dict message with op result.
@@ -93,7 +93,7 @@ def abnormal_report():
     """Send abnormal report to server via udp.
     ---
     tags:
-      - name: TTIA estop client
+      - name: TTIA EStop Protocol (client)
     parameters:
       - name: report info
         in: body

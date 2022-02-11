@@ -129,15 +129,15 @@ class ReportUpdateBusinfoDownlink(PayloadBase):
         assert self.IsLastBus in [0, 1], "IsLastBus should be 0~1; 0:非末班車 1:末班車"
         assert self.Direction in range(0, 3), "Direction should be 0~3; 0:去程 1:返程 2:尚未發車 3:末班已離駛"
         assert self.Type in [1, 2], "Type should be 1~2; 1:定期 2:非定期"
-        assert 2000 <= self.TransYear
-        assert 1 <= self.TransMonth <= 12
-        assert 1 <= self.TransDay <= 31
-        assert 0 <= self.TransHour <= 23
-        assert 0 <= self.TransMin <= 59
-        assert 0 <= self.TransSec <= 59
-        assert 2000 <= self.RcvYear
-        assert 1 <= self.RcvMonth <= 12
-        assert 1 <= self.RcvDay <= 31
-        assert 0 <= self.RcvHour <= 59
-        assert 0 <= self.RcvMin <= 59
-        assert 0 <= self.RcvSec <= 59
+        assert 2000 <= self.TransYear, "TransYear must > 2000"
+        assert 1 <= self.TransMonth <= 12, "TransMonth range error"
+        assert 1 <= self.TransDay <= 31, "TransDay range error"
+        assert 0 <= self.TransHour <= 23, "TransHour range error"
+        assert 0 <= self.TransMin <= 59, "TransMin range error"
+        assert 0 <= self.TransSec <= 59, "TransSec range error"
+        assert 2000 <= self.RcvYear, "RcvYear must > 2000"
+        assert 1 <= self.RcvMonth <= 12, "RcvMonth range error"
+        assert 1 <= self.RcvDay <= 31, "RcvDay range error"
+        assert 0 <= self.RcvHour <= 59, "RcvHour range error"
+        assert 0 <= self.RcvMin <= 59, "RcvMin range error"
+        assert 0 <= self.RcvSec <= 59, "RcvSec range error"
