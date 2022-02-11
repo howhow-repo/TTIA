@@ -508,6 +508,8 @@ def set_brightness(stop_id):
         description: Return dict message with op result.
     """
     post_body = request.get_json()
+    print(post_body)
+    print(type(post_body))
     try:
         assert post_body, "post body should be in json."
         assert 'LightSet' in post_body, "key 'LightSet' missing"

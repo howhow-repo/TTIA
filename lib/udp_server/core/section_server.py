@@ -85,9 +85,9 @@ class SectionServer(UDPServer):
         raise NotImplementedError
 
     def wrong_communicate_order(self, section: UDPWorkingSection):
-        logger.error(f"Wong communicate order. expire section of stop id: {section.stop_id}")
+        logger.warning(f"Wong communicate order. expire section of stop id: {section.stop_id}")
         self.remove_from_sections(section.stop_id)
 
     def unaccepted_cmd(self, section: UDPWorkingSection):
-        logger.error(f"Command unaccepted. expire section of stop id: {section.stop_id}")
+        logger.warning(f"Command unaccepted. expire section of stop id: {section.stop_id}")
         self.remove_from_sections(section.stop_id)

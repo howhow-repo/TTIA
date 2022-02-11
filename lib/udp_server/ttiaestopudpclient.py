@@ -56,6 +56,8 @@ class TTIAEStopUdpClient(ClientSideHandler):
 
     def recv_update_msg_tag(self, msg_obj: TTIABusStopMessage):
         logger.info(f"recv_update_msg_tag: {msg_obj.payload.to_dict()} \n {msg_obj.option_payload.to_dict()}")
+        self.estop.from_dict(msg_obj.payload.to_dict())
+        self.estop.from_dict(msg_obj.option_payload.to_dict())
         resp_msg = self.create_defaule_msg(0x06)
         resp_msg.payload.MsgTag = msg_obj.payload.MsgTag
         resp_msg.payload.MsgNo = msg_obj.payload.MsgNo

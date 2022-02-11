@@ -27,9 +27,9 @@ class TTIABusStopMessage:
             Case3: Init an empty message with default property/value:
                 init_data = <don't care>, init_type='default'
         """
-        self.header = Header
-        self.payload = PayloadBase
-        self.option_payload = OpPayloadBase
+        self.header = None
+        self.payload = None
+        self.option_payload = None
 
         if init_type == 'pdu':
             self.from_pdu(init_data)

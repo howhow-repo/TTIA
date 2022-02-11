@@ -74,7 +74,7 @@ class ServerSideHandler(SectionServer):
             self.remove_from_sections(section.stop_id)
             self.sock.sendto(b"echo: unknown msg id\n", section.client_addr)
 
-    #### TTIA estop behaviors
+    # TTIA estop behaviors
     def recv_registration(self, msg_obj: TTIABusStopMessage, section: UDPWorkingSection):  # 0x00
         raise NotImplementedError
 
