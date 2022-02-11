@@ -4,7 +4,7 @@ import requests
 
 
 class TestServerSendMessages(unittest.TestCase):
-    """Please make sure to turn on server and client before run testing."""
+    """Please make sure to turn on server and client is ready & registered before run testing."""
     server_ip = "localhost"
     server_port = 5000
     test_client_id = 5
