@@ -350,8 +350,6 @@ def set_bus_info(stop_id):
             Sequence:
               type: number
               description: 顯示順序
-
-
     responses:
       200:
         description: Return dict message with op result.

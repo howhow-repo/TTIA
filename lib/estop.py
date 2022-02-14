@@ -4,12 +4,15 @@ from .route_info import RouteInfo
 
 
 def deg_to_dms(deg):
-    """經緯度表示法轉換"""
-    d = int(deg)
-    md = abs(deg - d) * 60
-    m = int(md)
-    sd = (md - m) * 60
-    return [d, m, sd]
+    """
+        經緯度表示法轉換
+        按照文件，miao = 分的小數部分, 十進位非六十進位, 精度取４位數因此*10000
+    """
+    du = int(deg)
+    md = abs(deg - du) * 60
+    fen = int(md)
+    miao = int((md - fen)*10000)
+    return [du, fen, miao]
 
 
 class EStop:
@@ -76,13 +79,26 @@ class EStop:
                 self.routelist.append(RouteInfo(route_info))
             del setting_config['routelist']
 
+        if 'LongitudeDu' in setting_config.keys() \
+                and 'LongitudeFen' in setting_config.keys() \
+                and 'LongitudeMiao' in setting_config.keys():
+            self.Latitude = setting_config['LongitudeDu'] \
+                            + (setting_config['LongitudeFen'] / 60) \
+                            + (setting_config['LongitudeMiao'] / 60 / 60)
+        if 'LatitudeDu' in setting_config.keys() \
+                and 'LatitudeFen' in setting_config.keys() \
+                and 'LatitudeMiao' in setting_config.keys():
+            self.Latitude = setting_config['LatitudeDu'] \
+                            + (setting_config['LatitudeFen']/60) \
+                            + (setting_config['LatitudeMiao']/60/60)
+
     def to_dict(self):
         r = self.__dict__.copy()
         r['routelist'] = [route_info.to_dict() for route_info in self.routelist]
 
         # TODO: format Longitude Latitude to Du Fen Miao
-        r['LongitudeDu'] = int(abs(self.Longitude))
-        r['LatitudeDu'] = int(abs(self.Latitude))
+        r['LongitudeDu'], r['LongitudeFen'], r['LongitudeMiao'] = deg_to_dms(abs(self.Longitude))
+        r['LatitudeDu'], r['LatitudeFen'], r['LatitudeDMiao'] = deg_to_dms(abs(self.Latitude))
         return r
 
     def to_json(self):
