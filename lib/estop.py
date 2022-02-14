@@ -98,7 +98,7 @@ class EStop:
 
         # TODO: format Longitude Latitude to Du Fen Miao
         r['LongitudeDu'], r['LongitudeFen'], r['LongitudeMiao'] = deg_to_dms(abs(self.Longitude))
-        r['LatitudeDu'], r['LatitudeFen'], r['LatitudeDMiao'] = deg_to_dms(abs(self.Latitude))
+        r['LatitudeDu'], r['LatitudeFen'], r['LatitudeMiao'] = deg_to_dms(abs(self.Latitude))
         return r
 
     def to_json(self):
