@@ -82,7 +82,7 @@ class EStop:
         if 'LongitudeDu' in setting_config.keys() \
                 and 'LongitudeFen' in setting_config.keys() \
                 and 'LongitudeMiao' in setting_config.keys():
-            self.Latitude = setting_config['LongitudeDu'] \
+            self.Longitude = setting_config['LongitudeDu'] \
                             + (setting_config['LongitudeFen'] / 60) \
                             + (setting_config['LongitudeMiao'] / 60 / 60)
         if 'LatitudeDu' in setting_config.keys() \

@@ -32,11 +32,14 @@ SQL_CONFIG = {
 EStopObjCacher(SQL_CONFIG).load_from_sql()
 
 
-#  init scheduler
+#  init routine_scheduler
 routine_scheduler.start()
+atexit.register(lambda: routine_scheduler.shutdown())
+
+#  init msg_scheduler
 msg_scheduler.start()
 atexit.register(lambda: msg_scheduler.shutdown())
-atexit.register(lambda: routine_scheduler.shutdown())
+
 logging.getLogger('apscheduler').setLevel(logging.ERROR)
 
 
