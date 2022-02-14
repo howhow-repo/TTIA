@@ -55,6 +55,7 @@ class TTIAStopUdpServer(ServerSideHandler):
 
         if msg_obj.payload.MsgStatus == 1:  # 訊息設定成功
             EStopObjCacher.estop_cache[msg_obj.header.StopID].ready = True
+            EStopObjCacher.estop_cache[msg_obj.header.StopID].lasttime = datetime.now()
             EStopObjCacher.update_addr(msg_obj.header.StopID, section.client_addr)
             logger.info(f"id {msg_obj.header.StopID} registration ack ok")
 
@@ -96,6 +97,7 @@ class TTIAStopUdpServer(ServerSideHandler):
             return
 
     def recv_update_msg_tag_ack(self, msg_obj: TTIABusStopMessage, section: UDPWorkingSection):
+        EStopObjCacher.estop_cache[msg_obj.header.StopID].lasttime = datetime.now()
         logger.info(f"recv_update_msg_tag_ack from id: {msg_obj.header.StopID}")
 
     def send_update_bus_info(self, msg_obj: TTIABusStopMessage, wait_for_resp=True):
@@ -111,6 +113,7 @@ class TTIAStopUdpServer(ServerSideHandler):
             return
 
     def recv_update_bus_info_ack(self, msg_obj: TTIABusStopMessage, section: UDPWorkingSection):
+        EStopObjCacher.estop_cache[msg_obj.header.StopID].lasttime = datetime.now()
         logger.info(f"recv_update_msg_tag_ack from id: {msg_obj.header.StopID}")
 
     def recv_abnormal(self, msg_obj: TTIABusStopMessage, section: UDPWorkingSection):
@@ -128,6 +131,7 @@ class TTIAStopUdpServer(ServerSideHandler):
         self.send_abnormal_ack(resp_msg, section)
 
     def send_abnormal_ack(self, msg_obj: TTIABusStopMessage, section: UDPWorkingSection):
+        EStopObjCacher.estop_cache[msg_obj.header.StopID].lasttime = datetime.now()
         self.sock.sendto(msg_obj.to_pdu(), section.client_addr)
         self.remove_from_sections(section.stop_id)
 
@@ -144,6 +148,7 @@ class TTIAStopUdpServer(ServerSideHandler):
             return
 
     def recv_update_route_info_ack(self, msg_obj: TTIABusStopMessage, section: UDPWorkingSection):
+        EStopObjCacher.estop_cache[msg_obj.header.StopID].lasttime = datetime.now()
         logger.info(f"recv_update_route_info_ack from id: {msg_obj.header.StopID}")
 
     def send_set_brightness(self, msg_obj: TTIABusStopMessage, wait_for_resp=True):
@@ -159,6 +164,7 @@ class TTIAStopUdpServer(ServerSideHandler):
             return
 
     def recv_set_brightness_ack(self, msg_obj: TTIABusStopMessage, section: UDPWorkingSection):
+        EStopObjCacher.estop_cache[msg_obj.header.StopID].lasttime = datetime.now()
         logger.info(f"recv_set_brightness from id: {msg_obj.header.StopID}")
 
     def send_reboot(self, msg_obj: TTIABusStopMessage, wait_for_resp=True):
@@ -174,6 +180,7 @@ class TTIAStopUdpServer(ServerSideHandler):
             return
 
     def recv_reboot_ack(self, msg_obj: TTIABusStopMessage, section: UDPWorkingSection):
+        EStopObjCacher.estop_cache[msg_obj.header.StopID].lasttime = datetime.now()
         logger.info(f"recv_reboot_ack from id: {msg_obj.header.StopID}")
 
     def send_update_gif(self, msg_obj: TTIABusStopMessage, wait_for_resp=True):
@@ -189,6 +196,7 @@ class TTIAStopUdpServer(ServerSideHandler):
             return
 
     def recv_update_gif_ack(self, msg_obj: TTIABusStopMessage, section: UDPWorkingSection):
+        EStopObjCacher.estop_cache[msg_obj.header.StopID].lasttime = datetime.now()
         logger.info(f"recv_update_gif_ack from id: {msg_obj.header.StopID}")
 
     def wait_ack(self, section: UDPWorkingSection, expected_msg_id: int):

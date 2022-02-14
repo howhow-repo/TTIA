@@ -37,7 +37,7 @@ routine_scheduler.start()
 msg_scheduler.start()
 atexit.register(lambda: msg_scheduler.shutdown())
 atexit.register(lambda: routine_scheduler.shutdown())
-# logging.getLogger('apscheduler').setLevel(logging.ERROR)
+logging.getLogger('apscheduler').setLevel(logging.ERROR)
 
 
 #  init flask server
