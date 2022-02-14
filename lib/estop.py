@@ -11,7 +11,7 @@ def deg_to_dms(deg):
     du = int(deg)
     md = abs(deg - du) * 60
     fen = int(md)
-    miao = int((md - fen)*10000)
+    miao = int((md - fen) * 10000)
     return [du, fen, miao]
 
 
@@ -82,21 +82,21 @@ class EStop:
         if 'LongitudeDu' in setting_config.keys() \
                 and 'LongitudeFen' in setting_config.keys() \
                 and 'LongitudeMiao' in setting_config.keys():
-            self.Longitude = setting_config['LongitudeDu'] \
-                            + (setting_config['LongitudeFen'] / 60) \
-                            + (setting_config['LongitudeMiao'] / 60 / 60)
+            self.Longitude = setting_config['LongitudeDu'] + \
+                             ((setting_config['LongitudeFen'] + (setting_config['LongitudeMiao']/10000))/60)
+
+            self.Longitude = round(self.Longitude, 8)
         if 'LatitudeDu' in setting_config.keys() \
                 and 'LatitudeFen' in setting_config.keys() \
                 and 'LatitudeMiao' in setting_config.keys():
-            self.Latitude = setting_config['LatitudeDu'] \
-                            + (setting_config['LatitudeFen']/60) \
-                            + (setting_config['LatitudeMiao']/60/60)
+            self.Latitude = setting_config['LatitudeDu'] + \
+                             ((setting_config['LatitudeFen'] + (setting_config['LatitudeMiao'] / 10000)) / 60)
+            self.Latitude = round(self.Latitude, 8)
 
     def to_dict(self):
         r = self.__dict__.copy()
         r['routelist'] = [route_info.to_dict() for route_info in self.routelist]
 
-        # TODO: format Longitude Latitude to Du Fen Miao
         r['LongitudeDu'], r['LongitudeFen'], r['LongitudeMiao'] = deg_to_dms(abs(self.Longitude))
         r['LatitudeDu'], r['LatitudeFen'], r['LatitudeMiao'] = deg_to_dms(abs(self.Latitude))
         return r
