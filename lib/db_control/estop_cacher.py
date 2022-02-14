@@ -1,6 +1,10 @@
+from datetime import datetime, timedelta
+import logging
 from .mysql_handler import check_config_items
 from .station_center import StationCenter
 from ..estop import EStop
+
+logger = logging.getLogger(__name__)
 
 
 class EStopObjCacher:
@@ -69,3 +73,14 @@ class EStopObjCacher:
             if estop.IMSI == imsi:
                 return estop
         return None
+
+    @classmethod
+    def check_online(cls):
+        logger.debug("checking stop online...")
+        now = datetime.now()
+        for estop in cls.estop_cache.values():
+            if estop.ready and estop.lasttime:
+                delta_time = now - estop.lasttime
+                if delta_time > timedelta(seconds=estop.ReportPeriod*2):
+                    estop.ready = False
+                    logger.warning(f"set estop {estop.StopID} ready = False: {delta_time.seconds} second not reply.")

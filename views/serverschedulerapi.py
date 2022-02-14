@@ -1,32 +1,17 @@
 import logging
 from datetime import datetime
-from flask import Blueprint, jsonify, request
-from apscheduler.schedulers.background import BackgroundScheduler
-from apscheduler.triggers.cron import CronTrigger
 from decouple import config
+from flask import Blueprint, jsonify, request
 from .serversideapi import estop_udp_server
-from lib import EStopObjCacher, TTIAStopUdpServer, TTIABusStopMessage
+from apscheduler.schedulers.background import BackgroundScheduler
+from lib import EStopObjCacher, TTIABusStopMessage
 from lib import FlasggerResponse
 
 logger = logging.getLogger(__name__)
 scheduler_api = Blueprint('scheduler_api', __name__)
 
 TIMEZONE = config('TIMEZONE', default="Asia/Taipei")
-scheduler = BackgroundScheduler(timezone=TIMEZONE)
-scheduler.add_job(func=EStopObjCacher.load_from_sql,
-                  trigger=CronTrigger(
-                      hour="00",
-                      minute="01",
-                      timezone=TIMEZONE
-                  ),
-                  id='cache_daily_reload',
-                  max_instances=1,
-                  replace_existing=True, )
-
-scheduler.add_job(func=TTIAStopUdpServer.expire_timeout_section,
-                  trigger='interval',
-                  id='expire_timeout_section',
-                  seconds=TTIAStopUdpServer.section_lifetime / 2)
+msg_scheduler = BackgroundScheduler(timezone=TIMEZONE)
 
 
 def send_update_msg_tag(msg):
@@ -66,21 +51,21 @@ def add_launch_job(post_body, message_id: int, stop_id: int, trigger_time: datet
 
     if estop and estop.ready:
         if message_id == 0x05:
-            scheduler.add_job(func=lambda: send_update_msg_tag(msg),
-                              next_run_time=trigger_time,
-                              max_instances=1, )
+            msg_scheduler.add_job(func=lambda: send_update_msg_tag(msg),
+                                  next_run_time=trigger_time,
+                                  max_instances=1, )
         elif message_id == 0x07:
-            scheduler.add_job(func=lambda: send_update_bus_info(msg),
-                              next_run_time=trigger_time,
-                              max_instances=1, )
+            msg_scheduler.add_job(func=lambda: send_update_bus_info(msg),
+                                  next_run_time=trigger_time,
+                                  max_instances=1, )
         elif message_id == 0x0B:
-            scheduler.add_job(func=lambda: send_update_route_info(msg),
-                              next_run_time=trigger_time,
-                              max_instances=1, )
+            msg_scheduler.add_job(func=lambda: send_update_route_info(msg),
+                                  next_run_time=trigger_time,
+                                  max_instances=1, )
         elif message_id == 0x12:
-            scheduler.add_job(func=lambda: send_update_gif(msg),
-                              next_run_time=trigger_time,
-                              max_instances=1, )
+            msg_scheduler.add_job(func=lambda: send_update_gif(msg),
+                                  next_run_time=trigger_time,
+                                  max_instances=1, )
         else:
             raise NotImplementedError("Message id not implement yet.")
     else:
@@ -90,7 +75,7 @@ def add_launch_job(post_body, message_id: int, stop_id: int, trigger_time: datet
 
     return jsonify(
         [f"id: {job.id}, name: {job.name}, trigger: {job.trigger}, next: {job.next_run_time}" for job in
-         scheduler.get_jobs()]
+         msg_scheduler.get_jobs()]
     )
 
 
@@ -106,7 +91,7 @@ def get_jobs():
     """
     return jsonify(
         [f"id: {job.id}, name: {job.name}, trigger: {job.trigger}, next: {job.next_run_time}" for job in
-         scheduler.get_jobs()]
+         msg_scheduler.get_jobs()]
     )
 
 
@@ -150,8 +135,8 @@ def del_job():
                                         error_code=3,
                                         message=f"ValueError: {e}").response)
 
-    if scheduler.get_job(post_body['job_id']):
-        scheduler.remove_job(post_body['job_id'])
+    if msg_scheduler.get_job(post_body['job_id']):
+        msg_scheduler.remove_job(post_body['job_id'])
     else:
         return jsonify(FlasggerResponse(result="fail",
                                         error_code=3,
@@ -159,7 +144,7 @@ def del_job():
 
     return jsonify(
         [f"id: {job.id}, name: {job.name}, trigger: {job.trigger}, next: {job.next_run_time}" for job in
-         scheduler.get_jobs()]
+         msg_scheduler.get_jobs()]
     )
 
 

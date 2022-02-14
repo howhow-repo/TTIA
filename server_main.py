@@ -9,7 +9,9 @@ from swagger_page_context import SWAGGER_CONTEXT, SWAGGER_CONFIG
 
 from lib import EStopObjCacher
 from views.serversideapi import flasgger_server, estop_udp_server
-from views.serverschedulerapi import scheduler, scheduler_api
+from views.serverroutineschedule import routine_scheduler
+from views.serverschedulerapi import msg_scheduler
+from views.serverschedulerapi import scheduler_api
 from views.index import index_pade
 
 
@@ -31,9 +33,11 @@ EStopObjCacher(SQL_CONFIG).load_from_sql()
 
 
 #  init scheduler
-scheduler.start()
-atexit.register(lambda: scheduler.shutdown())
-logging.getLogger('apscheduler').setLevel(logging.ERROR)
+routine_scheduler.start()
+msg_scheduler.start()
+atexit.register(lambda: msg_scheduler.shutdown())
+atexit.register(lambda: routine_scheduler.shutdown())
+# logging.getLogger('apscheduler').setLevel(logging.ERROR)
 
 
 #  init flask server

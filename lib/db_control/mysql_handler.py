@@ -53,9 +53,12 @@ class MySqlHandler:
         logger.debug("close center DB connection")
 
     def __query(self, sqlcmd) -> pymysql.cursors.Cursor:
+        if self.cursor is None:
+            raise ConnectionError("DB is not connected yet. Please try method 'connect().")
         try:
             self.cursor.execute(sqlcmd)
         except pymysql.OperationalError:
+            logger.warning("Connection fail, reconnecting...")
             self.connect()
             self.cursor.execute(sqlcmd)
         return self.cursor

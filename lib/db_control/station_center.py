@@ -15,6 +15,10 @@ def pack_e_stop_data(dict_like_data):
         # split str every 2 char
         dict_like_data['shutdowntime'] = time(time_str[0], time_str[1], time_str[2])
 
+    if "reportperiod" in dict_like_data.keys():
+        if dict_like_data['reportperiod'] == 0:
+            dict_like_data['reportperiod'] = 60
+
     e_stop_data_template = {
         "StopID": dict_like_data["id"],
         "IMSI": dict_like_data["imsi"],
@@ -180,3 +184,18 @@ class StationCenter(MySqlHandler):
             e_stops_dict[s['id']]['routelist'].append(pack_route_data(s))
 
         return e_stops_dict
+
+    def get_valid_msgs(self):
+        """
+            return all messages
+        """
+        cmd = """
+            SELECT 
+                * 
+            FROM
+                estopMsg
+            WHERE
+                publish = 1 AND expiretime > NOW()
+            """
+        raw_data = self._get_table_in_dict(cmd)
+        return raw_data
