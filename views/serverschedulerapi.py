@@ -4,7 +4,7 @@ from decouple import config
 from flask import Blueprint, jsonify, request
 from .serversideapi import estop_udp_server
 from apscheduler.schedulers.background import BackgroundScheduler
-from lib import EStopObjCacher, TTIABusStopMessage
+from lib import EStopObjCacher, TTIABusStopMessage, MsgCacher
 from lib import FlasggerResponse
 
 logger = logging.getLogger(__name__)
@@ -84,7 +84,7 @@ def get_jobs():
     """get jobs from background scheduler.
     ---
     tags:
-      - name: scheduler
+      - name: msg scheduler
     responses:
       200:
         description: Return the current cache of estop id
@@ -100,7 +100,7 @@ def del_job():
     """remove current waiting job by id.
     ---
     tags:
-      - name: scheduler
+      - name: msg scheduler
     parameters:
       - name: del_job
         in: body
@@ -148,12 +148,28 @@ def del_job():
     )
 
 
+@scheduler_api.route("/stopapi/v1/msg_update_schedule/reload", methods=['POST'])
+def reload_msg_from_sql():
+    """reload waiting update msg from sql, and automatically add into scheduler.
+    ---
+    tags:
+      - name: msg scheduler
+    responses:
+      200:
+        description: Return dict message with op result.
+    """
+    MsgCacher.reload_form_sql()
+    return jsonify(
+        [f"id: {job.id}, name: {job.name}, trigger: {job.trigger}, next: {job.next_run_time}" for job in
+         msg_scheduler.get_jobs()]
+    )
+
 @scheduler_api.route("/stopapi/v1/msg_update_schedule/<stop_id>", methods=['POST'])
 def add_update_msg(stop_id):
     """add update msg mission to server.
     ---
     tags:
-      - name: scheduler
+      - name: msg scheduler
     parameters:
       - name: stop_id
         in: path
@@ -239,7 +255,7 @@ def add_update_bus_info(stop_id):
     """add update bus_info mission to server.
     ---
     tags:
-      - name: scheduler
+      - name: msg scheduler
     parameters:
       - name: stop_id
         in: path
@@ -433,7 +449,7 @@ def add_update_route_info(stop_id):
     """add update route_info mission to server.
     ---
     tags:
-      - name: scheduler
+      - name: msg scheduler
     parameters:
       - name: stop_id
         in: path
@@ -509,7 +525,7 @@ def add_update_gif(stop_id):
     """add update gif mission to server.
     ---
     tags:
-      - name: scheduler
+      - name: msg scheduler
     parameters:
       - name: stop_id
         in: path

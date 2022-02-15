@@ -657,16 +657,22 @@ def update_route_info(stop_id):
                                         message=f"StatusError: {check_stop(int(stop_id))[1]}").response)
 
     for route_info in EStopObjCacher.estop_cache[int(stop_id)].routelist:
-        payload = {
-            "RouteID": route_info.rrid,
-            "PathCName": route_info.rname,
-            "PathEName": route_info.rename,
-            "Sequence": route_info.seqno
-        }
         try:
+            payload = {
+                "RouteID": route_info.rrid,
+                "PathCName": route_info.rname,
+                "PathEName": route_info.rename,
+                "Sequence": route_info.seqno
+            }
             msg = create_msg(payload, 0x0B, int(stop_id))
-            estop_udp_server.send_update_route_info(msg_obj=msg, wait_for_resp=False)
+            ack_msg = estop_udp_server.send_update_route_info(msg_obj=msg)
+            if not ack_msg:
+                logger.error(f"did not get ack from stop_id [{msg.header.StopID}] "
+                             f"after sending route_id [{msg.payload.RouteID}] info.")
+            else:
+                logger.info(f"send route {msg.payload.RouteID} to stop {msg.header.StopID} success")
+
         except Exception as e:
-            logger.error(f"Batch pdate route fail. {e}")
+            logger.error(f"Batch update stop_id {stop_id} route info fail. {e}")
 
         return jsonify(FlasggerResponse().response)

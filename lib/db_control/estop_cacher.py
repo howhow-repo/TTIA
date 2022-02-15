@@ -41,12 +41,13 @@ class EStopObjCacher:
 
     @classmethod
     def __pack_come_in_data(cls, new_dict: dict):
-        for es in new_dict:
-            es_obj = EStop(new_dict[es])
-            if es_obj.StopID in cls.estop_cache:
-                cls.estop_cache[es].from_dict(new_dict[es])
+        """Create new estop or update estop from sql data."""
+        for estop_dict in new_dict:
+            estop_obj = EStop(new_dict[estop_dict])
+            if estop_obj.StopID in cls.estop_cache:
+                cls.estop_cache[estop_dict].from_dict(new_dict[estop_dict])
             else:
-                cls.estop_cache[es] = es_obj
+                cls.estop_cache[estop_dict] = estop_obj
 
     @classmethod
     def update_addr(cls, stop_id: int, addr):
@@ -76,6 +77,7 @@ class EStopObjCacher:
 
     @classmethod
     def check_online(cls):
+        """if miss two Period Report, set ready to false"""
         logger.debug("checking stop online...")
         now = datetime.now()
         for estop in cls.estop_cache.values():
@@ -83,4 +85,12 @@ class EStopObjCacher:
                 delta_time = now - estop.lasttime
                 if delta_time > timedelta(seconds=estop.ReportPeriod*2):
                     estop.ready = False
-                    logger.warning(f"set estop {estop.StopID} ready = False: {delta_time.seconds} second not reply.")
+                    logger.warning(f"set estop {estop.StopID} ready = False: {delta_time.seconds} seconds not replied.")
+
+    @classmethod
+    def get_stop_id_by_msg_group_id(cls, group_id):
+        ids = []
+        for estop in cls.estop_cache.values():
+            if estop.MessageGroupID == group_id:
+                ids.append(estop.StopID)
+        return ids

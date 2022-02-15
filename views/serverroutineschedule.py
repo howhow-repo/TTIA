@@ -1,4 +1,4 @@
-from lib import EStopObjCacher, TTIAStopUdpServer
+from lib import EStopObjCacher, TTIAStopUdpServer, MsgCacher
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.cron import CronTrigger
 from decouple import config
@@ -15,6 +15,18 @@ routine_scheduler.add_job(
         timezone=TIMEZONE
     ),
     id='cache_daily_reload',
+    max_instances=1,
+    replace_existing=True
+)
+
+routine_scheduler.add_job(
+    func=MsgCacher.reload_form_sql,
+    trigger=CronTrigger(
+        hour="00",
+        minute="05",
+        timezone=TIMEZONE
+    ),
+    id='stop_msg_daily_reload',
     max_instances=1,
     replace_existing=True
 )
