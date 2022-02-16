@@ -10,13 +10,13 @@ from swagger_page_context import SWAGGER_CONTEXT, SWAGGER_CONFIG
 from lib import EStopObjCacher, MsgCacher
 from views.serversideapi import flasgger_server, estop_udp_server
 from views.serverroutineschedule import routine_scheduler
-from views.serverschedulerapi import msg_scheduler
-from views.serverschedulerapi import scheduler_api
+from views.msgschedulerapi import msg_scheduler
+from views.msgschedulerapi import scheduler_api
 from views.index import index_pade
 
 
 #  init constants
-logging.basicConfig(level=logging.INFO, format='%(asctime)s | %(levelname)s | %(message)s',)
+logging.basicConfig(level=logging.INFO, format='%(asctime)s | %(name)s | %(levelname)s | %(message)s',)
 logger = logging.getLogger(__name__)
 TIMEZONE = config('TIMEZONE', default="Asia/Taipei")
 SQL_CONFIG = {
@@ -30,6 +30,7 @@ SQL_CONFIG = {
 
 #  init cacher
 EStopObjCacher(SQL_CONFIG).load_from_sql()
+
 MsgCacher(SQL_CONFIG, msg_scheduler, estop_udp_server).load_from_sql()
 MsgCacher.init_msg_jods()
 

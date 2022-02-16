@@ -62,7 +62,8 @@ class SectionServer(UDPServer):
 
     @classmethod
     def remove_from_sections(cls, stop_id):
-        del cls.sections[stop_id]
+        if cls.sections.get(stop_id):
+            del cls.sections[stop_id]
 
     def handle_request(self, data, client_address):
         msg_obj = decode_msg(data)

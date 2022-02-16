@@ -158,7 +158,7 @@ def reload_msg_from_sql():
       200:
         description: Return dict message with op result.
     """
-    MsgCacher.reload_form_sql()
+    MsgCacher.reload_from_sql()
     return jsonify(
         [f"id: {job.id}, name: {job.name}, trigger: {job.trigger}, next: {job.next_run_time}" for job in
          msg_scheduler.get_jobs()]

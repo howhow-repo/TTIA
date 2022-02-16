@@ -40,14 +40,40 @@ class EStopObjCacher:
         cls.__pack_come_in_data(estops_dict)
 
     @classmethod
+    def reload_from_sql(cls):
+        """
+            Check if the new data same as the cache.
+        """
+        cls.station.connect()
+        new_dict = cls.station.get_e_stops()
+        cls.station.disconnect()
+
+        for estop_id in new_dict:
+            old_stop = cls.estop_cache.get(estop_id)
+            new_stop_dict = new_dict[estop_id]
+            if old_stop:
+                # Check new coming item is same as old item
+                for key in new_stop_dict:
+                    if new_stop_dict[key] == old_stop.to_dict()[key]:
+                        continue
+                    else:
+                        logger.info(f"find diff at stop [{old_stop.StopID}]>> {key}: {old_stop.__getattribute__(key)} -> {new_stop_dict[key]}")
+            else:
+                estop_obj = EStop(new_stop_dict)
+                cls.estop_cache[estop_obj.StopID] = estop_obj
+                logger.info(f"Find new stop id {old_stop.StopID}, add to cache.")
+
+        logger.info('reload stop done.')
+
+    @classmethod
     def __pack_come_in_data(cls, new_dict: dict):
         """Create new estop or update estop from sql data."""
-        for estop_dict in new_dict:
-            estop_obj = EStop(new_dict[estop_dict])
+        for estop_id in new_dict:
+            estop_obj = EStop(new_dict[estop_id])
             if estop_obj.StopID in cls.estop_cache:
-                cls.estop_cache[estop_dict].from_dict(new_dict[estop_dict])
+                cls.estop_cache[estop_id].from_dict(new_dict[estop_id])
             else:
-                cls.estop_cache[estop_dict] = estop_obj
+                cls.estop_cache[estop_id] = estop_obj
 
     @classmethod
     def update_addr(cls, stop_id: int, addr):

@@ -20,7 +20,7 @@ routine_scheduler.add_job(
 )
 
 routine_scheduler.add_job(
-    func=MsgCacher.reload_form_sql,
+    func=MsgCacher.reload_from_sql,
     trigger=CronTrigger(
         hour="00",
         minute="05",

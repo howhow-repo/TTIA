@@ -123,7 +123,7 @@ def reload_caches():
     else:
         # Reload all
         try:
-            EStopObjCacher.load_from_sql()
+            EStopObjCacher.reload_from_sql()
             logger.info("estop cache total reloaded")
             return jsonify(FlasggerResponse(message="estop cache total reloaded").response)
         except Exception as err:

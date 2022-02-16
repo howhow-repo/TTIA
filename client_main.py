@@ -15,7 +15,7 @@ from views.index import index_pade
 #  init constants
 
 logger = logging.getLogger(__name__)
-logging.basicConfig(level=logging.DEBUG, format='%(asctime)s | %(levelname)s | %(message)s')
+logging.basicConfig(level=logging.DEBUG, format='%(asctime)s | %(name)s | %(levelname)s | %(message)s')
 TIMEZONE = config('TIMEZONE', default="Asia/Taipei")
 TTIA_UDP_PORT = config('TTIA_UDP_CLIENT_PORT', cast=int, default=50000)
 

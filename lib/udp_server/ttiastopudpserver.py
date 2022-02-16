@@ -58,6 +58,7 @@ class TTIAStopUdpServer(ServerSideHandler):
             EStopObjCacher.estop_cache[msg_obj.header.StopID].lasttime = datetime.now()
             EStopObjCacher.update_addr(msg_obj.header.StopID, section.client_addr)
             logger.info(f"id {msg_obj.header.StopID} registration ack ok")
+            self.update_route_info(section.stop_id)
 
         else:  # 訊息設定失敗
             logger.warning(f"estop {msg_obj.header.StopID} return fail in registration")
@@ -66,7 +67,7 @@ class TTIAStopUdpServer(ServerSideHandler):
 
     def recv_period_report(self, msg_obj: TTIABusStopMessage, section: UDPWorkingSection):
         """ 接收定時回報訊息 0x03 """
-        logger.info(f"period report recv from stop: {msg_obj.header.StopID}")
+        logger.debug(f"period report recv from stop: {msg_obj.header.StopID}")
         resp_msg = TTIABusStopMessage(0x04, 'default')
         estop = EStopObjCacher.get_estop_by_id(msg_obj.header.StopID)
         if estop:
@@ -82,7 +83,7 @@ class TTIAStopUdpServer(ServerSideHandler):
         msg_obj.header.StopID = section.stop_id
         self.sock.sendto(msg_obj.to_pdu(), section.client_addr)
         self.remove_from_sections(section.stop_id)
-        logger.info(f"send_period_report_ack: {msg_obj.header.StopID} ")
+        logger.debug(f"send_period_report_ack: {msg_obj.header.StopID} ")
 
     def send_update_msg_tag(self, msg_obj: TTIABusStopMessage, wait_for_resp=True):
         assert msg_obj.header.MessageID == 0x05
@@ -209,3 +210,9 @@ class TTIAStopUdpServer(ServerSideHandler):
             else:
                 sys_time.sleep(check_interval)
         return None
+
+    def update_route_info(self, stop_id: int):
+        estop = EStopObjCacher.get_estop_by_id(stop_id)
+        for i, route in enumerate(estop.routelist):
+            msg = route.to_ttia(stop_id, i)
+            ack = self.send_update_route_info(msg, wait_for_resp=True)

@@ -40,7 +40,7 @@ class MsgCacher:
         cls.__pack_come_in_data(estops_dict)
 
     @classmethod
-    def reload_form_sql(cls):
+    def reload_from_sql(cls):
         """
             Check if the new data same as the cache.
 
