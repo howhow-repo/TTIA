@@ -54,10 +54,11 @@ class EStopObjCacher:
             if old_stop:
                 # Check new coming item is same as old item
                 for key in new_stop_dict:
-                    if new_stop_dict[key] == old_stop.to_dict()[key]:
+                    if new_stop_dict[key] == old_stop.json()[key]:
                         continue
                     else:
-                        logger.info(f"find diff at stop [{old_stop.StopID}]>> {key}: {old_stop.__getattribute__(key)} -> {new_stop_dict[key]}")
+                        logger.info(f"find diff at stop [{old_stop.StopID}]>> "
+                                    f"{key}: {old_stop.__getattribute__(key)} -> {new_stop_dict[key]}")
             else:
                 estop_obj = EStop(new_stop_dict)
                 cls.estop_cache[estop_obj.StopID] = estop_obj

@@ -1,5 +1,5 @@
 from flask import Blueprint, jsonify, request
-from lib import EStopObjCacher, TTIAStopUdpServer, TTIABusStopMessage
+from lib import EStopObjCacher, RouteCacher, TTIAStopUdpServer, TTIABusStopMessage
 from lib import FlasggerResponse
 from decouple import config
 import logging
@@ -676,3 +676,24 @@ def update_route_info(stop_id):
             logger.error(f"Batch update stop_id {stop_id} route info fail. {e}")
 
         return jsonify(FlasggerResponse().response)
+
+
+@flasgger_server.route("/stopapi/v1/reload_route_info/", methods=['POST'])
+def reload_route_cache():
+    """reload route info from sql. Automatically sent ttia route info msg to estop if find diff.
+    ---
+    tags:
+      - name: TTIA EStop helper
+    responses:
+      200:
+        description: Return dict message with op result.
+    """
+    # Reload by id
+    RouteCacher.reload_from_sql()
+    try:
+        RouteCacher.reload_from_sql()
+        return jsonify(FlasggerResponse(message=f"testing api").response)
+    except Exception as err:
+        return jsonify(FlasggerResponse(result="fail",
+                                        error_code=2,
+                                        message=f"fail testing api: {err}").response)

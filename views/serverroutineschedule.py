@@ -1,4 +1,4 @@
-from lib import EStopObjCacher, TTIAStopUdpServer, MsgCacher
+from lib import EStopObjCacher, TTIAStopUdpServer, MsgCacher, RouteCacher
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.cron import CronTrigger
 from decouple import config
@@ -30,6 +30,19 @@ routine_scheduler.add_job(
     max_instances=1,
     replace_existing=True
 )
+
+routine_scheduler.add_job(
+    func=RouteCacher.reload_from_sql,
+    trigger=CronTrigger(
+        hour="00",
+        minute="10",
+        timezone=TIMEZONE
+    ),
+    id='route_info_daily_reload',
+    max_instances=1,
+    replace_existing=True
+)
+
 
 routine_scheduler.add_job(
     func=TTIAStopUdpServer.expire_timeout_section,

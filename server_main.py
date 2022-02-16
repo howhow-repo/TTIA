@@ -7,7 +7,7 @@ from flask import Flask
 from flasgger import Swagger
 from swagger_page_context import SWAGGER_CONTEXT, SWAGGER_CONFIG
 
-from lib import EStopObjCacher, MsgCacher
+from lib import EStopObjCacher, MsgCacher, RouteCacher
 from views.serversideapi import flasgger_server, estop_udp_server
 from views.serverroutineschedule import routine_scheduler
 from views.msgschedulerapi import msg_scheduler
@@ -33,6 +33,8 @@ EStopObjCacher(SQL_CONFIG).load_from_sql()
 
 MsgCacher(SQL_CONFIG, msg_scheduler, estop_udp_server).load_from_sql()
 MsgCacher.init_msg_jods()
+
+RouteCacher(SQL_CONFIG, estop_udp_server).load_from_sql()
 
 
 #  init routine_scheduler
