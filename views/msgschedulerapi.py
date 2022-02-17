@@ -1,17 +1,12 @@
 import logging
 from datetime import datetime
-from decouple import config
 from flask import Blueprint, jsonify, request
-from .serversideapi import estop_udp_server
-from apscheduler.schedulers.background import BackgroundScheduler
-from lib import EStopObjCacher, TTIABusStopMessage, MsgCacher
+from .serversideapi import estop_udp_server, msg_scheduler
+from lib import EStopObjCacher, TTIABusStopMessage
 from lib import FlasggerResponse
 
 logger = logging.getLogger(__name__)
 scheduler_api = Blueprint('scheduler_api', __name__)
-
-TIMEZONE = config('TIMEZONE', default="Asia/Taipei")
-msg_scheduler = BackgroundScheduler(timezone=TIMEZONE)
 
 
 def send_update_msg_tag(msg):
@@ -158,11 +153,12 @@ def reload_msg_from_sql():
       200:
         description: Return dict message with op result.
     """
-    MsgCacher.reload_from_sql()
+    estop_udp_server.reload_msg()
     return jsonify(
         [f"id: {job.id}, name: {job.name}, trigger: {job.trigger}, next: {job.next_run_time}" for job in
          msg_scheduler.get_jobs()]
     )
+
 
 @scheduler_api.route("/stopapi/v1/msg_update_schedule/<stop_id>", methods=['POST'])
 def add_update_msg(stop_id):

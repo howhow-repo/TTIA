@@ -1,4 +1,5 @@
-from lib import EStopObjCacher, TTIAStopUdpServer, MsgCacher, RouteCacher
+from lib import EStopObjCacher, TTIAStopUdpServer, RouteCacher
+from .serversideapi import estop_udp_server
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.cron import CronTrigger
 from decouple import config
@@ -20,7 +21,7 @@ routine_scheduler.add_job(
 )
 
 routine_scheduler.add_job(
-    func=MsgCacher.reload_from_sql,
+    func=lambda: estop_udp_server.reload_msg,
     trigger=CronTrigger(
         hour="00",
         minute="05",

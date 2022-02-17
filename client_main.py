@@ -18,6 +18,7 @@ logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.DEBUG, format='%(asctime)s | %(name)s | %(levelname)s | %(message)s')
 TIMEZONE = config('TIMEZONE', default="Asia/Taipei")
 TTIA_UDP_PORT = config('TTIA_UDP_CLIENT_PORT', cast=int, default=50000)
+HTTP_PORT = config('TTIA_HTTP_CLIENT_PORT', cast=int, default=5000)
 
 #  init estop
 #  init in views/clientsideapi.py
@@ -53,5 +54,5 @@ if __name__ == '__main__':
         (every task will execute twice with no reason.)
         (check https://stackify.dev/288431-apscheduler-in-flask-executes-twice)
     """
-    http_thread = threading.Thread(target=lambda: app.run(host="0.0.0.0", port=5000, use_reloader=False, debug=True)).start()
+    http_thread = threading.Thread(target=lambda: app.run(host="0.0.0.0", port=HTTP_PORT, use_reloader=False, debug=True)).start()
     udp_thread = threading.Thread(target=estop_udp_server.start()).start()

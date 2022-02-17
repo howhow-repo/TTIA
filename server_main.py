@@ -18,6 +18,8 @@ from views.index import index_pade
 #  init constants
 logging.basicConfig(level=logging.INFO, format='%(asctime)s | %(name)s | %(levelname)s | %(message)s',)
 logger = logging.getLogger(__name__)
+TTIA_UDP_PORT = config('TTIA_UDP_SERVER_PORT', cast=int, default=50000)
+HTTP_PORT = config('TTIA_HTTP_SERVER_PORT', cast=int, default=5000)
 TIMEZONE = config('TIMEZONE', default="Asia/Taipei")
 SQL_CONFIG = {
     "host": config('SQL_HOST'),
@@ -31,8 +33,7 @@ SQL_CONFIG = {
 #  init cacher
 EStopObjCacher(SQL_CONFIG).load_from_sql()
 
-MsgCacher(SQL_CONFIG, msg_scheduler, estop_udp_server).load_from_sql()
-MsgCacher.init_msg_jods()
+estop_udp_server.init_msg_jods()
 
 RouteCacher(SQL_CONFIG, estop_udp_server).load_from_sql()
 

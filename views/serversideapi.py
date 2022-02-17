@@ -1,6 +1,8 @@
 from flask import Blueprint, jsonify, request
-from lib import EStopObjCacher, RouteCacher, TTIAStopUdpServer, TTIABusStopMessage
+from lib import TTIABusStopMessage
+from lib import EStopObjCacher, RouteCacher, TTIAStopUdpServer, TTIAAutomationServer
 from lib import FlasggerResponse
+from apscheduler.schedulers.background import BackgroundScheduler
 from decouple import config
 import logging
 
@@ -11,8 +13,20 @@ import logging
 logger = logging.getLogger(__name__)
 flasgger_server = Blueprint('flasgger_server', __name__)
 
+SQL_CONFIG = {
+    "host": config('SQL_HOST'),
+    "port": config('SQL_PORT', cast=int),
+    "user": config('SQL_USER'),
+    "password": config('SQL_PW'),
+    "db": config('SQL_DB')
+}
+
+TIMEZONE = config('TIMEZONE', default="Asia/Taipei")
+
+msg_scheduler = BackgroundScheduler(timezone=TIMEZONE)
 TTIA_UDP_PORT = config('TTIA_UDP_SERVER_PORT', cast=int, default=50000)
-estop_udp_server = TTIAStopUdpServer(host="0.0.0.0", port=TTIA_UDP_PORT)
+estop_udp_server = TTIAAutomationServer(host="0.0.0.0", port=TTIA_UDP_PORT,
+                                        sql_config=SQL_CONFIG, msg_scheduler=msg_scheduler)
 
 
 def check_stop(stop_id: int):
