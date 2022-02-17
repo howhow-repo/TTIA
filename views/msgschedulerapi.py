@@ -1,7 +1,7 @@
 import logging
 from datetime import datetime
 from flask import Blueprint, jsonify, request
-from .serversideapi import estop_udp_server, msg_scheduler
+from .serversideapi import estop_auto_server, msg_scheduler
 from lib import EStopObjCacher, TTIABusStopMessage
 from lib import FlasggerResponse
 
@@ -11,28 +11,28 @@ scheduler_api = Blueprint('scheduler_api', __name__)
 
 def send_update_msg_tag(msg):
     try:
-        estop_udp_server.send_update_msg_tag(msg)
+        estop_auto_server.send_update_msg_tag(msg)
     except AssertionError as e:
         logger.error(f"{e}, fail to send_update_msg_tag")
 
 
 def send_update_bus_info(msg):
     try:
-        estop_udp_server.send_update_bus_info(msg)
+        estop_auto_server.send_update_bus_info(msg)
     except AssertionError as e:
         logger.error(f"{e}, fail to send_update_bus_info")
 
 
 def send_update_route_info(msg):
     try:
-        estop_udp_server.send_update_route_info(msg)
+        estop_auto_server.send_update_route_info(msg)
     except AssertionError as e:
         logger.error(f"{e}, fail to send_update_route_info")
 
 
 def send_update_gif(msg):
     try:
-        estop_udp_server.send_update_gif(msg)
+        estop_auto_server.send_update_gif(msg)
     except AssertionError as e:
         logger.error(f"{e}, fail to send_update_gif")
 
@@ -153,7 +153,7 @@ def reload_msg_from_sql():
       200:
         description: Return dict message with op result.
     """
-    estop_udp_server.reload_msg()
+    estop_auto_server.reload_msg()
     return jsonify(
         [f"id: {job.id}, name: {job.name}, trigger: {job.trigger}, next: {job.next_run_time}" for job in
          msg_scheduler.get_jobs()]

@@ -25,8 +25,8 @@ TIMEZONE = config('TIMEZONE', default="Asia/Taipei")
 
 msg_scheduler = BackgroundScheduler(timezone=TIMEZONE)
 TTIA_UDP_PORT = config('TTIA_UDP_SERVER_PORT', cast=int, default=50000)
-estop_udp_server = TTIAAutomationServer(host="0.0.0.0", port=TTIA_UDP_PORT,
-                                        sql_config=SQL_CONFIG, msg_scheduler=msg_scheduler)
+estop_udp_server = TTIAStopUdpServer(host="0.0.0.0", port=TTIA_UDP_PORT)
+estop_auto_server = TTIAAutomationServer(sql_config=SQL_CONFIG, msg_scheduler=msg_scheduler, udp_server=estop_udp_server)
 
 
 def check_stop(stop_id: int):
@@ -209,7 +209,7 @@ def set_msg(stop_id):
         assert 'MsgNo' in post_body, "key 'MsgNo' missing"
         assert 'MsgContent' in post_body, "key 'MsgContent' missing"
         msg = create_msg(post_body, 0x05, int(stop_id))
-        ack_msg = estop_udp_server.send_update_msg_tag(msg_obj=msg)
+        ack_msg = estop_auto_server.send_update_msg_tag(msg_obj=msg)
 
         if not ack_msg:
             return jsonify(FlasggerResponse(result="fail",
@@ -398,7 +398,7 @@ def set_bus_info(stop_id):
         assert 'RcvSec' in post_body, "key 'RcvSec' missing"
         assert 'Reserved' in post_body, "key 'Reserved' missing"
         msg = create_msg(post_body, 0x07, int(stop_id))
-        ack_msg = estop_udp_server.send_update_bus_info(msg_obj=msg)
+        ack_msg = estop_auto_server.send_update_bus_info(msg_obj=msg)
         if not ack_msg:
             return jsonify(FlasggerResponse(result="fail",
                                             error_code=3,
@@ -470,7 +470,7 @@ def set_route_info(stop_id):
         assert 'PathEName' in post_body, "key 'PathEName' missing"
         assert 'Sequence' in post_body, "key 'Sequence' missing"
         msg = create_msg(post_body, 0x0B, int(stop_id))
-        ack_msg = estop_udp_server.send_update_route_info(msg_obj=msg)
+        ack_msg = estop_auto_server.send_update_route_info(msg_obj=msg)
 
         if not ack_msg:
             return jsonify(FlasggerResponse(result="fail",
@@ -528,7 +528,7 @@ def set_brightness(stop_id):
         assert post_body, "post body should be in json."
         assert 'LightSet' in post_body, "key 'LightSet' missing"
         msg = create_msg(post_body, 0x0D, int(stop_id))
-        ack_msg = estop_udp_server.send_set_brightness(msg_obj=msg)
+        ack_msg = estop_auto_server.send_set_brightness(msg_obj=msg)
 
         if not ack_msg:
             return jsonify(FlasggerResponse(result="fail",
@@ -565,7 +565,7 @@ def set_reboot(stop_id):
                                         message=f"StatusError: {check_stop(int(stop_id))[1]}").response)
     try:
         msg = create_msg({}, 0x10, int(stop_id))
-        ack_msg = estop_udp_server.send_reboot(msg_obj=msg)
+        ack_msg = estop_auto_server.send_reboot(msg_obj=msg)
 
         if not ack_msg:
             return jsonify(FlasggerResponse(result="fail",
@@ -634,7 +634,7 @@ def set_gif(stop_id):
         assert 'PicURL' in post_body, "key 'PicURL' missing"
         assert 'MsgContent' in post_body, "key 'MsgContent' missing"
         msg = create_msg(post_body, 0x12, int(stop_id))
-        ack_msg = estop_udp_server.send_update_gif(msg_obj=msg)
+        ack_msg = estop_auto_server.send_update_gif(msg_obj=msg)
 
         if not ack_msg:
             return jsonify(FlasggerResponse(result="fail",
@@ -679,7 +679,7 @@ def update_route_info(stop_id):
                 "Sequence": route_info.seqno
             }
             msg = create_msg(payload, 0x0B, int(stop_id))
-            ack_msg = estop_udp_server.send_update_route_info(msg_obj=msg)
+            ack_msg = estop_auto_server.send_update_route_info(msg_obj=msg)
             if not ack_msg:
                 logger.error(f"did not get ack from stop_id [{msg.header.StopID}] "
                              f"after sending route_id [{msg.payload.RouteID}] info.")

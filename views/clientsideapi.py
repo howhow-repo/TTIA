@@ -12,10 +12,13 @@ logger = logging.getLogger(__name__)
 flasgger_client = Blueprint('flasgger_client', __name__)
 
 server_host = config('SERVER_IP', cast=str, default="192.168.30.177")
+server_port = config('TTIA_UDP_SERVER_PORT', cast=int, default=50000)
+print(f"server> {server_host}:{server_port}")
 TTIA_UDP_PORT = config('TTIA_UDP_CLIENT_PORT', cast=int, default=50000)
+
 estop = EStop({"StopID": 6, "IMSI": '358759222540402'})
 estop_udp_server = TTIAEStopUdpClient(host="0.0.0.0", port=TTIA_UDP_PORT, estop=estop,
-                                      server_host=server_host, server_port=50000)
+                                      server_host=server_host, server_port=server_port)
 
 
 class OperationResponse:

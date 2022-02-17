@@ -8,7 +8,7 @@ from flasgger import Swagger
 from swagger_page_context import SWAGGER_CONTEXT, SWAGGER_CONFIG
 
 from lib import EStopObjCacher, MsgCacher, RouteCacher
-from views.serversideapi import flasgger_server, estop_udp_server
+from views.serversideapi import flasgger_server, estop_auto_server
 from views.serverroutineschedule import routine_scheduler
 from views.msgschedulerapi import msg_scheduler
 from views.msgschedulerapi import scheduler_api
@@ -33,9 +33,9 @@ SQL_CONFIG = {
 #  init cacher
 EStopObjCacher(SQL_CONFIG).load_from_sql()
 
-estop_udp_server.init_msg_jods()
+estop_auto_server.init_msg_jods()
 
-RouteCacher(SQL_CONFIG, estop_udp_server).load_from_sql()
+RouteCacher(SQL_CONFIG, estop_auto_server).load_from_sql()
 
 
 #  init routine_scheduler
@@ -71,4 +71,4 @@ if __name__ == '__main__':
         use_reloader=False,
         debug=True)).start()
 
-    udp_thread = threading.Thread(target=estop_udp_server.start()).start()
+    udp_thread = threading.Thread(target=estop_auto_server.udp_server.start()).start()
