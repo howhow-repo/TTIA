@@ -28,9 +28,7 @@ class MsgCacher:
 
     @classmethod
     def load_from_sql(cls):
-        cls.station.connect()
-        estops_dict = cls.station.get_valid_msgs()
-        cls.station.disconnect()
+        estops_dict = cls.__get_new_dict()
 
         cls.__pack_come_in_data(estops_dict)
 
@@ -42,9 +40,7 @@ class MsgCacher:
             :return
             list of changed msg
         """
-        cls.station.connect()
-        estops_dict = cls.station.get_valid_msgs()
-        cls.station.disconnect()
+        estops_dict = cls.__get_new_dict()
 
         changed_msg = []
         updated_msg = []
@@ -68,3 +64,10 @@ class MsgCacher:
         for msg_dict in new_dict:
             msg_tag = StopMsg().from_dict(msg_dict)
             cls.msg_cache[msg_tag.id] = msg_tag
+
+    @classmethod
+    def __get_new_dict(cls):
+        cls.station.connect()
+        estops_dict = cls.station.get_valid_msgs()
+        cls.station.disconnect()
+        return estops_dict

@@ -27,8 +27,8 @@ def remove_job_by_msg(stop_msg: StopMsg):
 class TTIAAutomationServer:
     def __init__(self, sql_config, msg_scheduler, udp_server: TTIAStopUdpServer):
         self.udp_server = udp_server
+        EStopObjCacher(sql_config).load_from_sql()
         MsgCacher(sql_config, msg_scheduler).load_from_sql()
-        self.init_msg_jods()
 
     def init_msg_jods(self):
         for stop_msg in MsgCacher.msg_cache.values():
@@ -67,7 +67,7 @@ class TTIAAutomationServer:
                 updatetime = stop_msg.updatetime
             MsgCacher.scheduler.add_job(
                 id=f"MSG_{stop_msg.id}_{stop_id}",
-                func=self.udp_server.send_update_msg_tag,
+                func=self.update_msg_tag,
                 args=(msg,),
                 next_run_time=updatetime,
                 max_instances=1,
@@ -88,8 +88,23 @@ class TTIAAutomationServer:
                 updatetime = stop_msg.updatetime
             MsgCacher.scheduler.add_job(
                 id=f"MSG_default_{stop_id}",
-                func=self.udp_server.send_update_msg_tag,
+                func=self.update_msg_tag,
                 args=(msg,),
                 next_run_time=updatetime,
                 max_instances=1,
             )
+
+    def reload_stop_and_route(self):
+        updated_route_stop = EStopObjCacher.reload_from_sql()
+        for stop_id in updated_route_stop:
+            self.send_route_info(stop_id)
+
+    def reload_stop_and_route_by_ids(self, ids: list):
+        updated_route_stop = EStopObjCacher.reload_from_sql_by_estop_ids(ids)
+        for stop_id in updated_route_stop:
+            self.send_route_info(stop_id)
+
+    def send_route_info(self, stop_id: int):
+        for seq, info in enumerate(EStopObjCacher.estop_cache[stop_id].routelist):
+            msg = info.to_ttia(stop_id=stop_id, seq=seq)
+            ack = self.udp_server.send_update_route_info(msg_obj=msg, wait_for_resp=True)

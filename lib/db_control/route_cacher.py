@@ -17,8 +17,7 @@ class RouteCacher:
     ttia_server = TTIAStopUdpServer
 
     @classmethod
-    def __init__(cls, mysql_config: dict, ttia_server: TTIAStopUdpServer):
-        cls.ttia_server = ttia_server
+    def __init__(cls, mysql_config: dict):
         check_config_items(mysql_config)
         try:
             cls.station = StationCenter(mysql_config=mysql_config)
@@ -38,6 +37,7 @@ class RouteCacher:
         cls.station.connect()
         stop_dict = cls.station.get_e_stops()
         cls.station.disconnect()
+
         new_dict = {}
         for estop_id in stop_dict:
             routelist = []

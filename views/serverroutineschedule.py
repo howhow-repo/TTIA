@@ -1,4 +1,4 @@
-from lib import EStopObjCacher, TTIAStopUdpServer, RouteCacher
+from lib import EStopObjCacher, TTIAStopUdpServer
 from .serversideapi import estop_auto_server
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.cron import CronTrigger
@@ -33,7 +33,7 @@ routine_scheduler.add_job(
 )
 
 routine_scheduler.add_job(
-    func=RouteCacher.reload_from_sql,
+    func=estop_auto_server.reload_stop_and_route,
     trigger=CronTrigger(
         hour="00",
         minute="10",

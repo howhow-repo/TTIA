@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify, request
 from lib import TTIABusStopMessage
-from lib import EStopObjCacher, RouteCacher, TTIAStopUdpServer, TTIAAutomationServer
+from lib import EStopObjCacher, TTIAStopUdpServer, TTIAAutomationServer
 from lib import FlasggerResponse
 from apscheduler.schedulers.background import BackgroundScheduler
 from decouple import config
@@ -127,7 +127,7 @@ def reload_caches():
     if post_body and len(post_body.get('ids')) > 0:
         # Reload by id
         try:
-            EStopObjCacher.load_from_sql_by_estop_ids(post_body['ids'])
+            estop_auto_server.reload_stop_and_route_by_ids(post_body['ids'])
             logger.info(f"estop cache reloaded by id: {post_body['ids']}")
             return jsonify(FlasggerResponse(message=f"estop cache reloaded by id: [{post_body['ids']}]").response)
         except Exception as err:
@@ -136,14 +136,14 @@ def reload_caches():
                                             message=f"fail reload estop of {post_body['ids']}, {err}").response)
     else:
         # Reload all
-        try:
-            EStopObjCacher.reload_from_sql()
+        # try:
+            estop_auto_server.reload_stop_and_route()
             logger.info("estop cache total reloaded")
             return jsonify(FlasggerResponse(message="estop cache total reloaded").response)
-        except Exception as err:
-            return jsonify(FlasggerResponse(result="fail",
-                                            error_code=2,
-                                            message=f"fail reload estop, {err}").response)
+        # except Exception as err:
+        #     return jsonify(FlasggerResponse(result="fail",
+        #                                     error_code=2,
+        #                                     message=f"fail reload estop, {err}").response)
 
 
 @flasgger_server.route("/stopapi/v1/set_msg/<stop_id>", methods=['POST'])
@@ -692,22 +692,22 @@ def update_route_info(stop_id):
         return jsonify(FlasggerResponse().response)
 
 
-@flasgger_server.route("/stopapi/v1/reload_route_info/", methods=['POST'])
-def reload_route_cache():
-    """reload route info from sql. Automatically sent ttia route info msg to estop if find diff.
-    ---
-    tags:
-      - name: TTIA EStop helper
-    responses:
-      200:
-        description: Return dict message with op result.
-    """
-    # Reload by id
-    RouteCacher.reload_from_sql()
-    try:
-        RouteCacher.reload_from_sql()
-        return jsonify(FlasggerResponse(message=f"testing api").response)
-    except Exception as err:
-        return jsonify(FlasggerResponse(result="fail",
-                                        error_code=2,
-                                        message=f"fail testing api: {err}").response)
+# @flasgger_server.route("/stopapi/v1/reload_route_info/", methods=['POST'])
+# def reload_route_cache():
+#     """reload route info from sql. Automatically sent ttia route info msg to estop if find diff.
+#     ---
+#     tags:
+#       - name: TTIA EStop helper
+#     responses:
+#       200:
+#         description: Return dict message with op result.
+#     """
+#     # Reload by id
+#     RouteCacher.reload_from_sql()
+#     try:
+#         RouteCacher.reload_from_sql()
+#         return jsonify(FlasggerResponse(message=f"testing api").response)
+#     except Exception as err:
+#         return jsonify(FlasggerResponse(result="fail",
+#                                         error_code=2,
+#                                         message=f"fail testing api: {err}").response)

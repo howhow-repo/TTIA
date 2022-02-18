@@ -7,7 +7,6 @@ from flask import Flask
 from flasgger import Swagger
 from swagger_page_context import SWAGGER_CONTEXT, SWAGGER_CONFIG
 
-from lib import EStopObjCacher, MsgCacher, RouteCacher
 from views.serversideapi import flasgger_server, estop_auto_server
 from views.serverroutineschedule import routine_scheduler
 from views.msgschedulerapi import msg_scheduler
@@ -31,12 +30,7 @@ SQL_CONFIG = {
 
 
 #  init cacher
-EStopObjCacher(SQL_CONFIG).load_from_sql()
-
 estop_auto_server.init_msg_jods()
-
-RouteCacher(SQL_CONFIG, estop_auto_server).load_from_sql()
-
 
 #  init routine_scheduler
 routine_scheduler.start()

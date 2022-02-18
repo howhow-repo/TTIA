@@ -153,11 +153,17 @@ def reload_msg_from_sql():
       200:
         description: Return dict message with op result.
     """
-    estop_auto_server.reload_msg()
-    return jsonify(
-        [f"id: {job.id}, name: {job.name}, trigger: {job.trigger}, next: {job.next_run_time}" for job in
-         msg_scheduler.get_jobs()]
-    )
+
+    try:
+        estop_auto_server.reload_msg()
+        return jsonify(
+            [f"id: {job.id}, name: {job.name}, trigger: {job.trigger}, next: {job.next_run_time}" for job in
+             msg_scheduler.get_jobs()]
+        )
+    except Exception as e:
+        return jsonify(FlasggerResponse(result="fail",
+                                        error_code=3,
+                                        message=f"{e.__class__.__name__}: {e}").response)
 
 
 @scheduler_api.route("/stopapi/v1/msg_update_schedule/<stop_id>", methods=['POST'])

@@ -40,6 +40,36 @@ class EStopObjCacher:
         cls.__pack_come_in_data(estops_dict)
 
     @classmethod
+    def reload_from_sql_by_estop_ids(cls, ids: list):
+        cls.station.connect()
+        new_dict = cls.station.get_e_stop_by_ids(ids)
+        cls.station.disconnect()
+
+        route_updated_stops = []
+        for estop_id in new_dict:
+            old_stop = cls.estop_cache.get(estop_id)
+            new_stop_dict = new_dict[estop_id]
+
+            if old_stop:
+                # Check new coming item is same as old item
+                for key in new_stop_dict:
+                    if new_stop_dict[key] == old_stop.to_dict()[key]:
+                        continue
+                    else:
+                        logger.info(f"find diff at stop [{old_stop.StopID}]>> "
+                                    f"{key}: {old_stop.to_dict()[key]} -> {new_stop_dict[key]}")
+                        if key == 'routelist':
+                            route_updated_stops.append(old_stop.StopID)
+            else:
+                estop_obj = EStop(new_stop_dict)
+                cls.estop_cache[estop_obj.StopID] = estop_obj
+                logger.info(f"Find new stop id {old_stop.StopID}, add to cache.")
+
+        logger.info('reload stop done.')
+        logger.debug(f'route_updated_stops: {route_updated_stops}')
+        return set(route_updated_stops)
+
+    @classmethod
     def reload_from_sql(cls):
         """
             Check if the new data same as the cache.
@@ -48,23 +78,29 @@ class EStopObjCacher:
         new_dict = cls.station.get_e_stops()
         cls.station.disconnect()
 
+        route_updated_stops = []
         for estop_id in new_dict:
             old_stop = cls.estop_cache.get(estop_id)
             new_stop_dict = new_dict[estop_id]
+
             if old_stop:
                 # Check new coming item is same as old item
                 for key in new_stop_dict:
-                    if new_stop_dict[key] == old_stop.json()[key]:
+                    if new_stop_dict[key] == old_stop.to_dict()[key]:
                         continue
                     else:
                         logger.info(f"find diff at stop [{old_stop.StopID}]>> "
-                                    f"{key}: {old_stop.__getattribute__(key)} -> {new_stop_dict[key]}")
+                                    f"{key}: {old_stop.to_dict()[key]} -> {new_stop_dict[key]}")
+                        if key == 'routelist':
+                            route_updated_stops.append(old_stop.StopID)
             else:
                 estop_obj = EStop(new_stop_dict)
                 cls.estop_cache[estop_obj.StopID] = estop_obj
                 logger.info(f"Find new stop id {old_stop.StopID}, add to cache.")
 
         logger.info('reload stop done.')
+        logger.debug(f'route_updated_stops: {route_updated_stops}')
+        return set(route_updated_stops)
 
     @classmethod
     def __pack_come_in_data(cls, new_dict: dict):
@@ -106,10 +142,9 @@ class EStopObjCacher:
     def check_online(cls):
         """if miss two Period Report, set ready to false"""
         logger.debug("checking stop online...")
-        now = datetime.now()
         for estop in cls.estop_cache.values():
             if estop.ready and estop.lasttime:
-                delta_time = now - estop.lasttime
+                delta_time = datetime.now() - estop.lasttime
                 if delta_time > timedelta(seconds=estop.ReportPeriod*2):
                     estop.ready = False
                     logger.warning(f"set estop {estop.StopID} ready = False: {delta_time.seconds} seconds not replied.")
