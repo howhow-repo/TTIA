@@ -29,6 +29,7 @@ class TTIAAutomationServer:
         self.udp_server = udp_server
         EStopObjCacher(sql_config).load_from_sql()
         MsgCacher(sql_config, msg_scheduler).load_from_sql()
+        self.init_msg_jods()
 
     def init_msg_jods(self):
         for stop_msg in MsgCacher.msg_cache.values():
@@ -82,15 +83,11 @@ class TTIAAutomationServer:
             msg.payload.MsgTag = 5
             msg.payload.MsgNo = estop.MsgNo
             msg.payload.MsgContent = estop.IdleMessage
-            if stop_msg.updatetime < datetime.now():
-                updatetime = datetime.now() + timedelta(seconds=120)
-            else:
-                updatetime = stop_msg.updatetime
             MsgCacher.scheduler.add_job(
                 id=f"MSG_default_{stop_id}",
                 func=self.update_msg_tag,
                 args=(msg,),
-                next_run_time=updatetime,
+                next_run_time=stop_msg.expiretime,
                 max_instances=1,
             )
 

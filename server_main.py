@@ -29,9 +29,6 @@ SQL_CONFIG = {
 }
 
 
-#  init cacher
-estop_auto_server.init_msg_jods()
-
 #  init routine_scheduler
 routine_scheduler.start()
 atexit.register(lambda: routine_scheduler.shutdown())
