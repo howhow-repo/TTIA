@@ -100,7 +100,8 @@ def get_cache_by_id(stop_id):
 
 @flasgger_server.route("/stopapi/v1/reload_caches/", methods=['POST'])
 def reload_caches():
-    """Force cacher to reload from mysql. See more parameter description in Models below.
+    """Force cacher to reload from mysql. If route info changed, it will auto sent ttia to estop.
+        See more parameter description in Models below.
     ---
     tags:
       - name: TTIA EStop Server
@@ -209,7 +210,7 @@ def set_msg(stop_id):
         assert 'MsgNo' in post_body, "key 'MsgNo' missing"
         assert 'MsgContent' in post_body, "key 'MsgContent' missing"
         msg = create_msg(post_body, 0x05, int(stop_id))
-        ack_msg = estop_auto_server.send_update_msg_tag(msg_obj=msg)
+        ack_msg = estop_auto_server.udp_server.send_update_msg_tag(msg_obj=msg)
 
         if not ack_msg:
             return jsonify(FlasggerResponse(result="fail",
@@ -398,7 +399,7 @@ def set_bus_info(stop_id):
         assert 'RcvSec' in post_body, "key 'RcvSec' missing"
         assert 'Reserved' in post_body, "key 'Reserved' missing"
         msg = create_msg(post_body, 0x07, int(stop_id))
-        ack_msg = estop_auto_server.send_update_bus_info(msg_obj=msg)
+        ack_msg = estop_auto_server.udp_server.send_update_bus_info(msg_obj=msg)
         if not ack_msg:
             return jsonify(FlasggerResponse(result="fail",
                                             error_code=3,
@@ -470,7 +471,7 @@ def set_route_info(stop_id):
         assert 'PathEName' in post_body, "key 'PathEName' missing"
         assert 'Sequence' in post_body, "key 'Sequence' missing"
         msg = create_msg(post_body, 0x0B, int(stop_id))
-        ack_msg = estop_auto_server.send_update_route_info(msg_obj=msg)
+        ack_msg = estop_auto_server.udp_server.send_update_route_info(msg_obj=msg)
 
         if not ack_msg:
             return jsonify(FlasggerResponse(result="fail",
@@ -528,7 +529,7 @@ def set_brightness(stop_id):
         assert post_body, "post body should be in json."
         assert 'LightSet' in post_body, "key 'LightSet' missing"
         msg = create_msg(post_body, 0x0D, int(stop_id))
-        ack_msg = estop_auto_server.send_set_brightness(msg_obj=msg)
+        ack_msg = estop_auto_server.udp_server.send_set_brightness(msg_obj=msg)
 
         if not ack_msg:
             return jsonify(FlasggerResponse(result="fail",
@@ -565,7 +566,7 @@ def set_reboot(stop_id):
                                         message=f"StatusError: {check_stop(int(stop_id))[1]}").response)
     try:
         msg = create_msg({}, 0x10, int(stop_id))
-        ack_msg = estop_auto_server.send_reboot(msg_obj=msg)
+        ack_msg = estop_auto_server.udp_server.send_reboot(msg_obj=msg)
 
         if not ack_msg:
             return jsonify(FlasggerResponse(result="fail",
@@ -579,7 +580,7 @@ def set_reboot(stop_id):
                                         message=f"{e.__class__.__name__}: {e.__str__()}").response)
 
 
-@flasgger_server.route("/stopapi/v1/update_gif/<stop_id>", methods=['POST'])
+@flasgger_server.route("/stopapi/v1/set_gif/<stop_id>", methods=['POST'])
 def set_gif(stop_id):
     """Update gif info to estop.
     ---
@@ -634,7 +635,7 @@ def set_gif(stop_id):
         assert 'PicURL' in post_body, "key 'PicURL' missing"
         assert 'MsgContent' in post_body, "key 'MsgContent' missing"
         msg = create_msg(post_body, 0x12, int(stop_id))
-        ack_msg = estop_auto_server.send_update_gif(msg_obj=msg)
+        ack_msg = estop_auto_server.udp_server.send_update_gif(msg_obj=msg)
 
         if not ack_msg:
             return jsonify(FlasggerResponse(result="fail",
@@ -670,44 +671,33 @@ def update_route_info(stop_id):
                                         error_code=3,
                                         message=f"StatusError: {check_stop(int(stop_id))[1]}").response)
 
-    for route_info in EStopObjCacher.estop_cache[int(stop_id)].routelist:
-        try:
-            payload = {
-                "RouteID": route_info.rrid,
-                "PathCName": route_info.rname,
-                "PathEName": route_info.rename,
-                "Sequence": route_info.seqno
-            }
-            msg = create_msg(payload, 0x0B, int(stop_id))
-            ack_msg = estop_auto_server.send_update_route_info(msg_obj=msg)
-            if not ack_msg:
-                logger.error(f"did not get ack from stop_id [{msg.header.StopID}] "
-                             f"after sending route_id [{msg.payload.RouteID}] info.")
-            else:
-                logger.info(f"send route {msg.payload.RouteID} to stop {msg.header.StopID} success")
+    estop_auto_server.send_route_info(stop_id=int(stop_id))
 
-        except Exception as e:
-            logger.error(f"Batch update stop_id {stop_id} route info fail. {e}")
-
-        return jsonify(FlasggerResponse().response)
+    return jsonify(FlasggerResponse().response)
 
 
-# @flasgger_server.route("/stopapi/v1/reload_route_info/", methods=['POST'])
-# def reload_route_cache():
-#     """reload route info from sql. Automatically sent ttia route info msg to estop if find diff.
-#     ---
-#     tags:
-#       - name: TTIA EStop helper
-#     responses:
-#       200:
-#         description: Return dict message with op result.
-#     """
-#     # Reload by id
-#     RouteCacher.reload_from_sql()
-#     try:
-#         RouteCacher.reload_from_sql()
-#         return jsonify(FlasggerResponse(message=f"testing api").response)
-#     except Exception as err:
-#         return jsonify(FlasggerResponse(result="fail",
-#                                         error_code=2,
-#                                         message=f"fail testing api: {err}").response)
+@flasgger_server.route("/stopapi/v1/update_msg/<stop_id>", methods=['POST'])
+def update_msg(stop_id):
+    """Update serious msg tag to estop from cache.
+    ---
+    tags:
+      - name: TTIA EStop helper
+    parameters:
+      - name: stop_id
+        in: path
+        type: number
+        required: true
+
+    responses:
+      200:
+        description: Return dict message with op result.
+    """
+    if not check_stop(int(stop_id))[0]:
+        return jsonify(FlasggerResponse(result="fail",
+                                        error_code=3,
+                                        message=f"StatusError: {check_stop(int(stop_id))[1]}").response)
+
+    estop_auto_server.send_msg(stop_id=int(stop_id))
+
+    return jsonify(FlasggerResponse().response)
+

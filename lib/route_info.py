@@ -32,4 +32,6 @@ class RouteInfo:
             msg.payload.PathEName = ''
         if not self.seqno:
             msg.payload.Sequence = 0
+        else:
+            msg.payload.Sequence = seq
         return msg

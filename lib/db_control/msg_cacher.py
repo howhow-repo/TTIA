@@ -57,6 +57,11 @@ class MsgCacher:
                 cls.msg_cache[new_msg.id] = new_msg
 
         return changed_msg, updated_msg
+    @classmethod
+    def get_msg_by_group_id(cls, group_id) -> StopMsg:
+        for msg in cls.msg_cache.values():
+            if msg.gid == group_id:
+                return msg
 
     @classmethod
     def __pack_come_in_data(cls, new_dict: dict):

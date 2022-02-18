@@ -105,3 +105,14 @@ class TTIAAutomationServer:
         for seq, info in enumerate(EStopObjCacher.estop_cache[stop_id].routelist):
             msg = info.to_ttia(stop_id=stop_id, seq=seq)
             ack = self.udp_server.send_update_route_info(msg_obj=msg, wait_for_resp=True)
+
+    def send_msg(self, stop_id: int):
+        estop = EStopObjCacher.estop_cache.get(stop_id)
+        if estop:
+            gid = estop.MessageGroupID
+            stop_msg = MsgCacher.get_msg_by_group_id(gid)
+            if stop_msg and stop_msg.updatetime < datetime.now() < stop_msg.expiretime:
+                msg = stop_msg.to_ttia(stop_id)
+                ack = self.udp_server.send_update_msg_tag(msg)
+        else:
+            logger.error(f"estop {stop_id} not found.")
