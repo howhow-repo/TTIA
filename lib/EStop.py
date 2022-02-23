@@ -1,6 +1,6 @@
 from datetime import time
 
-from .route_info import RouteInfo
+from .RouteInfo import RouteInfo
 
 
 def deg_to_dms(deg):

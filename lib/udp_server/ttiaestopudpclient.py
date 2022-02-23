@@ -3,7 +3,7 @@ import logging
 from datetime import datetime
 from .core import ClientSideHandler
 from ..TTIA_stop_message import TTIABusStopMessage
-from ..estop import EStop
+from ..EStop import EStop
 
 
 logger = logging.getLogger(__name__)

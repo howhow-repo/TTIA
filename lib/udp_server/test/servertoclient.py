@@ -7,7 +7,7 @@ class TestServerSendMessages(unittest.TestCase):
     """Please make sure to turn on server and client is ready & registered before run testing."""
     server_ip = "localhost"
     server_port = 5000
-    test_client_id = 5
+    test_client_id = 6
 
     def test_send_reboot(self):
         r = requests.post(
@@ -99,7 +99,7 @@ class TestServerSendMessages(unittest.TestCase):
             "PicURL": "string"
         }
         r = requests.post(
-            f'http://{self.server_ip}:{self.server_port}/stopapi/v1/update_gif/{self.test_client_id}', json=body
+            f'http://{self.server_ip}:{self.server_port}/stopapi/v1/set_gif/{self.test_client_id}', json=body
         )
         self.assertEqual(r.json()['result'], 'success')
         self.assertEqual(r.json()['error_code'], 0)

@@ -678,7 +678,7 @@ def update_route_info(stop_id):
 
 @flasgger_server.route("/stopapi/v1/update_msg/<stop_id>", methods=['POST'])
 def update_msg(stop_id):
-    """Update serious msg tag to estop from cache.
+    """Update msg tag to estop from cache.
     ---
     tags:
       - name: TTIA EStop helper

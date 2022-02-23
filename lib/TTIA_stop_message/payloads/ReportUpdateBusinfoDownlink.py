@@ -127,7 +127,7 @@ class ReportUpdateBusinfoDownlink(PayloadBase):
 
     def self_assert(self):
         assert self.IsLastBus in [0, 1], "IsLastBus should be 0~1; 0:非末班車 1:末班車"
-        assert self.Direction in range(0, 3), "Direction should be 0~3; 0:去程 1:返程 2:尚未發車 3:末班已離駛"
+        assert self.Direction in range(0, 4), "Direction should be 0~3; 0:去程 1:返程 2:尚未發車 3:末班已離駛"
         assert self.Type in [1, 2], "Type should be 1~2; 1:定期 2:非定期"
         assert 2000 <= self.TransYear, "TransYear must > 2000"
         assert 1 <= self.TransMonth <= 12, "TransMonth range error"
