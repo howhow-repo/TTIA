@@ -3,6 +3,7 @@ from .core import UDPWorkingSection
 from ..db_control import EStopObjCacher
 from ..TTIA_stop_message import TTIABusStopMessage
 from datetime import datetime, time
+import time as systime
 import time as sys_time
 import logging
 
@@ -104,10 +105,11 @@ class TTIAStopUdpServer(ServerSideHandler):
     def send_update_bus_info(self, msg_obj: TTIABusStopMessage, wait_for_resp=True):
         assert msg_obj.header.MessageID == 0x07
         estop = EStopObjCacher.get_estop_by_id(msg_obj.header.StopID)
+        assert estop, f"Can not find client {msg_obj.header.StopID}"
         assert estop.address is not None, f"Can not find client {msg_obj.header.StopID} address"
         section = self.create_new_section(msg_obj.header.StopID, estop.address, msg_obj)
         self.sock.sendto(msg_obj.to_pdu(), estop.address)
-        logger.info(f"send_update_bus_info: {msg_obj.header.StopID} ")
+        # logger.info(f"send_update_bus_info: {msg_obj.header.StopID} ")
         if wait_for_resp:
             return self.wait_ack(section, 0x08)
         else:
@@ -115,7 +117,7 @@ class TTIAStopUdpServer(ServerSideHandler):
 
     def recv_update_bus_info_ack(self, msg_obj: TTIABusStopMessage, section: UDPWorkingSection):
         EStopObjCacher.estop_cache[msg_obj.header.StopID].lasttime = datetime.now()
-        logger.info(f"recv_update_msg_tag_ack from id: {msg_obj.header.StopID}")
+        # logger.info(f"recv_update_msg_tag_ack from id: {msg_obj.header.StopID}")
 
     def recv_abnormal(self, msg_obj: TTIABusStopMessage, section: UDPWorkingSection):
         """ 接收定時回報訊息 0x09 """
@@ -209,6 +211,7 @@ class TTIAStopUdpServer(ServerSideHandler):
                 return ack_msg
             else:
                 sys_time.sleep(check_interval)
+        logger.warning("do not get ack from client.")
         return None
 
     def update_route_info(self, stop_id: int):
@@ -216,3 +219,8 @@ class TTIAStopUdpServer(ServerSideHandler):
         for i, route in enumerate(estop.routelist):
             msg = route.to_ttia(stop_id, i)
             ack = self.send_update_route_info(msg, wait_for_resp=True)
+
+    def fake_udp_job(self, msg_obj: TTIABusStopMessage, wait_for_resp=True):
+        logger.info(f"sending fake udp msg... {msg_obj.header.StopID}")
+        systime.sleep(2)
+        logger.info(f"fake udp msg sent done. {msg_obj.header.StopID}")

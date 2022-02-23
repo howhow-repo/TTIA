@@ -30,8 +30,8 @@ class OpReportUpdateBusinfoDownlink(OpPayloadBase):
         self.self_assert()
         MsgCContent = bytearray(self.MsgCContent.encode("big5"))
         MsgEContent = bytearray(self.MsgEContent.encode("ascii"))
-        assert len(MsgCContent) <= 12, "MsgCContent overflow, please make sure it beneath 12 bytes"
-        assert len(MsgEContent) <= 12, "MsgEContent overflow, please make sure it beneath 12 bytes"
+        assert len(MsgCContent) <= 12, f"MsgCContent: [{self.MsgCContent}] overflow, please make sure it beneath 12 bytes"
+        assert len(MsgEContent) <= 12, f"MsgEContent [{self.MsgEContent}] overflow, please make sure it beneath 12 bytes"
 
         RouteMsgCContent = bytearray(self.RouteMsgCContent.encode("big5"))
         RouteMsgEContent = bytearray(self.RouteMsgEContent.encode("ascii"))

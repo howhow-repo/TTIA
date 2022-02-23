@@ -22,7 +22,7 @@ estop_udp_server = TTIAEStopUdpClient(host="0.0.0.0", port=TTIA_UDP_PORT, estop=
 
 
 class OperationResponse:
-    def __init__(self, result: str = 'success', error_code: int = 0, message: str = None):
+    def __init__(cls, result: str = 'success', error_code: int = 0, message: str = None):
         r = {
             'result': result,
             'error_code': error_code,
@@ -34,7 +34,7 @@ class OperationResponse:
 
 @flasgger_client.route("/clientapi/v1/info", methods=['GET'])
 def get_self_info():
-    """get self estop client current info.
+    """get cls estop client current info.
     ---
     tags:
       - name: TTIA estop client
@@ -43,7 +43,7 @@ def get_self_info():
         description: Return the current syayus of estops
     """
     try:
-        logger.info(f"Get self estop info: {estop.to_json()}")
+        logger.info(f"Get cls estop info: {estop.to_json()}")
         return jsonify(estop.to_json())
     except Exception as err:
         return jsonify(OperationResponse(result="fail",

@@ -26,7 +26,8 @@ TIMEZONE = config('TIMEZONE', default="Asia/Taipei")
 msg_scheduler = BackgroundScheduler(timezone=TIMEZONE)
 TTIA_UDP_PORT = config('TTIA_UDP_SERVER_PORT', cast=int, default=50000)
 estop_udp_server = TTIAStopUdpServer(host="0.0.0.0", port=TTIA_UDP_PORT)
-estop_auto_server = TTIAAutomationServer(sql_config=SQL_CONFIG, msg_scheduler=msg_scheduler, udp_server=estop_udp_server)
+estop_auto_server = TTIAAutomationServer(sql_config=SQL_CONFIG, msg_scheduler=msg_scheduler,
+                                         udp_server=estop_udp_server)
 
 
 def check_stop(stop_id: int):
@@ -95,7 +96,13 @@ def get_cache_by_id(stop_id):
       200:
         description: Return the current cache of estop id
     """
-    return jsonify(EStopObjCacher.estop_cache[int(stop_id)].to_json())
+    estop = EStopObjCacher.get_estop_by_id(int(stop_id))
+    if estop:
+        return jsonify(estop.to_json())
+    else:
+        return jsonify(FlasggerResponse(result="fail",
+                                        error_code=2,
+                                        message=f"Can not find stop id {int(stop_id)}").response)
 
 
 @flasgger_server.route("/stopapi/v1/reload_caches/", methods=['POST'])
@@ -138,13 +145,13 @@ def reload_caches():
     else:
         # Reload all
         # try:
-            estop_auto_server.reload_stop_and_route()
-            logger.info("estop cache total reloaded")
-            return jsonify(FlasggerResponse(message="estop cache total reloaded").response)
-        # except Exception as err:
-        #     return jsonify(FlasggerResponse(result="fail",
-        #                                     error_code=2,
-        #                                     message=f"fail reload estop, {err}").response)
+        estop_auto_server.reload_stop_and_route()
+        logger.info("estop cache total reloaded")
+        return jsonify(FlasggerResponse(message="estop cache total reloaded").response)
+    # except Exception as err:
+    #     return jsonify(FlasggerResponse(result="fail",
+    #                                     error_code=2,
+    #                                     message=f"fail reload estop, {err}").response)
 
 
 @flasgger_server.route("/stopapi/v1/set_msg/<stop_id>", methods=['POST'])
@@ -700,4 +707,3 @@ def update_msg(stop_id):
     estop_auto_server.send_msg(stop_id=int(stop_id))
 
     return jsonify(FlasggerResponse().response)
-

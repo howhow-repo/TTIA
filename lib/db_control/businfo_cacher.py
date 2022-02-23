@@ -3,6 +3,9 @@ from datetime import datetime, timedelta
 import requests
 from decouple import config
 from ..TTIA_stop_message import TTIABusStopMessage
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 def create_last_left_msg(StopID: int, RouteID: int):
@@ -82,8 +85,8 @@ class WebRoute:
             msg = TTIABusStopMessage(0x07, 'default')
             msg.header.StopID = stop_id
             msg.payload.RouteID = self.id
-            if ":" in web_stop.est and web_stop.bno is None: # TODO: 未發車
-                schtime = datetime(now.year, now.month, now.day, web_stop.est.split(":")[0], web_stop.est.split(":")[1])
+            if ":" in web_stop.est and web_stop.bno is None:  # TODO: 未發車
+                schtime = datetime(now.year, now.month, now.day, int(web_stop.est.split(":")[0]), int(web_stop.est.split(":")[1]))
                 msg.payload.EstimateTime = (schtime - now).seconds
                 msg.option_payload.SpectialEstimateTime = 1
                 msg.option_payload.MsgCContent = web_stop.est + ' 發車'
@@ -96,8 +99,8 @@ class WebRoute:
                 msg.payload.EstimateTime = web_stop.cdsec
                 if web_stop.cdcnt > 0:
                     msg.payload.StopDistance = web_stop.cdcnt
-                msg.option_payload.MsgCContent = f"尚余 {web_stop.cdsec//60} 分鐘進站"
-                msg.option_payload.MsgEContent = f"Will be arrived after {web_stop.cdsec//60} min."
+                msg.option_payload.MsgCContent = f"余 {web_stop.cdsec // 60} 分鐘"
+                msg.option_payload.MsgEContent = f"Arr {web_stop.cdsec // 60} min"
 
             elif web_stop.bno and 180 > web_stop.cdsec >= 60:  # TODO: 車在路上 & 即將進站
                 bus_info = web_stop.bno[0]
@@ -106,8 +109,8 @@ class WebRoute:
                 msg.payload.EstimateTime = web_stop.cdsec
                 if web_stop.cdcnt > 0:
                     msg.payload.StopDistance = web_stop.cdcnt
-                msg.option_payload.MsgCContent = f"3分鐘內 即將進站"
-                msg.option_payload.MsgEContent = f"Will be soon arrived within 3 min."
+                msg.option_payload.MsgCContent = f"即將進站"
+                msg.option_payload.MsgEContent = f"Arr 3 min."
 
             elif web_stop.bno and 60 > web_stop.cdsec:  # TODO: 車在路上 & 進站中
                 bus_info = web_stop.bno[0]
@@ -116,8 +119,8 @@ class WebRoute:
                 msg.payload.EstimateTime = web_stop.cdsec
                 if web_stop.cdcnt > 0:
                     msg.payload.StopDistance = web_stop.cdcnt
-                msg.option_payload.MsgCContent = f"車輛進站中..."
-                msg.option_payload.MsgEContent = f"Bus arriving...."
+                msg.option_payload.MsgCContent = f"車輛進站中"
+                msg.option_payload.MsgEContent = f"Bus arriving"
 
         msg.payload.TransYear, msg.payload.TransMonth, msg.payload.TransDay, msg.payload.TransHour, msg.payload.TransMin, msg.payload.TransSec \
             = now.year, now.month, now.day, now.hour, now.minute, now.second
@@ -130,11 +133,11 @@ class WebRoute:
 class WebStop:
     def __init__(self, json_info: dict):
         self.bno = json_info.get('bno')
+        if self.bno:
+            self.bno = sorted(self.bno, key=lambda k: k['no'])  # sort bno by 'no'
 
         if json_info.get('schTm'):
             self.est = json_info.get('schTm')
-        elif json_info.get('cdsec'):
-            self.est = json_info.get('cdsec')
         elif json_info.get('schBus'):
             self.est = json_info.get('schBus')
 
@@ -158,29 +161,48 @@ class BusInfoCacher:
     source_host = config('BUS_INFO_SOURCE', cast=str, default='http://110.25.88.242:60001/api/v1/routes/')
     businfo_cache = {}
 
-    def load_from_web(self):
-        routeests = requests.get(self.source_host, timeout=5).json()
+    @classmethod
+    def load_from_web(cls):
+        routeests = requests.get(cls.source_host, timeout=5).json()
         for route_id, route in routeests.items():  # pack to obj
-            self.businfo_cache[int(route_id)] = WebRoute(route)
+            cls.businfo_cache[int(route_id)] = WebRoute(route)
 
-    def reload_from_web(self):
-        """Reload data from source_host.
-            :return
-            a list of stop_id that data changes. Mostly is the bus info has changed.
+    @classmethod
+    def reload_from_web(cls):
         """
-        updated_stops = []
-        updated_routes = []
-        new_data = requests.get(self.source_host, timeout=5).json()
+            Reload data from source_host.
+
+            :return
+            new WebStop objs pack with route id
+            {
+                <route_id: int>: [<stop_obj>, <stop_obj>, <stop_obj>...],
+                <route_id: int>: [<stop_obj>, <stop_obj>, <stop_obj>...],
+                ...
+            }
+        """
+        updated_routes = {}
+        new_data = requests.get(cls.source_host, timeout=5).json()
 
         for route_id, route in new_data.items():
             new_route_obj = WebRoute(route)
-            for stop_id, stop in new_route_obj.stops.items():
-                old_stop = self.businfo_cache[int(route_id)].stops[int(stop_id)]
-                if stop.to_json() == old_stop.to_json():
-                    pass
-                else:
-                    updated_stops.append(stop_id)
-                    updated_routes.append(route_id)
-                    self.businfo_cache[int(route_id)].stops[int(stop_id)] = stop
+            old_route_obj = cls.businfo_cache.get(int(route_id))
 
-        return set(updated_stops), set(updated_routes)
+            if old_route_obj:
+                for stop_id, stop in new_route_obj.stops.items():
+                    old_stop = old_route_obj.stops.get(int(stop_id))
+                    if stop.cdsec != old_stop.cdsec:
+                        if updated_routes.get(route_id):
+                            updated_routes.get(route_id).append(stop_id)
+                        else:
+                            updated_routes[route_id] = [stop_id, ]
+                        cls.businfo_cache[int(route_id)].stops[int(stop_id)] = stop
+                    else:
+                        pass
+            else:  # no old_route
+                updated_routes[route_id] = [stop.sid for stop in new_route_obj.stops]
+        return updated_routes
+        #  {
+        #       <route_id>: [<stop_obj>, <stop_obj>, <stop_obj>...],
+        #       <route_id>: [<stop_obj>, <stop_obj>, <stop_obj>...],
+        #       ...
+        #  }

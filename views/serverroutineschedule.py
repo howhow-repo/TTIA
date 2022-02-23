@@ -21,7 +21,7 @@ routine_scheduler.add_job(
 )
 
 routine_scheduler.add_job(
-    func=lambda: estop_auto_server.reload_msg,
+    func=estop_auto_server.reload_msg,
     trigger=CronTrigger(
         hour="00",
         minute="05",
@@ -57,4 +57,11 @@ routine_scheduler.add_job(
     trigger='interval',
     id='check_online',
     seconds=60
+)
+
+routine_scheduler.add_job(
+    func=estop_auto_server.reload_bus_info,
+    trigger='interval',
+    id='reload_bus_info',
+    seconds=20
 )

@@ -127,9 +127,8 @@ class EStopObjCacher:
 
     @classmethod
     def get_estop_by_id(cls, id) -> EStop:
-        if int(id) in cls.estop_cache:
-            return cls.estop_cache[int(id)]
-        return None
+        return cls.estop_cache.get(int(id))
+
 
     @classmethod
     def get_estop_by_imsi(cls, imsi) -> EStop:

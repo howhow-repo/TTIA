@@ -1,6 +1,9 @@
+import threading
+import time
+from queue import Queue
 from datetime import datetime, timedelta
 from .ttiastopudpserver import TTIAStopUdpServer
-from ..db_control import EStopObjCacher, MsgCacher
+from ..db_control import EStopObjCacher, MsgCacher, BusInfoCacher
 from ..TTIA_stop_message import TTIABusStopMessage
 from ..StopMsg import StopMsg
 import logging
@@ -29,6 +32,7 @@ class TTIAAutomationServer:
         self.udp_server = udp_server
         EStopObjCacher(sql_config).load_from_sql()
         MsgCacher(sql_config, msg_scheduler).load_from_sql()
+        BusInfoCacher().load_from_web()
         self.init_msg_jods()
 
     def init_msg_jods(self):
@@ -116,3 +120,39 @@ class TTIAAutomationServer:
                 ack = self.udp_server.send_update_msg_tag(msg)
         else:
             logger.error(f"estop {stop_id} not found.")
+
+    def reload_bus_info(self):
+        start_time = datetime.now()
+        logger.info("Starting reload bus info....")
+
+        changed_routes = BusInfoCacher.reload_from_web()
+        changed_stops = []
+        for stops in changed_routes.values():
+            changed_stops += stops
+
+        all_thread = []
+        job_num = 0
+        for route_id, stop_ids in changed_routes.items():
+            for stop_id in stop_ids:
+                msg = BusInfoCacher.businfo_cache[int(route_id)].to_ttia(int(stop_id))
+
+                while len(all_thread) > 1000:
+                    [all_thread.remove(t) for t in all_thread if not t.is_alive()]
+
+                thread = threading.Thread(target=self.send_bus_info, args=(msg, True))
+                thread.start()
+                job_num += 1
+                all_thread.append(thread)
+        for t in all_thread:
+            t.join()
+
+        logger.info(f"len of changed_routes: {len(changed_routes)}")
+        logger.info(f"len of changed_stops: {len(changed_stops)}")
+        logger.info(f"Finish sending {job_num}s bus info update. -- time spent: {(datetime.now()-start_time).seconds} sec")
+
+    def send_bus_info(self, msg_obj: TTIABusStopMessage, wait_for_resp=True):
+        try:
+            self.udp_server.send_update_bus_info(msg_obj, wait_for_resp)
+        except Exception as e:
+            logger.error(e)
+
