@@ -1,7 +1,7 @@
 import logging
 from datetime import datetime
 from flask import Blueprint, jsonify, request
-from .serversideapi import estop_auto_server, msg_scheduler
+from .serversideapi import estop_auto_server
 from lib import EStopObjCacher, TTIABusStopMessage
 from lib import FlasggerResponse
 
@@ -46,19 +46,19 @@ def add_launch_job(post_body, message_id: int, stop_id: int, trigger_time: datet
 
     if estop and estop.ready:
         if message_id == 0x05:
-            msg_scheduler.add_job(func=lambda: send_update_msg_tag(msg),
+            estop_auto_server.TTIAAutoMsgServer.scheduler.add_job(func=lambda: send_update_msg_tag(msg),
                                   next_run_time=trigger_time,
                                   max_instances=1, )
         elif message_id == 0x07:
-            msg_scheduler.add_job(func=lambda: send_update_bus_info(msg),
+            estop_auto_server.TTIAAutoMsgServer.scheduler.add_job(func=lambda: send_update_bus_info(msg),
                                   next_run_time=trigger_time,
                                   max_instances=1, )
         elif message_id == 0x0B:
-            msg_scheduler.add_job(func=lambda: send_update_route_info(msg),
+            estop_auto_server.TTIAAutoMsgServer.scheduler.add_job(func=lambda: send_update_route_info(msg),
                                   next_run_time=trigger_time,
                                   max_instances=1, )
         elif message_id == 0x12:
-            msg_scheduler.add_job(func=lambda: send_update_gif(msg),
+            estop_auto_server.TTIAAutoMsgServer.scheduler.add_job(func=lambda: send_update_gif(msg),
                                   next_run_time=trigger_time,
                                   max_instances=1, )
         else:
@@ -70,7 +70,7 @@ def add_launch_job(post_body, message_id: int, stop_id: int, trigger_time: datet
 
     return jsonify(
         [f"id: {job.id}, name: {job.name}, trigger: {job.trigger}, next: {job.next_run_time}" for job in
-         msg_scheduler.get_jobs()]
+         estop_auto_server.TTIAAutoMsgServer.scheduler.get_jobs()]
     )
 
 
@@ -86,7 +86,7 @@ def get_jobs():
     """
     return jsonify(
         [f"id: {job.id}, name: {job.name}, trigger: {job.trigger}, next: {job.next_run_time}" for job in
-         msg_scheduler.get_jobs()]
+         estop_auto_server.TTIAAutoMsgServer.scheduler.get_jobs()]
     )
 
 
@@ -130,8 +130,8 @@ def del_job():
                                         error_code=3,
                                         message=f"ValueError: {e}").response)
 
-    if msg_scheduler.get_job(post_body['job_id']):
-        msg_scheduler.remove_job(post_body['job_id'])
+    if estop_auto_server.TTIAAutoMsgServer.scheduler.get_job(post_body['job_id']):
+        estop_auto_server.TTIAAutoMsgServer.scheduler.remove_job(post_body['job_id'])
     else:
         return jsonify(FlasggerResponse(result="fail",
                                         error_code=3,
@@ -139,7 +139,7 @@ def del_job():
 
     return jsonify(
         [f"id: {job.id}, name: {job.name}, trigger: {job.trigger}, next: {job.next_run_time}" for job in
-         msg_scheduler.get_jobs()]
+         estop_auto_server.TTIAAutoMsgServer.scheduler.get_jobs()]
     )
 
 
@@ -155,10 +155,10 @@ def reload_msg_from_sql():
     """
 
     try:
-        estop_auto_server.reload_msg()
+        estop_auto_server.TTIAAutoMsgServer.reload_msg()
         return jsonify(
             [f"id: {job.id}, name: {job.name}, trigger: {job.trigger}, next: {job.next_run_time}" for job in
-             msg_scheduler.get_jobs()]
+             estop_auto_server.TTIAAutoMsgServer.scheduler.get_jobs()]
         )
     except Exception as e:
         return jsonify(FlasggerResponse(result="fail",

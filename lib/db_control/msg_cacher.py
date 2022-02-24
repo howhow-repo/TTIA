@@ -2,7 +2,6 @@ from datetime import datetime, timedelta
 import logging
 from .mysql_handler import check_config_items
 from .station_center import StationCenter
-from apscheduler.schedulers.background import BackgroundScheduler
 from ..StopMsg import StopMsg
 
 logger = logging.getLogger(__name__)
@@ -15,11 +14,9 @@ class MsgCacher:
     """
     msg_cache = {}
     station = None
-    scheduler = BackgroundScheduler
 
     @classmethod
-    def __init__(cls, mysql_config: dict, scheduler: BackgroundScheduler):
-        cls.scheduler = scheduler
+    def __init__(cls, mysql_config: dict):
         check_config_items(mysql_config)
         try:
             cls.station = StationCenter(mysql_config=mysql_config)

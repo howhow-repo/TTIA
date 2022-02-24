@@ -21,13 +21,9 @@ SQL_CONFIG = {
     "db": config('SQL_DB')
 }
 
-TIMEZONE = config('TIMEZONE', default="Asia/Taipei")
-
-msg_scheduler = BackgroundScheduler(timezone=TIMEZONE)
 TTIA_UDP_PORT = config('TTIA_UDP_SERVER_PORT', cast=int, default=50000)
 estop_udp_server = TTIAStopUdpServer(host="0.0.0.0", port=TTIA_UDP_PORT)
-estop_auto_server = TTIAAutomationServer(sql_config=SQL_CONFIG, msg_scheduler=msg_scheduler,
-                                         udp_server=estop_udp_server)
+estop_auto_server = TTIAAutomationServer(sql_config=SQL_CONFIG, udp_server=estop_udp_server)
 
 
 def check_stop(stop_id: int):
@@ -135,7 +131,7 @@ def reload_caches():
     if post_body and len(post_body.get('ids')) > 0:
         # Reload by id
         try:
-            estop_auto_server.reload_stop_and_route_by_ids(post_body['ids'])
+            estop_auto_server.TTIAAutoStopandRouteServer.reload_stop_and_route_by_ids(post_body['ids'])
             logger.info(f"estop cache reloaded by id: {post_body['ids']}")
             return jsonify(FlasggerResponse(message=f"estop cache reloaded by id: [{post_body['ids']}]").response)
         except Exception as err:
@@ -145,7 +141,7 @@ def reload_caches():
     else:
         # Reload all
         # try:
-        estop_auto_server.reload_stop_and_route()
+        estop_auto_server.TTIAAutoStopandRouteServer.reload_stop_and_route()
         logger.info("estop cache total reloaded")
         return jsonify(FlasggerResponse(message="estop cache total reloaded").response)
     # except Exception as err:
@@ -678,7 +674,7 @@ def update_route_info(stop_id):
                                         error_code=3,
                                         message=f"StatusError: {check_stop(int(stop_id))[1]}").response)
 
-    estop_auto_server.send_route_info(stop_id=int(stop_id))
+    estop_auto_server.TTIAAutoStopandRouteServer.send_route_info(stop_id=int(stop_id))
 
     return jsonify(FlasggerResponse().response)
 
@@ -704,6 +700,6 @@ def update_msg(stop_id):
                                         error_code=3,
                                         message=f"StatusError: {check_stop(int(stop_id))[1]}").response)
 
-    estop_auto_server.send_msg(stop_id=int(stop_id))
+    estop_auto_server.TTIAAutoMsgServer.send_msg(stop_id=int(stop_id))
 
     return jsonify(FlasggerResponse().response)

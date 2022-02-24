@@ -14,7 +14,7 @@ class RouteCacher:
         {<stop_id: int>:{<route_info obj>}, <stop_id: int>:{<route_info obj>},....}
     """
     route_cache = {}
-    station = StationCenter
+    station = None
     scheduler = BackgroundScheduler
     ttia_server = TTIAStopUdpServer
 

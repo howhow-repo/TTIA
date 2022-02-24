@@ -31,6 +31,33 @@ def create_no_bus_msg(StopID: int, RouteID: int):
     return msg
 
 
+class WebStop:
+    def __init__(self, json_info: dict):
+        self.bno = json_info.get('bno')
+        if self.bno:
+            self.bno = sorted(self.bno, key=lambda k: k['no'])  # sort bno by 'no'
+
+        if json_info.get('schTm'):
+            self.est = json_info.get('schTm')
+        elif json_info.get('schBus'):
+            self.est = json_info.get('schBus')
+
+        self.schBus = json_info.get('schBus')
+        self.cdsec = json_info.get('cdsec')
+        self.cdcnt = json_info.get('cdcnt')
+        self.sid = json_info.get('sid')
+        self.seq = json_info.get('seq')
+        self.nm = json_info.get('nm')
+        self.d = json_info.get('d')
+        self.x = json_info.get('x')
+        self.y = json_info.get('y')
+        self.websid = json_info.get('websid')
+        self.traveltime = json_info.get('traveltime')
+
+    def to_json(self):
+        return self.__dict__
+
+
 class WebRoute:
     def __init__(self, json_info: dict):
         self.id = json_info.get('id')
@@ -81,7 +108,7 @@ class WebRoute:
             elif web_stop.est == 'NO BUS':  # 今日未營運
                 msg = create_no_bus_msg(RouteID=self.id, StopID=stop_id)
 
-        else:
+        else:  # 有車
             msg = TTIABusStopMessage(0x07, 'default')
             msg.header.StopID = stop_id
             msg.payload.RouteID = self.id
@@ -128,33 +155,6 @@ class WebRoute:
             = now.year, now.month, now.day, now.hour, now.minute, now.second
 
         return msg
-
-
-class WebStop:
-    def __init__(self, json_info: dict):
-        self.bno = json_info.get('bno')
-        if self.bno:
-            self.bno = sorted(self.bno, key=lambda k: k['no'])  # sort bno by 'no'
-
-        if json_info.get('schTm'):
-            self.est = json_info.get('schTm')
-        elif json_info.get('schBus'):
-            self.est = json_info.get('schBus')
-
-        self.schBus = json_info.get('schBus')
-        self.cdsec = json_info.get('cdsec')
-        self.cdcnt = json_info.get('cdcnt')
-        self.sid = json_info.get('sid')
-        self.seq = json_info.get('seq')
-        self.nm = json_info.get('nm')
-        self.d = json_info.get('d')
-        self.x = json_info.get('x')
-        self.y = json_info.get('y')
-        self.websid = json_info.get('websid')
-        self.traveltime = json_info.get('traveltime')
-
-    def to_json(self):
-        return self.__dict__
 
 
 class BusInfoCacher:

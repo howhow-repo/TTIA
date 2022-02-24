@@ -9,7 +9,6 @@ from swagger_page_context import SWAGGER_CONTEXT, SWAGGER_CONFIG
 
 from views.serversideapi import flasgger_server, estop_auto_server
 from views.serverroutineschedule import routine_scheduler
-from views.msgschedulerapi import msg_scheduler
 from views.msgschedulerapi import scheduler_api
 from views.index import index_pade
 
@@ -34,8 +33,8 @@ routine_scheduler.start()
 atexit.register(lambda: routine_scheduler.shutdown())
 
 #  init msg_scheduler
-msg_scheduler.start()
-atexit.register(lambda: msg_scheduler.shutdown())
+estop_auto_server.TTIAAutoMsgServer.scheduler.start()
+atexit.register(lambda: estop_auto_server.TTIAAutoMsgServer.scheduler.shutdown())
 
 logging.getLogger('apscheduler').setLevel(logging.ERROR)
 

@@ -9,7 +9,7 @@ TIMEZONE = config('TIMEZONE', default="Asia/Taipei")
 routine_scheduler = BackgroundScheduler(timezone=TIMEZONE)
 
 routine_scheduler.add_job(
-    func=EStopObjCacher.load_from_sql,
+    func=estop_auto_server.TTIAAutoStopandRouteServer.reload_stop_and_route,
     trigger=CronTrigger(
         hour="00",
         minute="01",
@@ -21,7 +21,7 @@ routine_scheduler.add_job(
 )
 
 routine_scheduler.add_job(
-    func=estop_auto_server.reload_msg,
+    func=estop_auto_server.TTIAAutoMsgServer.reload_msg,
     trigger=CronTrigger(
         hour="00",
         minute="05",
@@ -33,7 +33,7 @@ routine_scheduler.add_job(
 )
 
 routine_scheduler.add_job(
-    func=estop_auto_server.reload_stop_and_route,
+    func=estop_auto_server.TTIAAutoStopandRouteServer.reload_stop_and_route,
     trigger=CronTrigger(
         hour="00",
         minute="10",
@@ -44,14 +44,6 @@ routine_scheduler.add_job(
     replace_existing=True
 )
 
-
-routine_scheduler.add_job(
-    func=TTIAStopUdpServer.expire_timeout_section,
-    trigger='interval',
-    id='expire_timeout_section',
-    seconds=TTIAStopUdpServer.section_lifetime / 2
-)
-
 routine_scheduler.add_job(
     func=EStopObjCacher.check_online,
     trigger='interval',
@@ -60,7 +52,7 @@ routine_scheduler.add_job(
 )
 
 routine_scheduler.add_job(
-    func=estop_auto_server.reload_bus_info,
+    func=estop_auto_server.TTIAAutoBusInfoServer.reload_bus_info,
     trigger='interval',
     id='reload_bus_info',
     seconds=20

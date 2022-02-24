@@ -1,10 +1,13 @@
 from .base_server import UDPServer
+from decouple import config
 from lib import TTIABusStopMessage
 from datetime import datetime
+from apscheduler.schedulers.background import BackgroundScheduler
 import logging
 
 
 logger = logging.getLogger(__name__)
+TIMEZONE = config('TIMEZONE', default="Asia/Taipei")
 
 
 def decode_msg(data):
@@ -28,9 +31,17 @@ class UDPWorkingSection:
 class SectionServer(UDPServer):
     section_lifetime = UDPWorkingSection.lifetime
     sections = {}
+    routine_scheduler = BackgroundScheduler(timezone=TIMEZONE)
 
     def __init__(self, host, port):
         super().__init__(host, port)
+        self.routine_scheduler.add_job(
+            func=self.expire_timeout_section,
+            trigger='interval',
+            id='expire_timeout_section',
+            seconds=self.section_lifetime / 2
+        )
+        self.routine_scheduler.start()
 
     @classmethod
     def expire_timeout_section(cls):
@@ -86,9 +97,9 @@ class SectionServer(UDPServer):
         raise NotImplementedError
 
     def wrong_communicate_order(self, section: UDPWorkingSection):
-        # logger.warning(f"Wong communicate order. expire section of stop id: {section.stop_id}")
+        logger.debug(f"Wong communicate order. expire section of stop id: {section.stop_id}")
         self.remove_from_sections(section.stop_id)
 
     def unaccepted_cmd(self, section: UDPWorkingSection):
-        # logger.debug(f"Command unaccepted. expire section of stop id: {section.stop_id}")
+        logger.debug(f"Command unaccepted. expire section of stop id: {section.stop_id}")
         self.remove_from_sections(section.stop_id)
