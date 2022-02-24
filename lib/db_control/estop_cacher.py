@@ -129,24 +129,12 @@ class EStopObjCacher:
     def get_estop_by_id(cls, id) -> EStop:
         return cls.estop_cache.get(int(id))
 
-
     @classmethod
     def get_estop_by_imsi(cls, imsi) -> EStop:
         for estop in cls.estop_cache.values():
             if estop.IMSI == imsi:
                 return estop
         return None
-
-    @classmethod
-    def check_online(cls):
-        """if miss two Period Report, set ready to false"""
-        logger.debug("checking stop online...")
-        for estop in cls.estop_cache.values():
-            if estop.ready and estop.lasttime:
-                delta_time = datetime.now() - estop.lasttime
-                if delta_time > timedelta(seconds=estop.ReportPeriod*2):
-                    estop.ready = False
-                    logger.warning(f"set estop {estop.StopID} ready = False: {delta_time.seconds} seconds not replied.")
 
     @classmethod
     def get_stop_id_by_msg_group_id(cls, group_id):

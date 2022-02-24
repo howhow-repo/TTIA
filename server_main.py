@@ -8,7 +8,6 @@ from flasgger import Swagger
 from swagger_page_context import SWAGGER_CONTEXT, SWAGGER_CONFIG
 
 from views.serversideapi import flasgger_server, estop_auto_server
-from views.serverroutineschedule import routine_scheduler
 from views.msgschedulerapi import scheduler_api
 from views.index import index_pade
 
@@ -28,11 +27,11 @@ SQL_CONFIG = {
 }
 
 
-#  init routine_scheduler
-routine_scheduler.start()
-atexit.register(lambda: routine_scheduler.shutdown())
+#  start routine_scheduler
+estop_auto_server.routine_scheduler.start()
+atexit.register(lambda: estop_auto_server.routine_scheduler.shutdown())
 
-#  init msg_scheduler
+#  start msg_scheduler
 estop_auto_server.TTIAAutoMsgServer.scheduler.start()
 atexit.register(lambda: estop_auto_server.TTIAAutoMsgServer.scheduler.shutdown())
 
