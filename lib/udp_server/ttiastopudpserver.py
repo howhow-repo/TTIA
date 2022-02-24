@@ -220,7 +220,8 @@ class TTIAStopUdpServer(ServerSideHandler):
             msg = route.to_ttia(stop_id, i)
             ack = self.send_update_route_info(msg, wait_for_resp=True)
 
-    def fake_udp_job(self, msg_obj: TTIABusStopMessage, wait_for_resp=True):
+    @classmethod
+    def fake_udp_job(cls, msg_obj: TTIABusStopMessage, wait_for_resp=True):
         logger.info(f"sending fake udp msg... {msg_obj.header.StopID}")
         systime.sleep(2)
         logger.info(f"fake udp msg sent done. {msg_obj.header.StopID}")

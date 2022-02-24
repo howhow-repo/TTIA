@@ -70,7 +70,9 @@ class TTIAEStopUdpClient(ClientSideHandler):
         self.sock.sendto(msg_obj.to_pdu(), self.server_addr)
 
     def recv_update_bus_info(self, msg_obj: TTIABusStopMessage):
-        logger.info(f"recv_update_bus_info: {msg_obj.payload.to_dict()} \n {msg_obj.option_payload.to_dict()}")
+        logger.info(f"recv_update_bus_info: {msg_obj.header.to_dict()} \n "
+                    f"{msg_obj.payload.to_dict()} \n "
+                    f"{msg_obj.option_payload.to_dict()}")
         resp_msg = self.create_defaule_msg(0x08)
         resp_msg.payload.MsgStatus = 1
         self.estop.ready = True

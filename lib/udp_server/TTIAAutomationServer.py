@@ -29,6 +29,7 @@ def remove_job_by_msg(stop_msg: StopMsg):
 
 class TTIAAutomationServer:
     def __init__(self, sql_config, msg_scheduler, udp_server: TTIAStopUdpServer):
+        self.fail_update_stops = 0
         self.udp_server = udp_server
         EStopObjCacher(sql_config).load_from_sql()
         MsgCacher(sql_config, msg_scheduler).load_from_sql()
@@ -132,6 +133,7 @@ class TTIAAutomationServer:
 
         all_thread = []
         job_num = 0
+        self.fail_update_stops = 0
         for route_id, stop_ids in changed_routes.items():
             for stop_id in stop_ids:
                 msg = BusInfoCacher.businfo_cache[int(route_id)].to_ttia(int(stop_id))
@@ -146,13 +148,14 @@ class TTIAAutomationServer:
         for t in all_thread:
             t.join()
 
-        logger.info(f"len of changed_routes: {len(changed_routes)}")
         logger.info(f"len of changed_stops: {len(changed_stops)}")
         logger.info(f"Finish sending {job_num}s bus info update. -- time spent: {(datetime.now()-start_time).seconds} sec")
+        if self.fail_update_stops > 0:
+            logger.warning(f"fail updating stops: {self.fail_update_stops}")
 
     def send_bus_info(self, msg_obj: TTIABusStopMessage, wait_for_resp=True):
         try:
             self.udp_server.send_update_bus_info(msg_obj, wait_for_resp)
         except Exception as e:
-            logger.error(e)
-
+            logger.debug(e)
+            self.fail_update_stops += 1

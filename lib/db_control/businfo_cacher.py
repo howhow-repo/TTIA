@@ -85,24 +85,24 @@ class WebRoute:
             msg = TTIABusStopMessage(0x07, 'default')
             msg.header.StopID = stop_id
             msg.payload.RouteID = self.id
-            if ":" in web_stop.est and web_stop.bno is None:  # TODO: 未發車
+            if ":" in web_stop.est and web_stop.bno is None:  # 未發車
                 schtime = datetime(now.year, now.month, now.day, int(web_stop.est.split(":")[0]), int(web_stop.est.split(":")[1]))
                 msg.payload.EstimateTime = (schtime - now).seconds
                 msg.option_payload.SpectialEstimateTime = 1
                 msg.option_payload.MsgCContent = web_stop.est + ' 發車'
                 msg.option_payload.MsgEContent = web_stop.est + " depot"
 
-            elif web_stop.bno and web_stop.cdsec >= 180:  # TODO: 車在路上
+            elif web_stop.bno and web_stop.cdsec >= 180:  # 車在路上
                 bus_info = web_stop.bno[0]
                 msg.payload.CurrentStop = bus_info["sid"]
                 msg.payload.DestinationStop = self.last_stop_id
                 msg.payload.EstimateTime = web_stop.cdsec
                 if web_stop.cdcnt > 0:
                     msg.payload.StopDistance = web_stop.cdcnt
-                msg.option_payload.MsgCContent = f"余 {web_stop.cdsec // 60} 分鐘"
-                msg.option_payload.MsgEContent = f"Arr {web_stop.cdsec // 60} min"
+                msg.option_payload.MsgCContent = f"余 {round(web_stop.cdsec // 60)} 分鐘"
+                msg.option_payload.MsgEContent = f"Arr {round(web_stop.cdsec // 60)} min"
 
-            elif web_stop.bno and 180 > web_stop.cdsec >= 60:  # TODO: 車在路上 & 即將進站
+            elif web_stop.bno and 180 > web_stop.cdsec >= 60:  # 車在路上 & 即將進站
                 bus_info = web_stop.bno[0]
                 msg.payload.CurrentStop = bus_info["sid"]
                 msg.payload.DestinationStop = self.last_stop_id
@@ -112,7 +112,7 @@ class WebRoute:
                 msg.option_payload.MsgCContent = f"即將進站"
                 msg.option_payload.MsgEContent = f"Arr 3 min."
 
-            elif web_stop.bno and 60 > web_stop.cdsec:  # TODO: 車在路上 & 進站中
+            elif web_stop.bno and 60 > web_stop.cdsec:  # 車在路上 & 進站中
                 bus_info = web_stop.bno[0]
                 msg.payload.CurrentStop = bus_info["sid"]
                 msg.payload.DestinationStop = self.last_stop_id
@@ -171,12 +171,13 @@ class BusInfoCacher:
     def reload_from_web(cls):
         """
             Reload data from source_host.
-
+                1. update dict cache of bus info.
+                2. return the ids of those data has been changed
             :return
-            new WebStop objs pack with route id
+            Updated stop_ids pack with route id
             {
-                <route_id: int>: [<stop_obj>, <stop_obj>, <stop_obj>...],
-                <route_id: int>: [<stop_obj>, <stop_obj>, <stop_obj>...],
+                <route_id: int>: [<stop_id: int>, <stop_id: int>, <stop_id: int>...],
+                <route_id: int>: [<stop_id: int>, <stop_id: int>, <stop_id: int>...],
                 ...
             }
         """
@@ -202,7 +203,7 @@ class BusInfoCacher:
                 updated_routes[route_id] = [stop.sid for stop in new_route_obj.stops]
         return updated_routes
         #  {
-        #       <route_id>: [<stop_obj>, <stop_obj>, <stop_obj>...],
-        #       <route_id>: [<stop_obj>, <stop_obj>, <stop_obj>...],
+        #       <route_id>: [<stop_id>, <stop_id>, <stop_id>...],
+        #       <route_id>: [<stop_id>, <stop_id>, <stop_id>...],
         #       ...
         #  }
