@@ -22,7 +22,7 @@ estop_udp_server = TTIAEStopUdpClient(host="0.0.0.0", port=TTIA_UDP_PORT, estop=
 
 
 class OperationResponse:
-    def __init__(cls, result: str = 'success', error_code: int = 0, message: str = None):
+    def __init__(self, result: str = 'success', error_code: int = 0, message: str = None):
         r = {
             'result': result,
             'error_code': error_code,

@@ -138,20 +138,21 @@ class TTIAAutomationServer:
             for stop_id in stop_ids:
                 msg = BusInfoCacher.businfo_cache[int(route_id)].to_ttia(int(stop_id))
 
-                while len(all_thread) > 1000:
+                while len(all_thread) > 1000:  # keep thread num under 1000. Don't crash the memory :)
                     [all_thread.remove(t) for t in all_thread if not t.is_alive()]
 
                 thread = threading.Thread(target=self.send_bus_info, args=(msg, True))
                 thread.start()
                 job_num += 1
                 all_thread.append(thread)
+
+        # wait all thread done, log the result.
         for t in all_thread:
             t.join()
-
         logger.info(f"len of changed_stops: {len(changed_stops)}")
         logger.info(f"Finish sending {job_num}s bus info update. -- time spent: {(datetime.now()-start_time).seconds} sec")
         if self.fail_update_stops > 0:
-            logger.warning(f"fail updating stops: {self.fail_update_stops}")
+            logger.warning(f"fail updating stops: {self.fail_update_stops}s")
 
     def send_bus_info(self, msg_obj: TTIABusStopMessage, wait_for_resp=True):
         try:

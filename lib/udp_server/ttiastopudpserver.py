@@ -211,7 +211,7 @@ class TTIAStopUdpServer(ServerSideHandler):
                 return ack_msg
             else:
                 sys_time.sleep(check_interval)
-        logger.warning("do not get ack from client.")
+        logger.warning(f"Did not get ack from client {section.stop_id}.")
         return None
 
     def update_route_info(self, stop_id: int):
