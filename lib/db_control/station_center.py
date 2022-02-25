@@ -43,9 +43,9 @@ def pack_e_stop_data(dict_like_data):
 
 def pack_route_data(dict_like_data):
     routelist_template = {
-        "rrid": dict_like_data["rrid"],
+        "rid": dict_like_data["rid"],
         "sid": dict_like_data["sid"],
-        "gid": dict_like_data["gid"],
+        # "gid": dict_like_data["gid"],
         "dir": dict_like_data["dir"],
         "seqno": dict_like_data["seqno"],
         "rname": dict_like_data["rname"],

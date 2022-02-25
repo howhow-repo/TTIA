@@ -137,7 +137,7 @@ class WebRoute:
                 if web_stop.cdcnt > 0:
                     msg.payload.StopDistance = web_stop.cdcnt
                 msg.option_payload.MsgCContent = f"即將進站"
-                msg.option_payload.MsgEContent = f"Arr 3 min."
+                msg.option_payload.MsgEContent = f"Nearly arrive"
 
             elif web_stop.bno and 60 > web_stop.cdsec:  # 車在路上 & 進站中
                 bus_info = web_stop.bno[0]
@@ -182,7 +182,11 @@ class BusInfoCacher:
             }
         """
         updated_routes = {}
-        new_data = requests.get(cls.source_host, timeout=5).json()
+        try:
+            new_data = requests.get(cls.source_host, timeout=5).json()
+        except Exception as e:
+            logger.error(f"Reload BusInfoCacher from web fail. {e}")
+            return {}
 
         for route_id, route in new_data.items():
             new_route_obj = WebRoute(route)

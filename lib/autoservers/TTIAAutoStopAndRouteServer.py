@@ -7,7 +7,8 @@ logger = logging.getLogger(__name__)
 
 
 class TTIAAutoStopAndRouteServer:
-    def __init__(self, udp_server: TTIAStopUdpServer):
+    def __init__(self, sql_config: dict, udp_server: TTIAStopUdpServer):
+        EStopObjCacher(sql_config).load_from_sql()
         self.udp_server = udp_server
 
     def reload_stop_and_route(self):

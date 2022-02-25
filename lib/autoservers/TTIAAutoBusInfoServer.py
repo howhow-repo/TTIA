@@ -10,6 +10,7 @@ logger = logging.getLogger(__name__)
 
 class TTIAAutoBusInfoServer:
     def __init__(self, udp_server: TTIAStopUdpServer):
+        BusInfoCacher().load_from_web()
         self.fail_update_stops = 0
         self.udp_server = udp_server
 
@@ -28,10 +29,8 @@ class TTIAAutoBusInfoServer:
         for route_id, stop_ids in changed_routes.items():
             for stop_id in stop_ids:
                 msg = BusInfoCacher.businfo_cache[int(route_id)].to_ttia(int(stop_id))
-
-                # # Warning! this is fake msg
-                # if msg.header.StopID == 41370:
-                #     msg.header.StopID = 6
+                # TODO: stop_id in msg here is route-stop_id, need format to stop_id.
+                # TODO: count seqno of route on stop.
 
                 while len(all_thread) > 1000:  # keep thread num under 1000. Don't crash the memory :)
                     [all_thread.remove(t) for t in all_thread if not t.is_alive()]

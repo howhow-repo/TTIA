@@ -15,15 +15,11 @@ TIMEZONE = config('TIMEZONE', default="Asia/Taipei")
 
 
 class TTIAAutomationServer:
-    def __init__(self, sql_config, udp_server: TTIAStopUdpServer):
-        EStopObjCacher(sql_config).load_from_sql()
-        MsgCacher(sql_config).load_from_sql()
-        BusInfoCacher().load_from_web()
-
+    def __init__(self, sql_config: dict, udp_server: TTIAStopUdpServer):
         self.udp_server = udp_server
 
-        self.TTIAAutoStopandRouteServer = TTIAAutoStopAndRouteServer(self.udp_server)
-        self.TTIAAutoMsgServer = TTIAAutoMsgServer(self.udp_server)
+        self.TTIAAutoStopandRouteServer = TTIAAutoStopAndRouteServer(sql_config, self.udp_server)
+        self.TTIAAutoMsgServer = TTIAAutoMsgServer(sql_config, self.udp_server)
         self.TTIAAutoBusInfoServer = TTIAAutoBusInfoServer(self.udp_server)
 
         self.routine_scheduler = BackgroundScheduler(timezone=TIMEZONE)

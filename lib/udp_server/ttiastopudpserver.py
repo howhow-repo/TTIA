@@ -1,6 +1,6 @@
 from .core import ServerSideHandler
 from .core import UDPWorkingSection
-from ..db_control import EStopObjCacher
+from ..db_control import EStopObjCacher, MsgCacher
 from ..TTIA_stop_message import TTIABusStopMessage
 from datetime import datetime, time
 import time as systime
@@ -60,6 +60,7 @@ class TTIAStopUdpServer(ServerSideHandler):
             EStopObjCacher.update_addr(msg_obj.header.StopID, section.client_addr)
             logger.info(f"id {msg_obj.header.StopID} registration ack ok")
             self.update_route_info(section.stop_id)
+            self.update_msg(section.stop_id)
 
         else:  # 訊息設定失敗
             logger.warning(f"estop {msg_obj.header.StopID} return fail in registration")
@@ -219,6 +220,15 @@ class TTIAStopUdpServer(ServerSideHandler):
         for i, route in enumerate(estop.routelist):
             msg = route.to_ttia(stop_id, i)
             ack = self.send_update_route_info(msg, wait_for_resp=True)
+
+    def update_msg(self, stop_id: int):
+        estop = EStopObjCacher.estop_cache.get(stop_id)
+        if estop:
+            gid = estop.MessageGroupID
+            stop_msg = MsgCacher.get_msg_by_group_id(gid)
+            if stop_msg and stop_msg.updatetime < datetime.now() < stop_msg.expiretime:
+                msg = stop_msg.to_ttia(stop_id)
+                ack = self.send_update_msg_tag(msg)
 
     @classmethod
     def fake_udp_job(cls, msg_obj: TTIABusStopMessage, wait_for_resp=True):

@@ -12,8 +12,9 @@ logger = logging.getLogger(__name__)
 
 
 class TTIAAutoMsgServer:
-    def __init__(self, udp_server: TTIAStopUdpServer):
+    def __init__(self, sql_config: dict, udp_server: TTIAStopUdpServer):
         TIMEZONE = config('TIMEZONE', default="Asia/Taipei")
+        MsgCacher(sql_config).load_from_sql()
         self.udp_server = udp_server
         self.scheduler = BackgroundScheduler(timezone=TIMEZONE)
         self.init_msg_jods()
