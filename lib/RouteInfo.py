@@ -3,10 +3,10 @@ from .TTIA_stop_message import TTIABusStopMessage
 
 class RouteInfo:
     def __init__(self, setting_config):
-        self.rrid = None
-        self.sid = None
+        self.rid = None
+        self.rsid = None
         self.dir = None
-        self.gid = None
+        # self.gid = None
         self.seqno = None
         self.rname = None
         self.rename = None
@@ -24,7 +24,10 @@ class RouteInfo:
     def to_ttia(self, stop_id: int, seq: int):
         msg = TTIABusStopMessage(0x0B, 'default')
         msg.header.StopID = stop_id
-        if not self.rrid:
+        msg.payload.RouteID = self.rid
+        msg.payload.PathCName = self.rname
+        msg.payload.PathEName = self.rename
+        if not self.rid:
             msg.payload.RouteID = 0
         if not self.rname:
             msg.payload.PathCName = ''

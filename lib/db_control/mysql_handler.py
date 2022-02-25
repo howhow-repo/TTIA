@@ -71,7 +71,7 @@ class MySqlHandler:
             self.disconnect()
             raise ConnectionError(f"ebus center mysql test connection fail.\n {err}")
 
-    def _get_table_in_dict(self, sqlcmd):
+    def _get_list_of_dict(self, sqlcmd):
         r = self.__query(sqlcmd)
         return dictfetchall(r)
 

@@ -37,7 +37,7 @@ class RegDownlink(PayloadBase):
         super().__init__(init_data, init_type)
 
     def from_pdu(self, pdu: bytes):
-        payload = struct.unpack_from('<BH32s32sBBHBBHHBBBBBBB32sBBBBBBBBBH', pdu)
+        payload = struct.unpack_from('<BH32s32sBBHBBHHBBBBBBh32sBBBBBBBBBH', pdu)
         self.Result = payload[0]
         self.MsgTag = payload[1]  # 系統訊息
         self.StopCName = (payload[2].decode('big5')).rstrip('\x00')
@@ -74,7 +74,7 @@ class RegDownlink(PayloadBase):
 
         self.self_assert()
 
-        return struct.pack('<BH32s32sBBHBBHHBBBBBBB32sBBBBBBBBBH',
+        return struct.pack('<BH32s32sBBHBBHHBBBBBBH32sBBBBBBBBBH',
                            self.Result, self.MsgTag,
                            StopCName, StopEName,
                            self.LongitudeDu, self.LongitudeFen, self.LongitudeMiao,

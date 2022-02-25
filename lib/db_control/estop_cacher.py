@@ -13,6 +13,7 @@ class EStopObjCacher:
         {<StopID: int>:{<estop obj>}, <StopID: int>:{<estop obj>},....}
     """
     estop_cache = {}
+    rsid_sid_table = {}
     station = None
 
     @classmethod
@@ -27,14 +28,7 @@ class EStopObjCacher:
     def load_from_sql(cls):
         cls.station.connect()
         estops_dict = cls.station.get_e_stops()
-        cls.station.disconnect()
-
-        cls.__pack_come_in_data(estops_dict)
-
-    @classmethod
-    def load_from_sql_by_estop_ids(cls, ids: list):
-        cls.station.connect()
-        estops_dict = cls.station.get_e_stop_by_ids(ids)
+        cls.rsid_sid_table = cls.station.get_rsid_sid_table()
         cls.station.disconnect()
 
         cls.__pack_come_in_data(estops_dict)
@@ -43,6 +37,7 @@ class EStopObjCacher:
     def reload_from_sql_by_estop_ids(cls, ids: list):
         cls.station.connect()
         new_dict = cls.station.get_e_stop_by_ids(ids)
+        cls.rsid_sid_table = cls.station.get_rsid_sid_table()
         cls.station.disconnect()
 
         route_updated_stops = []
@@ -104,7 +99,7 @@ class EStopObjCacher:
 
     @classmethod
     def __pack_come_in_data(cls, new_dict: dict):
-        """Create new estop or update estop from sql data."""
+        """Create new estop_obj or update estop_obj from sql data."""
         for estop_id in new_dict:
             estop_obj = EStop(new_dict[estop_id])
             if estop_obj.StopID in cls.estop_cache:

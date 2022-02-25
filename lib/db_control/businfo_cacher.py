@@ -91,7 +91,7 @@ class WebRoute:
         r['stops'] = stops_json
         return r
 
-    def to_ttia(self, stop_id: int):
+    def to_ttia(self, stop_id: int) -> TTIABusStopMessage:
         # sampled data
         web_stop = self.stops.get(stop_id)
         if web_stop and web_stop.est != 'LAST LEFT' and web_stop.est != 'NO BUS':
@@ -168,16 +168,16 @@ class BusInfoCacher:
             cls.businfo_cache[int(route_id)] = WebRoute(route)
 
     @classmethod
-    def reload_from_web(cls):
+    def reload_from_web(cls) -> dict:
         """
             Reload data from source_host.
                 1. update dict cache of bus info.
                 2. return the ids of those data has been changed
             :return
-            Updated stop_ids pack with route id
+            Updated routestop_ids pack with route id
             {
-                <route_id: int>: [<stop_id: int>, <stop_id: int>, <stop_id: int>...],
-                <route_id: int>: [<stop_id: int>, <stop_id: int>, <stop_id: int>...],
+                <route_id: int>: [<routestop_id: int>, <routestop_id: int>, <routestop_id: int>...],
+                <route_id: int>: [<routestop_id: int>, <routestop_id: int>, <routestop_id: int>...],
                 ...
             }
         """

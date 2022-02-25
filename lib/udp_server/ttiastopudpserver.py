@@ -30,8 +30,8 @@ class TTIAStopUdpServer(ServerSideHandler):
                 payload_dict = estop.to_dict()
                 payload_dict['Result'] = 1
                 payload_dict['MsgTag'] = 0
-                payload_dict['BootTime'] = time(0, 0, 0)  # TODO: data from sql is define wired. Force overwrite.
-                payload_dict['ShutdownTime'] = time(0, 0, 0)  # TODO: data from sql is define wired. Force overwrite.
+                # payload_dict['BootTime'] = time(0, 0, 0)  # TODO: data from sql is define wired. Force overwrite.
+                # payload_dict['ShutdownTime'] = time(0, 0, 0)  # TODO: data from sql is define wired. Force overwrite.
                 resp_msg.payload.from_lazy_dict(payload_dict)
             else:
                 logger.error("Fail to match data: StopID & IMSI does not match")
@@ -208,7 +208,7 @@ class TTIAStopUdpServer(ServerSideHandler):
         for i in range(int(self.estop_comm_timeout / check_interval)):
             if section.logs[-1].header.MessageID == expected_msg_id:
                 ack_msg = section.logs[-1]
-                self.remove_from_sections(section.stop_id)
+                # self.remove_from_sections(section.stop_id)
                 return ack_msg
             else:
                 sys_time.sleep(check_interval)

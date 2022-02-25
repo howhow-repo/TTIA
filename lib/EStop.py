@@ -20,19 +20,19 @@ class EStop:
 
         # setting properties (check TTIA estop message id 0x01)
         self.StopID = None
-        self.Provider = None
+        self.Provider = 0
         self.IMSI = ""
         self.IMEI = ""
         self.StopCName = ""
         self.StopEName = ""
         self.Latitude = 0
         self.Longitude = 0
-        self.TypeID = None
-        self.BootTime = None
-        self.ShutdownTime = None
+        self.TypeID = 0
+        self.BootTime = time(5,0)
+        self.ShutdownTime = time(2,0)
         self.IdleMessage = ""
-        self.DisplayMode = None
-        self.MessageGroupID = None
+        self.DisplayMode = 0
+        self.MessageGroupID = 0
         self.TextRollingSpeed = 0
         self.DistanceFunctionMode = 0
         self.ReportPeriod = 60
@@ -41,23 +41,23 @@ class EStop:
         self.LightSet = 0
         self.SentCount = 0
         self.RevCount = 0
-        self.MsgTag = None
-        self.MsgNo = None
+        self.MsgTag = 0
+        self.MsgNo = 0
         self.MsgContent = ''
         self.MsgPriority = 0
         self.MsgType = 0
 
         # setting optional properties (check TTIA estop message id 0x01)
-        self.MessageGroupZoneID = None
-        self.MessageGroupCasID = None
-        self.WeekendBootTime = None
-        self.WeekendShutdownTime = None
-        self.District = None
+        self.MessageGroupZoneID = 0
+        self.MessageGroupCasID = 0
+        self.WeekendBootTime = 0
+        self.WeekendShutdownTime = 0
+        self.District = 0
         self.MsgStopDelay = 0
         self.BootMessage = ""
-        self.IdleTime = None
-        self.EventReportPeriod = None
-        self.WeekDay = None
+        self.IdleTime = 0
+        self.EventReportPeriod = 0
+        self.WeekDay = 0
 
         # customise properties
         self.routelist = []  # routes that pass through this stop

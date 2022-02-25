@@ -1,6 +1,30 @@
 from .mysql_handler import MySqlHandler
 from datetime import time
 
+demo_cmd = """
+                SELECT 
+                stop.id AS id,
+                stop.id AS imsi,
+                stop.name AS name,
+                stop.id AS gid,
+                stop.ename,
+                stop.lat AS lat,
+                stop.lon AS lon,
+                routestop.rid AS rid,
+                routestop.id AS rsid,
+                routestop.seqno AS seqno,
+                routestop.direction AS dir,
+                route.name AS rname,
+                route.ename AS `rename`
+            FROM
+                stop
+                    LEFT JOIN
+                routestop ON stop.id = routestop.sid
+                    LEFT JOIN
+                route ON routestop.rid = route.id
+
+"""
+
 
 def pack_e_stop_data(dict_like_data):
     if "boottime" in dict_like_data.keys():
@@ -20,31 +44,37 @@ def pack_e_stop_data(dict_like_data):
             dict_like_data['reportperiod'] = 60
 
     e_stop_data_template = {
-        "StopID": dict_like_data["id"],
-        "IMSI": dict_like_data["imsi"],
-        "StopCName": dict_like_data["name"],
-        "StopEName": dict_like_data["ename"],
-        "MessageGroupID": dict_like_data["gid"],
-        "BootTime": dict_like_data["boottime"],
-        "ShutdownTime": dict_like_data["shutdowntime"],
-        "IdleMessage": dict_like_data["idlemessage"],
-        "DisplayMode": dict_like_data["displaymode"],
-        "TextRollingSpeed": dict_like_data["textrollingspeed"],
-        "DistanceFunctionMode": dict_like_data["distancefunctionmode"],
-        "ReportPeriod": dict_like_data["reportperiod"],
-        'TypeID': dict_like_data["tid"],
-        'Provider': dict_like_data["vid"],
-        'Latitude': dict_like_data["lat"],
-        'Longitude': dict_like_data["lon"],
+        "StopID": dict_like_data.get("id"),
+        "IMSI": str(dict_like_data.get("imsi")),
+        "StopCName": dict_like_data.get("name"),
+        "StopEName": dict_like_data.get("ename"),
+        "MessageGroupID": dict_like_data.get("gid"),
+        "BootTime": dict_like_data.get("boottime"),
+        "ShutdownTime": dict_like_data.get("shutdowntime"),
+        "IdleMessage": dict_like_data.get("idlemessage"),
+        "DisplayMode": dict_like_data.get("displaymode"),
+        "TextRollingSpeed": dict_like_data.get("textrollingspeed"),
+        "DistanceFunctionMode": dict_like_data.get("distancefunctionmode"),
+        "ReportPeriod": dict_like_data.get("reportperiod"),
+        'TypeID': dict_like_data.get("tid"),
+        'Provider': dict_like_data.get("vid"),
+        'Latitude': dict_like_data.get("lat"),
+        'Longitude': dict_like_data.get("lon"),
         'routelist': []
     }
+    rm_k = []
+    for k, v in e_stop_data_template.items():
+        if v is None:
+            rm_k.append(k)
+    for k in rm_k:
+        e_stop_data_template.pop(k)
     return e_stop_data_template
 
 
 def pack_route_data(dict_like_data):
     routelist_template = {
         "rid": dict_like_data["rid"],
-        "sid": dict_like_data["sid"],
+        "rsid": dict_like_data["rsid"],
         # "gid": dict_like_data["gid"],
         "dir": dict_like_data["dir"],
         "seqno": dict_like_data["seqno"],
@@ -101,8 +131,8 @@ class StationCenter(MySqlHandler):
                 estop.reportperiod,
                 estop.lat AS lat,
                 estop.lon AS lon,
-                routestop.rid AS rrid,
-                routestop.id AS sid,
+                routestop.rid AS rid,
+                routestop.id AS rsid,
                 routestop.seqno AS seqno,
                 routestop.direction AS dir,
                 route.name AS rname,
@@ -119,8 +149,8 @@ class StationCenter(MySqlHandler):
                 route ON routestop.rid = route.id
             ORDER BY id
         """
-
-        raw_data = self._get_table_in_dict(cmd)
+        cmd = demo_cmd
+        raw_data = self._get_list_of_dict(cmd)
         e_stops_dict = {}
         for s in raw_data:
             if s['id'] not in e_stops_dict:
@@ -157,8 +187,8 @@ class StationCenter(MySqlHandler):
                 estop.reportperiod,
                 estop.lat AS lat,
                 estop.lon AS lon,
-                routestop.rid AS rrid,
-                routestop.id AS sid,
+                routestop.rid AS rid,
+                routestop.id AS rsid,
                 routestop.seqno AS seqno,
                 routestop.direction AS dir,
                 route.name AS rname,
@@ -176,7 +206,9 @@ class StationCenter(MySqlHandler):
                 {condition}
             ORDER BY id
         """
-        raw_data = self._get_table_in_dict(cmd)
+        cmd = demo_cmd
+
+        raw_data = self._get_list_of_dict(cmd)
         e_stops_dict = {}
         for s in raw_data:
             if s['id'] not in e_stops_dict:
@@ -197,5 +229,25 @@ class StationCenter(MySqlHandler):
             WHERE
                 publish = 1 AND expiretime > NOW()
             """
-        raw_data = self._get_table_in_dict(cmd)
+        raw_data = self._get_list_of_dict(cmd)
         return raw_data
+
+    def get_rsid_sid_table(self):
+        """
+        a list for matching rsid to sid.
+        :return:
+            list: [
+                        {<rsid: int>: <sid: int>},
+                        {<rsid: int>: <sid: int>},
+                        {<rsid: int>: <sid: int>},
+                        ...
+                    ]
+        """
+        cmd = """
+                SELECT id as rsid, sid FROM bus.routestop
+            """
+        raw_data = self._get_list_of_dict(cmd)
+        mapping = {}
+        for d in raw_data:
+            mapping[d['rsid']] = d['sid']
+        return mapping

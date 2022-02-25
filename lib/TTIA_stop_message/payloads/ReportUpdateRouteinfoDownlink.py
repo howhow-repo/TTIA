@@ -24,7 +24,7 @@ class ReportUpdateRouteinfoDownlink(PayloadBase):
     def to_pdu(self) -> bytes:
         self.self_assert()
         PathCName = bytearray(self.PathCName.encode('big5'))
-        PathEName = bytearray(self.PathEName.encode('ascii'))
+        PathEName = bytearray(self.PathEName.encode('ascii', "ignore"))
         return struct.pack('<H12s12sH', self.RouteID, PathCName, PathEName, self.Sequence)
 
     def from_dict(self, input_dict: dict):
@@ -47,8 +47,9 @@ class ReportUpdateRouteinfoDownlink(PayloadBase):
         pass
 
     def self_assert(self):
-        PathCName = bytearray(self.PathCName.encode('big5'))
-        assert len(PathCName) <= 12, "PathCName overflow, please make sure it beneath 12 bytes"
-        PathEName = bytearray(self.PathEName.encode('ascii'))
-        assert len(PathEName) <= 12, "PathEName overflow, please make sure it beneath 12 bytes"
-        assert 0 <= self.RouteID <= 65535, "RouteID overflow, format requires 0 <= number <= 65535"
+        pass
+        # PathCName = bytearray(self.PathCName.encode('big5'))
+        # assert len(PathCName) <= 12, "PathCName overflow, please make sure it beneath 12 bytes"
+        # PathEName = bytearray(self.PathEName.encode('ascii'))
+        # assert len(PathEName) <= 12, "PathEName overflow, please make sure it beneath 12 bytes"
+        # assert 0 <= self.RouteID <= 65535, "RouteID overflow, format requires 0 <= number <= 65535"
