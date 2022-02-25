@@ -137,7 +137,7 @@ class WebRoute:
                 if web_stop.cdcnt > 0:
                     msg.payload.StopDistance = web_stop.cdcnt
                 msg.option_payload.MsgCContent = f"即將進站"
-                msg.option_payload.MsgEContent = f"Nearly arrive"
+                msg.option_payload.MsgEContent = f"Nearly arr"
 
             elif web_stop.bno and 60 > web_stop.cdsec:  # 車在路上 & 進站中
                 bus_info = web_stop.bno[0]

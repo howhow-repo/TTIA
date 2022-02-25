@@ -14,6 +14,7 @@ def get_sid(rsid):
         sid = 0
     return sid
 
+
 def get_seq(sid, rsid):
     estop = EStopObjCacher.estop_cache.get(sid)
     if not estop:
@@ -22,6 +23,7 @@ def get_seq(sid, rsid):
         if route_info.rsid == rsid:
             return route_info.seqno
     return 0
+
 
 class TTIAAutoBusInfoServer:
     def __init__(self, udp_server: TTIAStopUdpServer):
@@ -44,10 +46,6 @@ class TTIAAutoBusInfoServer:
                 sid = get_sid(routestop_id)
                 msg.header.StopID = sid
                 msg.option_payload.Sequence = get_seq(sid, routestop_id)
-
-                # # Warning! this is fake msg
-                # if msg.header.StopID == 1392:
-                #     msg.header.StopID = 6
 
                 while len(all_thread) > 1000:  # keep thread num under 1000. Don't crash the memory :)
                     [all_thread.remove(t) for t in all_thread if not t.is_alive()]

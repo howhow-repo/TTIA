@@ -11,10 +11,19 @@ logger = logging.getLogger(__name__)
 
 
 class TTIAStopUdpServer(ServerSideHandler):
+    header_sequence = 0
 
     def __init__(self, host, port, timeout: int = 5):
         self.estop_comm_timeout = timeout
         super().__init__(host, port)
+
+    @classmethod
+    def add_header_seq(cls, msg_obj: TTIABusStopMessage):
+        msg_obj.header.Sequence = cls.header_sequence
+        cls.header_sequence += 1
+        if cls.header_sequence > 65535:
+            cls.header_sequence = 0
+        return msg_obj
 
     def recv_registration(self, msg_obj: TTIABusStopMessage, section: UDPWorkingSection):
         """
@@ -42,6 +51,7 @@ class TTIAStopUdpServer(ServerSideHandler):
 
     def send_registration_info(self, msg_obj: TTIABusStopMessage, section: UDPWorkingSection):  # 0x01
         logger.info("send_registration_info")
+        msg_obj = self.add_header_seq(msg_obj)
         section.logs.append(msg_obj)
         self.sock.sendto(msg_obj.to_pdu(), section.client_addr)
 
@@ -82,12 +92,14 @@ class TTIAStopUdpServer(ServerSideHandler):
         self.send_period_report_ack(resp_msg, section)
 
     def send_period_report_ack(self, msg_obj: TTIABusStopMessage, section: UDPWorkingSection):
+        msg_obj = self.add_header_seq(msg_obj)
         msg_obj.header.StopID = section.stop_id
         self.sock.sendto(msg_obj.to_pdu(), section.client_addr)
         self.remove_from_sections(section.stop_id)
         logger.debug(f"send_period_report_ack: {msg_obj.header.StopID} ")
 
     def send_update_msg_tag(self, msg_obj: TTIABusStopMessage, wait_for_resp=True):
+        msg_obj = self.add_header_seq(msg_obj)
         assert msg_obj.header.MessageID == 0x05
         estop = EStopObjCacher.get_estop_by_id(msg_obj.header.StopID)
         assert estop.address is not None, f"Can not find client {msg_obj.header.StopID} address"
@@ -104,6 +116,7 @@ class TTIAStopUdpServer(ServerSideHandler):
         logger.info(f"recv_update_msg_tag_ack from id: {msg_obj.header.StopID}")
 
     def send_update_bus_info(self, msg_obj: TTIABusStopMessage, wait_for_resp=True):
+        msg_obj = self.add_header_seq(msg_obj)
         assert msg_obj.header.MessageID == 0x07
         estop = EStopObjCacher.get_estop_by_id(msg_obj.header.StopID)
         assert estop, f"Can not find client {msg_obj.header.StopID}"
@@ -135,11 +148,13 @@ class TTIAStopUdpServer(ServerSideHandler):
         self.send_abnormal_ack(resp_msg, section)
 
     def send_abnormal_ack(self, msg_obj: TTIABusStopMessage, section: UDPWorkingSection):
+        msg_obj = self.add_header_seq(msg_obj)
         EStopObjCacher.estop_cache[msg_obj.header.StopID].lasttime = datetime.now()
         self.sock.sendto(msg_obj.to_pdu(), section.client_addr)
         self.remove_from_sections(section.stop_id)
 
     def send_update_route_info(self, msg_obj: TTIABusStopMessage, wait_for_resp=True):
+        msg_obj = self.add_header_seq(msg_obj)
         assert msg_obj.header.MessageID == 0x0B, "uncorrect message id"
         estop = EStopObjCacher.get_estop_by_id(msg_obj.header.StopID)
         assert estop.address is not None, f"Can not find client {msg_obj.header.StopID} address"
@@ -156,6 +171,7 @@ class TTIAStopUdpServer(ServerSideHandler):
         logger.info(f"recv_update_route_info_ack from id: {msg_obj.header.StopID}")
 
     def send_set_brightness(self, msg_obj: TTIABusStopMessage, wait_for_resp=True):
+        msg_obj = self.add_header_seq(msg_obj)
         assert msg_obj.header.MessageID == 0x0D, "uncorrect message id"
         estop = EStopObjCacher.get_estop_by_id(msg_obj.header.StopID)
         assert estop.address is not None, f"Can not find client {msg_obj.header.StopID} address"
@@ -172,6 +188,7 @@ class TTIAStopUdpServer(ServerSideHandler):
         logger.info(f"recv_set_brightness from id: {msg_obj.header.StopID}")
 
     def send_reboot(self, msg_obj: TTIABusStopMessage, wait_for_resp=True):
+        msg_obj = self.add_header_seq(msg_obj)
         assert msg_obj.header.MessageID == 0x10, "uncorrect message id"
         estop = EStopObjCacher.get_estop_by_id(msg_obj.header.StopID)
         assert estop.address is not None, f"Can not find client {msg_obj.header.StopID} address"
@@ -188,6 +205,7 @@ class TTIAStopUdpServer(ServerSideHandler):
         logger.info(f"recv_reboot_ack from id: {msg_obj.header.StopID}")
 
     def send_update_gif(self, msg_obj: TTIABusStopMessage, wait_for_resp=True):
+        msg_obj = self.add_header_seq(msg_obj)
         assert msg_obj.header.MessageID == 0x12, "uncorrect message id"
         estop = EStopObjCacher.get_estop_by_id(msg_obj.header.StopID)
         assert estop.address is not None, f"Can not find client {msg_obj.header.StopID} address"
