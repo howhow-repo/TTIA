@@ -67,7 +67,7 @@ class TTIAAutoBusInfoServer:
         logger.info(
             f"Finish sending {job_num}s bus info update. -- time spent: {(datetime.now() - start_time).seconds} sec")
         if self.fail_update_stops > 0:
-            logger.warning(f"fail updating bus info to stops: {self.fail_update_stops}")
+            logger.warning(f"fail updating bus info to stops: {self.fail_update_stops}s")
 
     def send_bus_info(self, msg_obj: TTIABusStopMessage, wait_for_resp=True):
         try:

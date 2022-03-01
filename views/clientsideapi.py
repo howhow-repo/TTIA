@@ -16,7 +16,7 @@ server_port = config('TTIA_UDP_SERVER_PORT', cast=int, default=50000)
 print(f"server> {server_host}:{server_port}")
 TTIA_UDP_PORT = config('TTIA_UDP_CLIENT_PORT', cast=int, default=50000)
 
-estop = EStop({"StopID": 6, "IMSI": '358759222540402'})
+estop = EStop({"StopID": 492, "IMSI": '492'})
 estop_udp_server = TTIAEStopUdpClient(host="0.0.0.0", port=TTIA_UDP_PORT, estop=estop,
                                       server_host=server_host, server_port=server_port)
 

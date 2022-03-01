@@ -25,7 +25,15 @@ class UDPWorkingSection:
         self.stop_id = stop_id
         self.start_time = datetime.now()
         self.process_id = msg_obj.header.MessageID
-        self.logs = [msg_obj]
+        self.logs = {}  # self.logs = {<header.Sequence: int>: [<msg_obj>, <msg_obj>....],...}
+
+    def to_json(self):
+        self_dict = self.__dict__
+        logs_json = {}
+        for Sequence, msg_obj_list in self.logs.items():
+            logs_json[Sequence] = [msg_obj.to_dict() for msg_obj in msg_obj_list]
+        self_dict['logs'] = logs_json
+        return self_dict
 
 
 class SectionServer(UDPServer):
@@ -54,10 +62,10 @@ class SectionServer(UDPServer):
             del cls.sections[section_id]
 
     @classmethod
-    def section_or_none(cls, stop_id):
+    def get_section(cls, stop_id):
         """
         :return:
-            :return section if section if found
+            :return section if section is found
             :return None if section not found
         """
         for section_id in cls.sections:
@@ -73,15 +81,23 @@ class SectionServer(UDPServer):
 
     @classmethod
     def remove_from_sections(cls, stop_id):
+        logger.debug(f"remove_from_sections: {stop_id}")
         if cls.sections.get(stop_id):
             del cls.sections[stop_id]
+
+    @classmethod
+    def remove_from_logs(cls, stop_id: int, seq: int):
+        section = cls.sections.get(stop_id)
+        if section:
+            if section.logs.get(seq):
+                del section.logs[seq]
 
     def handle_request(self, data, client_address):
         msg_obj = decode_msg(data)
         if not msg_obj:  # quick fail if data not ttia format
             return
 
-        section = self.section_or_none(msg_obj.header.StopID)
+        section = self.get_section(msg_obj.header.StopID)
 
         if not section:
             section = self.create_new_section(msg_obj.header.StopID, client_address, msg_obj)

@@ -11,6 +11,7 @@ class ServerSideHandler(SectionServer):
         super().__init__(host, port)
 
     def handle_new_section(self, msg_obj: TTIABusStopMessage, section: UDPWorkingSection):
+        section.logs[msg_obj.header.Sequence] = [msg_obj]
         if msg_obj.header.MessageID == 0x00:  # 基本資料程序
             self.recv_registration(msg_obj, section)
         elif msg_obj.header.MessageID == 0x03:  # 定時回報程序
@@ -21,7 +22,6 @@ class ServerSideHandler(SectionServer):
             self.recv_reboot_ack(msg_obj, section)
 
         # """ 異常處理 """
-
         elif msg_obj.header.MessageID in [0x01, 0x05, 0x07, 0x0B, 0x0D, 0x10, 0x12]:
             # client 不可對server做設定。
             self.unaccepted_cmd(section)
@@ -35,12 +35,16 @@ class ServerSideHandler(SectionServer):
 
         else:
             logger.warning("drop new_section unknown message id.")
-            self.remove_from_sections(section.stop_id)
+            self.remove_from_logs(section.stop_id, msg_obj.header.Sequence)
             self.sock.sendto(b"echo: unknown msg id\n", section.client_addr)
 
     def handle_old_section(self, msg_obj: TTIABusStopMessage, section: UDPWorkingSection):
         section.start_time = datetime.now()
-        section.logs.append(msg_obj)
+
+        if section.logs.get(msg_obj.header.Sequence):
+            section.logs[msg_obj.header.Sequence].append(msg_obj)
+        else:
+            section.logs[msg_obj.header.Sequence] = [msg_obj]
 
         if msg_obj.header.MessageID == 0x02:  # 基本資料程序ack
             self.recv_registration_ack(msg_obj, section)
@@ -71,7 +75,7 @@ class ServerSideHandler(SectionServer):
 
         else:
             logger.warning("drop old_section unknown message id.")
-            self.remove_from_sections(section.stop_id)
+            self.remove_from_logs(section.stop_id, msg_obj.header.Sequence)
             self.sock.sendto(b"echo: unknown msg id\n", section.client_addr)
 
     # TTIA estop behaviors
