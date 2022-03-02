@@ -55,7 +55,7 @@ IdleTime = 300
 EventReportPeriod = 300
 WeekDay = 1
 
-payload = struct.pack('<BH32s32sBBHBBHHBBBBBBB32sBBBBBBBBBH',
+payload = struct.pack('<BH32s32sBBHBBHHBBBBBBH32sBBBBBBBBBH',
                       Result,
                       MsgTag,
                       StopCName,

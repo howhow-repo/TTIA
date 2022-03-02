@@ -16,8 +16,8 @@ class ReportUpdateRouteinfoDownlink(PayloadBase):
     def from_pdu(self, pdu: bytes):
         payload = struct.unpack_from('<H12s12sH', pdu)
         self.RouteID = payload[0]
-        self.PathCName = payload[1].decode('big5', "ignore")
-        self.PathEName = payload[2].decode('ascii', "ignore")
+        self.PathCName = payload[1].decode('big5', "ignore").rstrip('\x00')
+        self.PathEName = payload[2].decode('ascii', "ignore").rstrip('\x00')
         self.Sequence = payload[3]
         self.self_assert()
 
