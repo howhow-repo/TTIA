@@ -6,12 +6,21 @@ from lib import TTIABusStopMessage
 logger = logging.getLogger(__name__)
 
 
+def add_to_section_log(msg_obj: TTIABusStopMessage, section: UDPWorkingSection):
+    if msg_obj.header.Sequence != 0:
+        if section.logs.get(msg_obj.header.Sequence):
+            section.logs[msg_obj.header.Sequence].append(msg_obj)
+        else:
+            section.logs[msg_obj.header.Sequence] = [msg_obj]
+
+
 class ServerSideHandler(SectionServer):
     def __init__(self, host, port):
         super().__init__(host, port)
 
     def handle_new_section(self, msg_obj: TTIABusStopMessage, section: UDPWorkingSection):
-        section.logs[msg_obj.header.Sequence] = [msg_obj]
+        add_to_section_log(msg_obj, section)
+
         if msg_obj.header.MessageID == 0x00:  # 基本資料程序
             self.recv_registration(msg_obj, section)
         elif msg_obj.header.MessageID == 0x03:  # 定時回報程序
@@ -24,14 +33,14 @@ class ServerSideHandler(SectionServer):
         # """ 異常處理 """
         elif msg_obj.header.MessageID in [0x01, 0x05, 0x07, 0x0B, 0x0D, 0x10, 0x12]:
             # client 不可對server做設定。
-            self.unaccepted_cmd(section)
+            self.unaccepted_cmd(section, msg_obj.header.Sequence)
         elif msg_obj.header.MessageID in [0x02, 0x06, 0x08, 0x0C, 0x0E, 0x13]:
             # client 非預期回覆
-            self.wrong_communicate_order(section)
+            self.wrong_communicate_order(section, msg_obj.header.Sequence)
 
         elif msg_obj.header.MessageID in [0x04, 0x0A]:
             # 應由server端發出的訊息
-            self.wrong_communicate_order(section)
+            self.wrong_communicate_order(section, msg_obj.header.Sequence)
 
         else:
             logger.warning("drop new_section unknown message id.")
@@ -40,11 +49,7 @@ class ServerSideHandler(SectionServer):
 
     def handle_old_section(self, msg_obj: TTIABusStopMessage, section: UDPWorkingSection):
         section.start_time = datetime.now()
-
-        if section.logs.get(msg_obj.header.Sequence):
-            section.logs[msg_obj.header.Sequence].append(msg_obj)
-        else:
-            section.logs[msg_obj.header.Sequence] = [msg_obj]
+        add_to_section_log(msg_obj, section)
 
         if msg_obj.header.MessageID == 0x02:  # 基本資料程序ack
             self.recv_registration_ack(msg_obj, section)
@@ -56,14 +61,14 @@ class ServerSideHandler(SectionServer):
             self.recv_update_route_info_ack(msg_obj, section)
         elif msg_obj.header.MessageID == 0x0E:  # 更新亮度ack
             self.recv_set_brightness_ack(msg_obj, section)
-        elif msg_obj.header.MessageID == 0x13:  # 更新gifack
+        elif msg_obj.header.MessageID == 0x13:  # 更新gif ack
             self.recv_update_gif_ack(msg_obj, section)
 
         # """ 異常處理 """
 
         elif msg_obj.header.MessageID in [0x01, 0x05, 0x07, 0x0B, 0x0D, 0x10, 0x12]:
             # client 不可對server做設定。
-            self.unaccepted_cmd(section)
+            self.unaccepted_cmd(section, msg_obj.header.Sequence)
 
         elif msg_obj.header.MessageID in [0x00, 0x03, 0x09, 0x11]:
             # 新工作項目
@@ -71,7 +76,7 @@ class ServerSideHandler(SectionServer):
 
         elif msg_obj.header.MessageID in [0x04, 0x0A]:
             # 應由server端發出的訊息
-            self.wrong_communicate_order(section)
+            self.wrong_communicate_order(section, msg_obj.header.Sequence)
 
         else:
             logger.warning("drop old_section unknown message id.")

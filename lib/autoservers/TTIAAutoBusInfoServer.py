@@ -42,8 +42,8 @@ class TTIAAutoBusInfoServer:
         self.fail_update_stops = 0
         for route_id, routestop_ids in changed_routes.items():
             for routestop_id in routestop_ids:
-                msg = BusInfoCacher.businfo_cache[int(route_id)].to_ttia(int(routestop_id))
                 sid = get_sid(routestop_id)
+                msg = BusInfoCacher.businfo_cache[int(route_id)].to_ttia(int(routestop_id))
                 msg.header.StopID = sid
                 msg.option_payload.Sequence = get_seq(sid, routestop_id)
 

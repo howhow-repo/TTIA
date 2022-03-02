@@ -28,10 +28,10 @@ class UDPWorkingSection:
         self.logs = {}  # self.logs = {<header.Sequence: int>: [<msg_obj>, <msg_obj>....],...}
 
     def to_json(self):
-        self_dict = self.__dict__
+        self_dict = {'stop_id': self.stop_id}
         logs_json = {}
         for Sequence, msg_obj_list in self.logs.items():
-            logs_json[Sequence] = [msg_obj.to_dict() for msg_obj in msg_obj_list]
+            logs_json[Sequence] = [(msg_obj.header.MessageID,msg_obj.header.Sequence) for msg_obj in msg_obj_list]
         self_dict['logs'] = logs_json
         return self_dict
 
@@ -112,10 +112,10 @@ class SectionServer(UDPServer):
     def handle_old_section(self, msg_obj: TTIABusStopMessage, section: UDPWorkingSection):
         raise NotImplementedError
 
-    def wrong_communicate_order(self, section: UDPWorkingSection):
+    def wrong_communicate_order(self, section: UDPWorkingSection, seq: int):
         logger.debug(f"Wong communicate order. expire section of stop id: {section.stop_id}")
-        self.remove_from_sections(section.stop_id)
+        self.remove_from_logs(section.stop_id, seq)
 
-    def unaccepted_cmd(self, section: UDPWorkingSection):
+    def unaccepted_cmd(self, section: UDPWorkingSection, seq: int):
         logger.debug(f"Command unaccepted. expire section of stop id: {section.stop_id}")
-        self.remove_from_sections(section.stop_id)
+        self.remove_from_logs(section.stop_id, seq)

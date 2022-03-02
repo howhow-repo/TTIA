@@ -1,8 +1,8 @@
+import sys
 from flask import Blueprint, jsonify, request
 from lib import TTIABusStopMessage
 from lib import EStopObjCacher, TTIAStopUdpServer, TTIAAutomationServer
 from lib import FlasggerResponse
-from apscheduler.schedulers.background import BackgroundScheduler
 from decouple import config
 import logging
 
@@ -703,3 +703,22 @@ def update_msg(stop_id):
     estop_auto_server.TTIAAutoMsgServer.send_msg(stop_id=int(stop_id))
 
     return jsonify(FlasggerResponse().response)
+
+
+@flasgger_server.route("/stopapi/v1/size_monitor", methods=['POST'])
+def check_caches_size():
+    """Use to monitor the caches size.
+    ---
+    tags:
+      - name: TTIA EStop helper
+
+    responses:
+      200:
+        description: Return dict message with op result.
+    """
+    sizes = {
+        "estop_cache": sys.getsizeof(EStopObjCacher.estop_cache),
+        "estop_rsid_sid": sys.getsizeof(EStopObjCacher.rsid_sid_table),
+        "server_udp_sections": sys.getsizeof(estop_auto_server.udp_server.sections)
+    }
+    return jsonify(sizes)
