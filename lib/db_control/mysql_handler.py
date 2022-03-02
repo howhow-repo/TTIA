@@ -1,6 +1,7 @@
 import logging
 import pymysql
 
+logging.basicConfig(level=logging.INFO, format='%(asctime)s | %(name)s | %(levelname)s | %(message)s',)
 logger = logging.getLogger(__name__)
 
 
@@ -66,7 +67,7 @@ class MySqlHandler:
     def test_connection(self):
         try:
             ver = self.get_single_data('SELECT VERSION()')
-            print(f"Test Connecting success; MySQL version : {ver} ")
+            logger.info(f"Test Connecting success; MySQL version : {ver} ")
         except Exception as err:
             self.disconnect()
             raise ConnectionError(f"ebus center mysql test connection fail.\n {err}")

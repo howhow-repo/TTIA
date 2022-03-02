@@ -674,7 +674,7 @@ def update_route_info(stop_id):
                                         error_code=3,
                                         message=f"StatusError: {check_stop(int(stop_id))[1]}").response)
 
-    estop_auto_server.TTIAAutoStopandRouteServer.send_route_info(stop_id=int(stop_id))
+    estop_auto_server.TTIAAutoStopandRouteServer.udp_server.update_route_info(stop_id=int(stop_id))
 
     return jsonify(FlasggerResponse().response)
 

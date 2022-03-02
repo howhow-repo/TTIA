@@ -1,10 +1,10 @@
-from datetime import datetime, timedelta
-
+from datetime import datetime
 import requests
 from decouple import config
 from ..TTIA_stop_message import TTIABusStopMessage
 import logging
 
+logging.basicConfig(level=logging.INFO, format='%(asctime)s | %(name)s | %(levelname)s | %(message)s',)
 logger = logging.getLogger(__name__)
 
 
@@ -166,6 +166,7 @@ class BusInfoCacher:
         routeests = requests.get(cls.source_host, timeout=5).json()
         for route_id, route in routeests.items():  # pack to obj
             cls.businfo_cache[int(route_id)] = WebRoute(route)
+        logger.info(f"Init bus info from {cls.source_host} ok.")
 
     @classmethod
     def reload_from_web(cls) -> dict:

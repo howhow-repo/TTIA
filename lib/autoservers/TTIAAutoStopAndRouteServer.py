@@ -3,6 +3,7 @@ from lib.db_control import EStopObjCacher
 from datetime import datetime, timedelta
 import logging
 
+logging.basicConfig(level=logging.INFO, format='%(asctime)s | %(name)s | %(levelname)s | %(message)s',)
 logger = logging.getLogger(__name__)
 
 
@@ -14,17 +15,12 @@ class TTIAAutoStopAndRouteServer:
     def reload_stop_and_route(self):
         updated_route_stop = EStopObjCacher.reload_from_sql()
         for stop_id in updated_route_stop:
-            self.send_route_info(stop_id)
+            self.udp_server.update_route_info(stop_id)
 
     def reload_stop_and_route_by_ids(self, ids: list):
         updated_route_stop = EStopObjCacher.reload_from_sql_by_estop_ids(ids)
         for stop_id in updated_route_stop:
-            self.send_route_info(stop_id)
-
-    def send_route_info(self, stop_id: int):
-        for seq, info in enumerate(EStopObjCacher.estop_cache[stop_id].routelist):
-            msg = info.to_ttia(stop_id=stop_id, seq=seq)
-            ack = self.udp_server.send_update_route_info(msg_obj=msg, wait_for_resp=True)
+            self.udp_server.update_route_info(stop_id)
 
     @classmethod
     def check_online(cls):
