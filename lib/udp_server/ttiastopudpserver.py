@@ -3,8 +3,7 @@ from .core import ServerSideHandler
 from .core import UDPWorkingSection
 from ..db_control import EStopObjCacher, MsgCacher
 from ..TTIA_stop_message import TTIABusStopMessage
-from datetime import datetime, time
-import time as systime
+from datetime import datetime
 import time as sys_time
 import logging
 

@@ -6,8 +6,6 @@ from ..udp_server.ttiastopudpserver import TTIAStopUdpServer
 from .TTIAAutoMsgServer import TTIAAutoMsgServer
 from .TTIAAutoBusInfoServer import TTIAAutoBusInfoServer
 from .TTIAAutoStopAndRouteServer import TTIAAutoStopAndRouteServer
-from ..db_control import EStopObjCacher, MsgCacher, BusInfoCacher
-
 import logging
 
 logger = logging.getLogger(__name__)

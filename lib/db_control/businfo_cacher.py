@@ -1,3 +1,4 @@
+import sys
 from datetime import datetime
 import requests
 from decouple import config
@@ -33,10 +34,11 @@ def create_no_bus_msg(StopID: int, RouteID: int):
 
 class WebStop:
     def __init__(self, json_info: dict):
-        self.bno = json_info.get('bno')
+        self.bno = json_info.get('bno')  # a list
         if self.bno:
             self.bno = sorted(self.bno, key=lambda k: k['no'])  # sort bno by 'no'
 
+        # est: estimate time (sec)
         if json_info.get('schTm'):
             self.est = json_info.get('schTm')
         elif json_info.get('schBus'):
@@ -163,7 +165,9 @@ class BusInfoCacher:
 
     @classmethod
     def load_from_web(cls):
+        now = datetime.now()
         routeests = requests.get(cls.source_host, timeout=5).json()
+        logger.debug(f"Getting bus info api time spend {(datetime.now() - now).seconds} sec, size: {sys.getsizeof(routeests)} Byte")
         for route_id, route in routeests.items():  # pack to obj
             cls.businfo_cache[int(route_id)] = WebRoute(route)
         logger.info(f"Init bus info from {cls.source_host} ok.")
@@ -184,7 +188,9 @@ class BusInfoCacher:
         """
         updated_routes = {}
         try:
+            now = datetime.now()
             new_data = requests.get(cls.source_host, timeout=5).json()
+            logger.info(f"Getting bus info api time spend {(datetime.now() - now).seconds} sec, size: {sys.getsizeof(new_data)} Byte")
         except Exception as e:
             logger.error(f"Reload BusInfoCacher from web fail. {e}")
             return {}

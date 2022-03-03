@@ -50,6 +50,7 @@ class SectionServer(UDPServer):
             seconds=self.section_lifetime / 2
         )
         self.routine_scheduler.start()
+        logging.getLogger('apscheduler').setLevel(logging.ERROR)
 
     @classmethod
     def expire_timeout_section(cls):
