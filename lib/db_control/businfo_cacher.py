@@ -165,12 +165,13 @@ class BusInfoCacher:
 
     @classmethod
     def load_from_web(cls):
+        logger.info(f"Initing bus info from {cls.source_host}....")
         now = datetime.now()
         routeests = requests.get(cls.source_host, timeout=5).json()
         logger.debug(f"Getting bus info api time spend {(datetime.now() - now).seconds} sec, size: {sys.getsizeof(routeests)} Byte")
         for route_id, route in routeests.items():  # pack to obj
             cls.businfo_cache[int(route_id)] = WebRoute(route)
-        logger.info(f"Init bus info from {cls.source_host} ok.")
+        logger.info(f"Init bus info success.")
 
     @classmethod
     def reload_from_web(cls) -> dict:
@@ -186,7 +187,7 @@ class BusInfoCacher:
                 ...
             }
         """
-        updated_routes = {}
+        updated_routes = {}  # {<route id>: [<stop_id>, <stop_id>,...], <route id>: [<stop_id>, <stop_id>,...],...}
         try:
             now = datetime.now()
             new_data = requests.get(cls.source_host, timeout=5).json()
@@ -202,14 +203,13 @@ class BusInfoCacher:
             if old_route_obj:
                 for stop_id, stop in new_route_obj.stops.items():
                     old_stop = old_route_obj.stops.get(int(stop_id))
-                    if stop.cdsec != old_stop.cdsec:
-                        if updated_routes.get(route_id):
-                            updated_routes.get(route_id).append(stop_id)
-                        else:
-                            updated_routes[route_id] = [stop_id, ]
-                        cls.businfo_cache[int(route_id)].stops[int(stop_id)] = stop
-                    else:
+                    if old_stop and old_stop.cdsec == stop.cdsec:
                         pass
+                    else:
+                        if route_id not in updated_routes:
+                            updated_routes[route_id] = []
+                        updated_routes[route_id].append(stop_id)
+                        cls.businfo_cache[int(route_id)].stops[int(stop_id)] = stop
             else:  # no old_route
                 updated_routes[route_id] = [stop.sid for stop in new_route_obj.stops]
         return updated_routes

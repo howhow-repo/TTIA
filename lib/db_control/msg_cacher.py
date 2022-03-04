@@ -25,7 +25,6 @@ class MsgCacher:
     @classmethod
     def load_from_sql(cls):
         estops_dict = cls.__get_new_dict()
-
         cls.__pack_come_in_data(estops_dict)
 
     @classmethod
