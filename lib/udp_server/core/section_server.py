@@ -20,11 +20,10 @@ def decode_msg(data):
 class UDPWorkingSection:
     lifetime = 15  # second
 
-    def __init__(self, stop_id, client_addr, msg_obj: TTIABusStopMessage):
+    def __init__(self, stop_id, client_addr):
         self.client_addr = client_addr
         self.stop_id = stop_id
-        self.start_time = datetime.now()
-        self.process_id = msg_obj.header.MessageID
+        self.last_msg_time = datetime.now()
         self.logs = {}  # self.logs = {<header.Sequence: int>: [<msg_obj>, <msg_obj>....],...}
 
     def to_json(self):
@@ -57,7 +56,7 @@ class SectionServer(UDPServer):
         now = datetime.now()
         should_be_del = []
         for section_id in cls.sections:
-            if (now - cls.sections[section_id].start_time).seconds > UDPWorkingSection.lifetime:
+            if (now - cls.sections[section_id].last_msg_time).seconds > UDPWorkingSection.lifetime:
                 should_be_del.append(section_id)
         for section_id in should_be_del:
             del cls.sections[section_id]

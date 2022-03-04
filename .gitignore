@@ -4,3 +4,4 @@ __pycache__
 playground.py
 .env
 *.log
+*.DS_Store

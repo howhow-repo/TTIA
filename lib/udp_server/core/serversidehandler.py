@@ -48,7 +48,7 @@ class ServerSideHandler(SectionServer):
             self.sock.sendto(b"echo: unknown msg id\n", section.client_addr)
 
     def handle_old_section(self, msg_obj: TTIABusStopMessage, section: UDPWorkingSection):
-        section.start_time = datetime.now()
+        section.last_msg_time = datetime.now()
         add_to_section_log(msg_obj, section)
 
         if msg_obj.header.MessageID == 0x02:  # 基本資料程序ack

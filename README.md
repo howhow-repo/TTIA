@@ -20,7 +20,7 @@ Bus info api support bus location information live and dynamically.
 This center will collect this information and send directly to related estop.  
 
 ## Server diagram
-![diagram](diagrams/TTIAEStopServer_diagram.png)
+![diagram](diagrams/server_diagram.png)
 
 ## installation
 ```
