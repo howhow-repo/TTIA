@@ -100,6 +100,7 @@ msg.payload.StopCName = "新站名"  # or update property directly
 print(msg.payload.StopCName)
 # >> 新站名
 ```
+
 2. Create an empty msg:
 ```python
 from lib import TTIABusStopMessage
@@ -117,7 +118,6 @@ from lib import TTIABusStopMessage
 data_dict = {"header":{...}, "payload": {...}}
 # please aware with every prop's data type
 msg = TTIABusStopMessage(init_data=data_dict, init_type='dict')
-
 ```
 
 ## Auto testing

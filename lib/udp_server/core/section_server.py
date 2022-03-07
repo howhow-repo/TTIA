@@ -74,8 +74,8 @@ class SectionServer(UDPServer):
         return None
 
     @classmethod
-    def create_new_section(cls, stop_id: int, client_address, msg_obj: TTIABusStopMessage):
-        section = UDPWorkingSection(stop_id, client_address, msg_obj)
+    def create_new_section(cls, stop_id: int, client_address):
+        section = UDPWorkingSection(stop_id, client_address)
         cls.sections[stop_id] = section
         return section
 
@@ -100,7 +100,7 @@ class SectionServer(UDPServer):
         section = self.get_section(msg_obj.header.StopID)
 
         if not section:
-            section = self.create_new_section(msg_obj.header.StopID, client_address, msg_obj)
+            section = self.create_new_section(msg_obj.header.StopID, client_address)
             self.handle_new_section(msg_obj, section)
 
         else:  # old section

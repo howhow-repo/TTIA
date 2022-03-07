@@ -31,4 +31,4 @@ class TTIAAutoStopAndRouteServer:
                 delta_time = datetime.now() - estop.lasttime
                 if delta_time > timedelta(seconds=estop.ReportPeriod * 2):
                     estop.ready = False
-                    logger.warning(f"set estop {estop.StopID} ready = False: {delta_time.seconds} seconds not replied.")
+                    logger.error(f"set estop {estop.StopID} ready = False: {delta_time.seconds} seconds not replied.")

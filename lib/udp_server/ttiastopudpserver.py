@@ -107,7 +107,7 @@ class TTIAStopUdpServer(ServerSideHandler):
         assert estop.address is not None, f"Can not find client {msg_obj.header.StopID} address"
         section = self.get_section(msg_obj.header.StopID)
         if not section:
-            section = self.create_new_section(msg_obj.header.StopID, estop.address, msg_obj)
+            section = self.create_new_section(msg_obj.header.StopID, estop.address)
         section.logs[msg_obj.header.Sequence] = [msg_obj]
         self.sock.sendto(msg_obj.to_pdu(), estop.address)
         logger.info(f"send_update_msg_tag: {msg_obj.header.StopID} ")
@@ -138,7 +138,7 @@ class TTIAStopUdpServer(ServerSideHandler):
         assert estop.address is not None, f"Can not find client {msg_obj.header.StopID} address"
         section = self.get_section(msg_obj.header.StopID)
         if not section:
-            section = self.create_new_section(msg_obj.header.StopID, estop.address, msg_obj)
+            section = self.create_new_section(msg_obj.header.StopID, estop.address)
         section.logs[msg_obj.header.Sequence] = [msg_obj]
         self.sock.sendto(msg_obj.to_pdu(), estop.address)
         logger.info(f"send_update_bus_info: {msg_obj.header.StopID}, {msg_obj.header.Sequence}")
@@ -188,7 +188,7 @@ class TTIAStopUdpServer(ServerSideHandler):
         assert estop.address is not None, f"Can not find client {msg_obj.header.StopID} address"
         section = self.get_section(msg_obj.header.StopID)
         if not section:
-            section = self.create_new_section(msg_obj.header.StopID, estop.address, msg_obj)
+            section = self.create_new_section(msg_obj.header.StopID, estop.address)
         section.logs[msg_obj.header.Sequence] = [msg_obj]
         self.sock.sendto(msg_obj.to_pdu(), estop.address)
         logger.info(f"send_update_route_info: {msg_obj.header.StopID}, {msg_obj.header.Sequence}")
@@ -217,7 +217,7 @@ class TTIAStopUdpServer(ServerSideHandler):
         assert estop.address is not None, f"Can not find client {msg_obj.header.StopID} address"
         section = self.get_section(msg_obj.header.StopID)
         if not section:
-            section = self.create_new_section(msg_obj.header.StopID, estop.address, msg_obj)
+            section = self.create_new_section(msg_obj.header.StopID, estop.address)
         section.logs[msg_obj.header.Sequence] = [msg_obj]
         self.sock.sendto(msg_obj.to_pdu(), estop.address)
         logger.info(f"send_set_brightness: {msg_obj.header.StopID} ")
@@ -246,7 +246,7 @@ class TTIAStopUdpServer(ServerSideHandler):
         assert estop.address is not None, f"Can not find client {msg_obj.header.StopID} address"
         section = self.get_section(msg_obj.header.StopID)
         if not section:
-            section = self.create_new_section(msg_obj.header.StopID, estop.address, msg_obj)
+            section = self.create_new_section(msg_obj.header.StopID, estop.address)
         section.logs[msg_obj.header.Sequence] = [msg_obj]
         self.sock.sendto(msg_obj.to_pdu(), estop.address)
         logger.info(f"send_reboot: {msg_obj.header.StopID} ")
@@ -275,7 +275,7 @@ class TTIAStopUdpServer(ServerSideHandler):
         assert estop.address is not None, f"Can not find client {msg_obj.header.StopID} address"
         section = self.get_section(msg_obj.header.StopID)
         if not section:
-            section = self.create_new_section(msg_obj.header.StopID, estop.address, msg_obj)
+            section = self.create_new_section(msg_obj.header.StopID, estop.address)
         section.logs[msg_obj.header.Sequence] = [msg_obj]
         self.sock.sendto(msg_obj.to_pdu(), estop.address)
         logger.info(f"send_update_gif: {msg_obj.header.StopID} ")

@@ -1,6 +1,17 @@
 import atexit
 import threading
 import logging
+from logging.handlers import RotatingFileHandler
+
+#  Warning! This is weird, but i can only get the logger work by putting the code here before other import.
+formatter = '%(asctime)s | %(name)s | %(levelname)s | %(message)s'
+fh = RotatingFileHandler('logs/server.log', maxBytes=1024*1024*4, backupCount=2)
+fh.setLevel(logging.WARNING)
+logging.basicConfig(level=logging.INFO, format=formatter,
+                    handlers=[
+                        fh,
+                        logging.StreamHandler()
+                    ])
 
 from decouple import config
 from flask import Flask
@@ -11,10 +22,9 @@ from views.serversideapi import flasgger_server, estop_auto_server
 from views.msgschedulerapi import scheduler_api
 from views.index import index_pade
 
+logger = logging.getLogger(__name__)
 
 #  init constants
-logging.basicConfig(level=logging.INFO, format='%(asctime)s | %(name)s | %(levelname)s | %(message)s',)
-logger = logging.getLogger(__name__)
 TTIA_UDP_PORT = config('TTIA_UDP_SERVER_PORT', cast=int, default=50000)
 HTTP_PORT = config('TTIA_HTTP_SERVER_PORT', cast=int, default=5000)
 TIMEZONE = config('TIMEZONE', default="Asia/Taipei")
@@ -26,7 +36,6 @@ SQL_CONFIG = {
     "db": config('SQL_DB')
 }
 
-
 #  start routine_scheduler
 estop_auto_server.routine_scheduler.start()
 atexit.register(lambda: estop_auto_server.routine_scheduler.shutdown())
@@ -37,7 +46,6 @@ atexit.register(lambda: estop_auto_server.TTIAAutoMsgServer.scheduler.shutdown()
 
 logging.getLogger('apscheduler').setLevel(logging.ERROR)
 
-
 #  init flask server
 app = Flask(__name__)
 app.config['SWAGGER'] = SWAGGER_CONFIG
@@ -45,7 +53,6 @@ swagger = Swagger(app, template=SWAGGER_CONTEXT)
 app.register_blueprint(index_pade)
 app.register_blueprint(flasgger_server)
 app.register_blueprint(scheduler_api)
-
 
 if __name__ == '__main__':
     """
