@@ -3,10 +3,28 @@ from datetime import datetime
 import requests
 from decouple import config
 from ..TTIA_stop_message import TTIABusStopMessage
+from ..db_control import EStopObjCacher
 import logging
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s | %(name)s | %(levelname)s | %(message)s',)
 logger = logging.getLogger(__name__)
+
+
+def get_sid(rsid):
+    sid = EStopObjCacher.rsid_sid_table.get(rsid)
+    if not sid:
+        sid = 0
+    return sid
+
+
+def get_seq(sid, rsid):
+    estop = EStopObjCacher.estop_cache.get(sid)
+    if not estop:
+        return 0
+    for route_info in estop.routelist:
+        if route_info.rsid == rsid:
+            return route_info.seqno
+    return 0
 
 
 def create_last_left_msg(StopID: int, RouteID: int):
@@ -72,7 +90,7 @@ class WebRoute:
         self.dest = json_info.get('dest')
         self.edest = json_info.get('edest')
         self.cars = json_info.get('cars')
-        self.stops = {}
+        self.stops = {}  # actually is rsid
         if json_info.get('stops').items():
             self.stops = {int(stop_id): WebStop(stop) for stop_id, stop in json_info.get('stops').items()}
 
@@ -93,9 +111,11 @@ class WebRoute:
         r['stops'] = stops_json
         return r
 
-    def to_ttia(self, stop_id: int) -> TTIABusStopMessage:
+    def to_ttia(self, routestop_id: int) -> TTIABusStopMessage:
+        """return a TTIA msg obj with WRONG STOPID"""
         # sampled data
-        web_stop = self.stops.get(stop_id)
+        web_stop = self.stops.get(routestop_id)
+        sid = get_sid(routestop_id)
         if web_stop and web_stop.est != 'LAST LEFT' and web_stop.est != 'NO BUS':
             no_bus = False
         else:
@@ -106,13 +126,13 @@ class WebRoute:
         now = datetime.now()
         if no_bus:
             if web_stop.est == 'LAST LEFT':  # 末班車駛離
-                msg = create_last_left_msg(RouteID=self.id, StopID=stop_id)
+                msg = create_last_left_msg(RouteID=self.id, StopID=sid)
             elif web_stop.est == 'NO BUS':  # 今日未營運
-                msg = create_no_bus_msg(RouteID=self.id, StopID=stop_id)
+                msg = create_no_bus_msg(RouteID=self.id, StopID=sid)
 
         else:  # 有車
             msg = TTIABusStopMessage(0x07, 'default')
-            msg.header.StopID = stop_id
+            msg.header.StopID = sid
             msg.payload.RouteID = self.id
             if ":" in web_stop.est and web_stop.bno is None:  # 未發車
                 schtime = datetime(now.year, now.month, now.day, int(web_stop.est.split(":")[0]), int(web_stop.est.split(":")[1]))
@@ -156,12 +176,14 @@ class WebRoute:
         msg.payload.RcvYear, msg.payload.RcvMonth, msg.payload.RcvDay, msg.payload.RcvHour, msg.payload.RcvMin, msg.payload.RcvSec \
             = now.year, now.month, now.day, now.hour, now.minute, now.second
 
+        msg.option_payload.Sequence = get_seq(sid, routestop_id)
         return msg
 
 
 class BusInfoCacher:
     source_host = config('BUS_INFO_SOURCE', cast=str, default='http://110.25.88.242:60001/api/v1/routes/')
     businfo_cache = {}
+    # businfo_cache = {<route_id: int>: <WebRoute: obj>, <route_id: int>: <WebRoute: obj>, ....}
 
     @classmethod
     def load_from_web(cls):

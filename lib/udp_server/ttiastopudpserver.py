@@ -10,6 +10,16 @@ import logging
 logger = logging.getLogger(__name__)
 
 
+def get_seq(sid, rsid):
+    estop = EStopObjCacher.estop_cache.get(sid)
+    if not estop:
+        return 0
+    for route_info in estop.routelist:
+        if route_info.rsid == rsid:
+            return route_info.seqno
+    return 0
+
+
 class TTIAStopUdpServer(ServerSideHandler):
     header_sequence = 1
 
@@ -311,11 +321,12 @@ class TTIAStopUdpServer(ServerSideHandler):
 
     def update_route_info(self, stop_id: int):
         estop = EStopObjCacher.get_estop_by_id(stop_id)
-        for i, route in enumerate(estop.routelist):
-            msg = route.to_ttia(stop_id, i)
-            thread = threading.Thread(target=self.send_update_route_info, args=(msg, True, 3))
-            thread.start()
-        logger.info(f"{len(estop.routelist)}s route_ids has been sent.")
+        if estop:
+            for i, route in enumerate(estop.routelist):
+                msg = route.to_ttia(stop_id, i)
+                thread = threading.Thread(target=self.send_update_route_info, args=(msg, True, 3))
+                thread.start()
+            logger.info(f"{len(estop.routelist)}s route_ids has been sent.")
 
     def update_msg(self, stop_id: int):
         estop = EStopObjCacher.estop_cache.get(stop_id)
