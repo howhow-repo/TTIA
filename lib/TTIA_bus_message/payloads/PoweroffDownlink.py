@@ -1,8 +1,8 @@
 from ..message_base import MessageBase
 
 
-class EventsDownlink(MessageBase):
-    MessageID = 0x09
+class PoweroffDownlink(MessageBase):
+    MessageID = 0x0B
 
     def __init__(self, init_data, init_type: str):
         super().__init__(init_data, init_type)

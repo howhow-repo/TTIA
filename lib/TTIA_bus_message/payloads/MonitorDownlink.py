@@ -1,6 +1,4 @@
-import struct
 from ..message_base import MessageBase
-from ..tables.MonitorStruct import MonitorStructType1
 
 
 class MonitorDownlink(MessageBase):

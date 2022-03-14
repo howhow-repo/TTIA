@@ -1,3 +1,7 @@
+from .EventContent import *
+from ..message_base import MessageBase
+
+
 class EventCode:
     Normal = 0x0000
     StopEnterLeave = 0x0001  # 進出站(圓形偵測)
@@ -12,3 +16,32 @@ class EventCode:
     TurnSharp = 0x2000  # 急轉
     TurnOver = 0x4000  # 翻車
     RouteDisallow = 0x8000  # 路線外營運
+
+    @classmethod
+    def get_default_content(cls, event_code) -> MessageBase:
+        if event_code == cls.Normal:
+            pass
+        elif event_code == cls.StopEnterLeave:
+            return StopEnterLeave({}, 'default')
+        elif event_code == cls.SpeedRpmOverLimitation:
+            return SpeedRpmOverLimitation({}, 'default')
+        elif event_code == cls.SpeedUpDownSuddenly:
+            return SpeedUpDownSuddenly({}, 'default')
+        elif event_code == cls.DoorOpenOnDriving:
+            return DoorOpenOnDriving({}, 'default')
+        elif event_code == cls.CarAbnormal:
+            return CarAbnormal({}, 'default')
+        elif event_code == cls.CarStateChange:
+            return CarStateChange({}, 'default')
+        elif event_code == cls.DutyOnNotSchedule:
+            return DutyOnNotSchedule({}, 'default')
+        elif event_code == cls.DriverResponse:
+            return DriverResponse({}, 'default')
+        elif event_code == cls.AreaLimitationEnter:
+            return AreaLimitationEnter({}, 'default')
+        elif event_code == cls.TurnSharp:
+            return TurnSharp({}, 'default')
+        elif event_code == cls.TurnOver:
+            return TurnOver({}, 'default')
+        elif event_code == cls.RouteDisallow:
+            return RouteDisallow({}, 'default')
