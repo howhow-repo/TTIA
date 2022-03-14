@@ -9,6 +9,6 @@ class EventCode:
     DutyOnNotSchedule = 0x0040  # 異常發車
     DriverResponse = 0x0080  # 司機回覆
     AreaLimitationEnter = 0x0100  # 進入特定區域
-    TurnSharp = 0x2000
-    TurnOver = 0x4000
+    TurnSharp = 0x2000  # 急轉
+    TurnOver = 0x4000  # 翻車
     RouteDisallow = 0x8000  # 路線外營運
