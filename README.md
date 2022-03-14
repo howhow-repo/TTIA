@@ -41,24 +41,32 @@ SQL_USER = <user>
 SQL_PW = <password>
 SQL_DB = <name of database>
 
-#  No using in this stage
+#  Not using in this stage
 MON_HOST = <ip>
 MON_PORT = <port>
 MON_USER = <user>
 MON_PW = <password>
 MON_DB = <name of database>
 
-BUS_INFO_SOURCE = http://xxx.xxx.xxx.xxxx:xxxxx/api/v1/routes/  # api of bus info
+# api of bus info
+BUS_INFO_SOURCE = http://xxx.xxx.xxx.xxxx:xxxxx/api/v1/routes/
 
 TIMEZONE = Asia/Taipei
 
-TTIA_HTTP_SERVER_PORT = 5000  # http api port
-TTIA_UDP_SERVER_PORT = 50000  # TTIA UDP port
+# http api port
+TTIA_HTTP_SERVER_PORT = 5000
+# TTIA UDP port
+TTIA_UDP_SERVER_PORT = 50000  
+
 
 # if run the dummy client
-SERVER_IP = localhost  # communicate center IP:Port
-TTIA_HTTP_CLIENT_PORT = 5002  # dummy client http api port
-TTIA_UDP_CLIENT_PORT = 50002  # dummy client TTIA UDP port
+
+# communicate center IP:Port
+SERVER_IP = localhost
+# dummy client http api port
+TTIA_HTTP_CLIENT_PORT = 5002
+# dummy client TTIA UDP port  
+TTIA_UDP_CLIENT_PORT = 50002
 
 
 

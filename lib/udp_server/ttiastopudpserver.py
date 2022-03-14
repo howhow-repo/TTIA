@@ -4,7 +4,6 @@ from .core import UDPWorkingSection
 from ..db_control import EStopObjCacher, MsgCacher
 from ..TTIA_stop_message import TTIABusStopMessage
 from datetime import datetime
-import time as sys_time
 import logging
 
 logger = logging.getLogger(__name__)
@@ -21,19 +20,10 @@ def get_seq(sid, rsid):
 
 
 class TTIAStopUdpServer(ServerSideHandler):
-    header_sequence = 1
 
     def __init__(self, host, port, timeout: int = 5):
         self.estop_comm_timeout = timeout
         super().__init__(host, port)
-
-    @classmethod
-    def add_header_seq(cls, msg_obj: TTIABusStopMessage):
-        msg_obj.header.Sequence = cls.header_sequence
-        cls.header_sequence += 1
-        if cls.header_sequence > 65535:
-            cls.header_sequence = 1
-        return msg_obj
 
     def recv_registration(self, msg_obj: TTIABusStopMessage, section: UDPWorkingSection):
         """
@@ -71,8 +61,8 @@ class TTIAStopUdpServer(ServerSideHandler):
         """
         logger.info(f"recv_registration_ack: {msg_obj.header.StopID}, {msg_obj.header.Sequence}")
 
-        if not section.logs.get(msg_obj.header.Sequence) and section.logs.get(msg_obj.header.Sequence)[
-            -1].header.MessageID != 1:
+        if not section.logs.get(msg_obj.header.Sequence) \
+                and section.logs.get(msg_obj.header.Sequence)[-1].header.MessageID != 1:
             self.wrong_communicate_order(section, msg_obj.header.Sequence)
             return
 
@@ -307,14 +297,12 @@ class TTIAStopUdpServer(ServerSideHandler):
         logger.info(f"recv_update_gif_ack from id: {msg_obj.header.StopID}, {msg_obj.header.Sequence}")
 
     def wait_ack(self, section: UDPWorkingSection, seq: int, expected_msg_id: int):
-        check_interval = 0.5
-        for i in range(int(self.estop_comm_timeout / check_interval)):
+        begin = datetime.now()
+        while (datetime.now() - begin).seconds < self.estop_comm_timeout:
             if section.logs[seq][-1].header.MessageID == expected_msg_id:
                 ack_msg = section.logs[seq][-1]
                 self.remove_from_logs(section.stop_id, seq)
                 return ack_msg
-            else:
-                sys_time.sleep(check_interval)
         logger.warning(
             f"Did not get ack from client {section.stop_id}, seq: {seq}, expected_msg_id: {expected_msg_id}.")
         return None

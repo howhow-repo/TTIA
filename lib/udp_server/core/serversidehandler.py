@@ -15,8 +15,18 @@ def add_to_section_log(msg_obj: TTIABusStopMessage, section: UDPWorkingSection):
 
 
 class ServerSideHandler(SectionServer):
+    header_sequence = 1
+
     def __init__(self, host, port):
         super().__init__(host, port)
+
+    @classmethod
+    def add_header_seq(cls, msg_obj: TTIABusStopMessage):
+        msg_obj.header.Sequence = cls.header_sequence
+        cls.header_sequence += 1
+        if cls.header_sequence > 65535:
+            cls.header_sequence = 1
+        return msg_obj
 
     def handle_new_section(self, msg_obj: TTIABusStopMessage, section: UDPWorkingSection):
         add_to_section_log(msg_obj, section)

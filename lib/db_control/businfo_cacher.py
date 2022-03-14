@@ -211,9 +211,7 @@ class BusInfoCacher:
         """
         updated_routes = {}  # {<route id>: [<stop_id>, <stop_id>,...], <route id>: [<stop_id>, <stop_id>,...],...}
         try:
-            now = datetime.now()
             new_data = requests.get(cls.source_host, timeout=5).json()
-            logger.info(f"Getting bus info api time spend {(datetime.now() - now).seconds} sec, size: {sys.getsizeof(new_data)} Byte")
         except Exception as e:
             logger.error(f"Reload BusInfoCacher from web fail. {e}")
             return {}

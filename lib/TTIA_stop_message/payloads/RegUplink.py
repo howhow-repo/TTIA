@@ -36,8 +36,8 @@ class RegUplink(PayloadBase):
 
     def from_pdu(self, pdu: bytes):
         payload = struct.unpack_from('<15s15sBBBB', pdu)
-        self.IMSI = payload[0].decode('utf-8').rstrip('\0')
-        self.IMEI = payload[1].decode('utf-8').rstrip('\0')
+        self.IMSI = payload[0].decode().rstrip('\0')
+        self.IMEI = payload[1].decode().rstrip('\0')
         self.FirmwareVersion = str(payload[2]) + '.' + str(payload[3]) + str(payload[4])
         self.Reserved = payload[5]
         self.self_assert()
@@ -45,8 +45,8 @@ class RegUplink(PayloadBase):
     def to_pdu(self) -> bytes:
         self.self_assert()
         fv1, fv2, fv3 = fwversion_str_to_int_list(self.FirmwareVersion)
-        IMSI = bytearray(self.IMSI.encode('ascii'))
-        IMEI = bytearray(self.IMEI.encode('ascii'))
+        IMSI = bytearray(self.IMSI.encode())
+        IMEI = bytearray(self.IMEI.encode())
         return struct.pack('<15s15sBBBB', IMSI, IMEI, fv1, fv2, fv3, self.Reserved)
 
     def from_dict(self, input_dict: dict):

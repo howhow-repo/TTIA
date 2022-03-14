@@ -16,7 +16,7 @@ class Header(MessageBase):
 
     def from_pdu(self, header_pdu, offset=0):
         header = struct.unpack('<4sBBHQHH', header_pdu)
-        self.ProtocolID = header[0].decode('utf-8')
+        self.ProtocolID = header[0].decode()
         self.ProtocolVer = header[1]
         self.MessageID = header[2]
         self.Provider = header[3]
