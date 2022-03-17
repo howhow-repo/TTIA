@@ -3,6 +3,35 @@ from ..message_base import MessageBase
 from .TimeStruct import TimeStruct
 
 
+class Record(MessageBase):
+    def __init__(self, init_data, init_type: str):
+        self.TypeID = 0
+        self.TypeNum = 0
+        super().__init__(init_data, init_type)
+
+    def from_pdu(self, pdu: bytes):
+        pdu = struct.unpack('<BB', pdu)
+        self.TypeID = pdu[0]
+        self.TypeNum = pdu[1]
+
+    def to_pdu(self) -> bytes:
+        return struct.pack('<BB', self.TypeID, self.TypeNum)
+
+    def from_dict(self, input_dict: dict):
+        self.TypeID = input_dict['TypeID']
+        self.TypeNum = input_dict['TypeNum']
+
+    def to_dict(self) -> dict:
+        r = {
+            'TypeID': self.TypeID,
+            'TypeNum': self.TypeNum,
+        }
+        return r
+
+    def from_default(self):
+        pass
+
+
 class ODStruct(MessageBase):
     def __init__(self, init_data, init_type: str):
         self.OrgStopID = 0
@@ -11,37 +40,34 @@ class ODStruct(MessageBase):
         self.DstODTime = TimeStruct({}, 'default')
         self.RemainingNum = 0
         self.RecordNum = 0
-        self.TypeID1 = 0
-        self.TypeNum1 = 0
-        self.TypeIDN = 0
-        self.TypeNumN = 0
+        self.Records = []
         super().__init__(init_data, init_type)
 
     def from_pdu(self, pdu: bytes):
         self.OrgStopID = pdu[0]
         self.DstStopID = pdu[1]
-        self.OrgODTime = TimeStruct(pdu[2:2 + 6], 'pdu')
-        self.DstODTime = TimeStruct(pdu[2 + 6:2 + 6 + 6], 'pdu')
-        pdu = struct.unpack('<BBBBBB', pdu[14:])
+        self.OrgODTime = TimeStruct(pdu[2:8], 'pdu')
+        self.DstODTime = TimeStruct(pdu[8:14], 'pdu')
+
+        pdu = struct.unpack('<BB', pdu[14:15])
         self.RemainingNum = pdu[0]
         self.RecordNum = pdu[1]
-        self.TypeID1 = pdu[2]
-        self.TypeNum1 = pdu[3]
-        self.TypeIDN = pdu[4]
-        self.TypeNumN = pdu[5]
+
+        pdu = pdu[15:]
+        for i in range(self.RecordNum):
+            record = Record(pdu[2 * i:(2 * i) + 2], 'pdu')
+            self.Records.append(record)
 
     def to_pdu(self) -> bytes:
         OrgStopID = struct.pack('<B', self.OrgStopID)
         DstStopID = struct.pack('<B', self.DstStopID)
         OrgODTime = self.OrgODTime.to_pdu()
         DstODTime = self.DstODTime.to_pdu()
-        return OrgStopID \
-               + DstStopID \
-               + OrgODTime \
-               + DstODTime \
-               + struct.pack('<BBBBBB',
-                             self.RemainingNum, self.RecordNum, self.TypeID1,
-                             self.TypeNum1, self.TypeIDN, self.TypeNumN)
+        head = OrgStopID + DstStopID + OrgODTime + DstODTime
+        Records = bytes()
+        for data in self.Records:
+            Records += data.to_pdu()
+        return head + struct.pack('<BB', self.RemainingNum, len(self.Records), ) + Records
 
     def from_dict(self, input_dict: dict):
         self.OrgStopID = input_dict['OrgStopID']
@@ -50,10 +76,7 @@ class ODStruct(MessageBase):
         self.DstODTime = TimeStruct(input_dict['DstODTime'], 'dict')
         self.RemainingNum = input_dict['RemainingNum']
         self.RecordNum = input_dict['RecordNum']
-        self.TypeID1 = input_dict['TypeID1']
-        self.TypeNum1 = input_dict['TypeNum1']
-        self.TypeIDN = input_dict['TypeIDN']
-        self.TypeNumN = input_dict['TypeNumN']
+        self.Records = [Record(record, 'dict') for record in input_dict['Record']]
 
     def to_dict(self) -> dict:
         r = {
@@ -63,10 +86,7 @@ class ODStruct(MessageBase):
             'DstODTime': self.DstODTime.to_dict(),
             'RemainingNum': self.RemainingNum,
             'RecordNum': self.RecordNum,
-            'TypeID1': self.TypeID1,
-            'TypeNum1': self.TypeNum1,
-            'TypeIDN': self.TypeIDN,
-            'TypeNumN': self.TypeNumN
+            'Records': [record.to_dict() for record in self.Records],
         }
         return r
 
