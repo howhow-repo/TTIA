@@ -2,6 +2,7 @@
 venv
 __pycache__
 playground.py
+manual_test.py
 .env
 *.DS_Store
 

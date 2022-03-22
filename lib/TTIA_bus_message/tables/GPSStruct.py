@@ -9,16 +9,16 @@ class GPSStruct(MessageBase):
         self.LongitudeDu = 0
         self.LongitudeFen = 0
         self.LongitudeMiao = 0
-        self.LongitudeQuadrant = 0
+        self.LongitudeQuadrant = 'E'
         self.LatitudeDu = 0
         self.LatitudeFen = 0
         self.LatitudeMiao = 0
-        self.LatitudeQuadrant = 0
+        self.LatitudeQuadrant = "N"
         self.Direction = 0
         self.IntSpeed = 0
         self.Year = 2000
-        self.Month = 0
-        self.Day = 0
+        self.Month = 1
+        self.Day = 1
         self.Hour = 0
         self.Minute = 0
         self.Second = 0
@@ -26,17 +26,17 @@ class GPSStruct(MessageBase):
         super().__init__(init_data, init_type)
 
     def from_pdu(self, pdu, offset=0):
-        pdu = struct.unpack('<BBBBHBBBHBHHBBBBBB', pdu)
+        pdu = struct.unpack('<BBBBH1sBBH1sHHBBBBBB', pdu)
         self.SatelliteNo = pdu[0]
         self.GPSStatus = pdu[1]
         self.LongitudeDu = pdu[2]
         self.LongitudeFen = pdu[3]
         self.LongitudeMiao = pdu[4]
-        self.LongitudeQuadrant = pdu[5]
+        self.LongitudeQuadrant = pdu[5].decode().rstrip('\0')
         self.LatitudeDu = pdu[6]
         self.LatitudeFen = pdu[7]
         self.LatitudeMiao = pdu[8]
-        self.LatitudeQuadrant = pdu[9]
+        self.LatitudeQuadrant = pdu[9].decode().rstrip('\0')
 
         self.Direction = pdu[10]
         self.IntSpeed = pdu[11]
@@ -47,10 +47,13 @@ class GPSStruct(MessageBase):
         self.Minute = pdu[16]
         self.Second = pdu[17]
 
+        self.self_assert()
+
     def to_pdu(self):
-        return struct.pack('<BBBBHBBBHBHHBBBBBB', self.SatelliteNo, self.GPSStatus,
-                           self.LongitudeDu, self.LongitudeFen, self.LongitudeMiao, self.LongitudeQuadrant,
-                           self.LatitudeDu, self.LatitudeFen, self.LatitudeMiao, self.LatitudeQuadrant,
+        self.self_assert()
+        return struct.pack('<BBBBH1sBBH1sHHBBBBBB', self.SatelliteNo, self.GPSStatus,
+                           self.LongitudeDu, self.LongitudeFen, self.LongitudeMiao, str.encode(self.LongitudeQuadrant),
+                           self.LatitudeDu, self.LatitudeFen, self.LatitudeMiao, str.encode(self.LatitudeQuadrant),
                            self.Direction, self.IntSpeed,
                            self.Year - 2000, self.Month, self.Day, self.Hour, self.Minute, self.Second)
 
@@ -74,7 +77,10 @@ class GPSStruct(MessageBase):
         self.Minute = input_dict['Minute']
         self.Second = input_dict['Second']
 
+        self.self_assert()
+
     def to_dict(self):
+        self.self_assert()
         r = {
             'SatelliteNo': self.SatelliteNo,
             'GPSStatus': self.GPSStatus,
@@ -107,3 +113,7 @@ class GPSStruct(MessageBase):
         assert 0 <= self.Hour <= 23, "Hour range error"
         assert 0 <= self.Minute <= 59, "Min range error"
         assert 0 <= self.Second <= 59, "Sec range error"
+        assert 0 <= self.LongitudeDu <= 180, 'LongitudeDu should between 0 to 180'
+        assert 0 <= self.LatitudeDu <= 90, 'LatitudeDu should between 0 to 90'
+        assert self.LongitudeQuadrant == 'E' or self.LongitudeQuadrant == 'W', 'LongitudeQuadrant need to be "E" or "W"'
+        assert self.LatitudeQuadrant == 'N' or self.LatitudeQuadrant == 'S', 'LatitudeQuadrant need to be "N" or "S"'

@@ -2,7 +2,7 @@ import struct
 import unittest
 
 from lib.TTIA_stop_message import TTIABusStopMessage, MessageConstants
-from .test_base_case import TestBaseCase
+from .test_base_case import TestStopMsgBaseCase
 
 
 MESSAGEID = 0x0C
@@ -26,6 +26,6 @@ HEADER_PDU = struct.pack('<4sBBHQHH',
 pdu_pack = HEADER_PDU + payload
 
 
-class TestReportUpdateRouteinfoUplink(TestBaseCase):
+class TestReportUpdateRouteinfoUplink(TestStopMsgBaseCase):
     pdu_pack = pdu_pack
     MESSAGEID = MESSAGEID

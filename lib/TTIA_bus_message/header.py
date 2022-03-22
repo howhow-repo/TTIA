@@ -18,7 +18,7 @@ class Header(MessageBase):
 
     def from_pdu(self, header_pdu, offset=0):
         header = struct.unpack('<4sBBHHBIHBH', header_pdu)
-        self.ProtocolID = header[0]
+        self.ProtocolID = header[0].decode()
         self.ProtocolVer = header[1]
         self.MessageID = header[2]
         self.CustomerID = header[3]
@@ -32,8 +32,7 @@ class Header(MessageBase):
 
     def to_pdu(self):
         self.self_assert()
-        byte_like_ProtocolID = str.encode(self.ProtocolID)
-        return struct.pack('<4sBBHHBIHBH', byte_like_ProtocolID, self.ProtocolVer, self.MessageID, self.CustomerID,
+        return struct.pack('<4sBBHHBIHBH', self.ProtocolID.encode(), self.ProtocolVer, self.MessageID, self.CustomerID,
                            self.CarID, self.IDStorage, self.DriverID, self.Sequence, self.Reserved, self.Len)
 
     def from_dict(self, input_dict):

@@ -25,8 +25,7 @@ class Header(MessageBase):
         self.Len = header[6]
 
     def to_pdu(self):
-        byte_like_ProtocolID = str.encode(self.ProtocolID)
-        return struct.pack('<4sBBHQHH', byte_like_ProtocolID, self.ProtocolVer, self.MessageID,
+        return struct.pack('<4sBBHQHH', self.ProtocolID.encode(), self.ProtocolVer, self.MessageID,
                            self.Provider, self.StopID, self.Sequence, self.Len)
 
     def from_dict(self, input_dict):

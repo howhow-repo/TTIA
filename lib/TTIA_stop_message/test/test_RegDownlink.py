@@ -1,6 +1,6 @@
 import struct
 
-from .test_base_case import TestBaseCase
+from .test_base_case import TestStopMsgBaseCase
 from lib import MessageConstants
 
 MESSAGEID = 0x01
@@ -98,6 +98,6 @@ HEADER_PDU = struct.pack('<4sBBHQHH',
 pdu_pack = HEADER_PDU + payload + option_payload
 
 
-class TestREGDOWNLINK(TestBaseCase):
+class TestREGDOWNLINK(TestStopMsgBaseCase):
     pdu_pack = pdu_pack
     MESSAGEID = MESSAGEID

@@ -2,7 +2,7 @@ import unittest
 from lib import TTIABusStopMessage
 
 
-class TestBaseCase(unittest.TestCase):
+class TestStopMsgBaseCase(unittest.TestCase):
     """
         Base type for testing TTIA python obj.
         Please write test case here with method name start with "test",

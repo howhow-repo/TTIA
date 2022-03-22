@@ -34,6 +34,7 @@ class MessageBase:
     def self_assert(self):
         pass
 
+
 class MessageConstants:
     ProtocolID = 'APTS'
     ProtocolVer = 0x01
