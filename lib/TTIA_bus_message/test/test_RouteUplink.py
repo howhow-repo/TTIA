@@ -6,7 +6,7 @@ from lib.TTIA_bus_message import MessageConstants
 
 
 # header para
-MESSAGEID = 0x01
+MESSAGEID = 0x02
 CustomerID = 65535
 CarID = 60000
 head_DriverID = 123456
@@ -14,42 +14,14 @@ IDStorage = 1
 head_Reserved = 0
 
 # payload para
-Result = 0
-Schedule = 1
-RouteID = 0
-RouteDirect = 0
-RouteBranch = 'aa'
-RouteVer = 1
-Reserved = 0
-DriverID = 0
-DriverName = '王大明'
-DepartHr = 0
-DepartMin = 0
-Year = 2000
-Month = 1
-Day = 1
-Hour = 0
-Min = 0
-Sec = 0
-Event = 1
-RPM = 3001
-Accelerate = 31
-Decelerate = 32
-Halt = 11
-InRadius = 5
-OutRadius = 6
-Movement = 11
-OTATime = 1
-OTAIP = 0
-OTAPort = 0
+RouteID = 1234
+RouteDirect = 3
+RouteBranch = 'a'.encode()
 
 payload_pdu = struct.pack(
-    '<BBHB1sHHI8sBBBBBBBBHHBBBBBHBIH', Result, Schedule, RouteID, RouteDirect, RouteBranch.encode(), RouteVer,
-    Reserved, DriverID, DriverName.encode('big5'), DepartHr, DepartMin,
-    Year-2000, Month, Day, Hour, Min, Sec,
-    Event, RPM, Accelerate, Decelerate, Halt, InRadius, OutRadius,
-    Movement, OTATime, OTAIP, OTAPort,
+    '<HB1s', RouteID, RouteDirect, RouteBranch,
 )
+
 
 HEADER_PDU = struct.pack('<4sBBHHBIHBH',
                          bytearray(MessageConstants.ProtocolID.encode('ascii')),
@@ -66,7 +38,7 @@ HEADER_PDU = struct.pack('<4sBBHHBIHBH',
 pdu_pack = HEADER_PDU + payload_pdu
 
 
-class TestBusMsgRegDownlink(TestBusMsgBaseCase):
+class TestBusMsgRouteUplink(TestBusMsgBaseCase):
     pdu_pack = pdu_pack
     MESSAGEID = MESSAGEID
 

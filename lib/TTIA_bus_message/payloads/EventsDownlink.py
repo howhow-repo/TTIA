@@ -11,7 +11,7 @@ class EventsDownlink(MessageBase):
         pass
 
     def to_pdu(self) -> bytes:
-        pass
+        return b''
 
     def from_dict(self, input_dict: dict):
         pass
