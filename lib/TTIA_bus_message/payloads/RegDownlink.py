@@ -152,4 +152,9 @@ class RegDownlink(MessageBase):
         pass
 
     def self_assert(self):
-        pass
+        assert 2000 <= self.Year, "Year must > 2000"
+        assert 1 <= self.Month <= 12, "Month range error"
+        assert 1 <= self.Day <= 31, "Day range error"
+        assert 0 <= self.Hour <= 23, "Hour range error"
+        assert 0 <= self.Min <= 59, "Min range error"
+        assert 0 <= self.Sec <= 59, "Sec range error"

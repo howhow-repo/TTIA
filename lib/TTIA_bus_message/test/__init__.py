@@ -1,1 +1,2 @@
-from .test_RegUplink import TestBusMsgREGUPLINK
+from .test_RegUplink import TestBusMsgRegUPLINK
+from .test_RegDownlink import TestBusMsgRegDownLINK

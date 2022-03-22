@@ -75,7 +75,7 @@ HEADER_PDU = struct.pack('<4sBBHHBIHBH',
 pdu_pack = HEADER_PDU + payload_pdu
 
 
-class TestBusMsgREGUPLINK(TestBusMsgBaseCase):
+class TestBusMsgRegUPLINK(TestBusMsgBaseCase):
     pdu_pack = pdu_pack
     MESSAGEID = MESSAGEID
 
