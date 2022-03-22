@@ -1,5 +1,6 @@
 from ..message_base import MessageBase
 
+
 class DisseminateUplink(MessageBase):
     MessageID = 0xE1
 

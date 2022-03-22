@@ -1,4 +1,4 @@
-from .test_REGUPLINK import TestREGUPLINK
+from .test_RegUplink import TestREGUPLINK
 from .test_RegDownlink import TestREGDOWNLINK
 from .test_ReportBaseMsgTagUplink import TestReportBaseMsgTagUplink
 from .test_ReportMsgcountDownlink import TestReportMsgcountDownlink

@@ -1,11 +1,9 @@
 import struct
-from ..EventCode import EventCode
 from ..MonitorStruct import MonitorStructType2
 from ...message_base import MessageBase
 
 
 class SpeedUpDownSuddenly(MessageBase):
-    EventCode = EventCode.SpeedUpDownSuddenly
 
     def __init__(self, init_data, init_type: str):
         self.MonitorData = MonitorStructType2({}, 'default')

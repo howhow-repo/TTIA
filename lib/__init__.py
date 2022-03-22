@@ -1,4 +1,5 @@
 from .TTIA_stop_message import TTIABusStopMessage, MessageConstants
+from .TTIA_bus_message import TTIABusMessage
 from .db_control import EStopObjCacher, MsgCacher, BusInfoCacher
 from .EStop import EStop
 from .udp_server import TTIAStopUdpServer, TTIAEStopUdpClient

@@ -1,8 +1,7 @@
-import struct
 from ..message_base import MessageBase
 
 
-class ObstacleDownlink:
+class ObstacleDownlink(MessageBase):
     MessageID = 0xF1
 
     def __init__(self, init_data, init_type: str):

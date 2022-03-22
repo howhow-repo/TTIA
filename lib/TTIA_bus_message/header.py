@@ -1,5 +1,4 @@
 import struct
-
 from .message_base import MessageBase, MessageConstants
 
 

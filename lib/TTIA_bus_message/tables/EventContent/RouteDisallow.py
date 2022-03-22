@@ -1,10 +1,8 @@
-from ..EventCode import EventCode
 from ..MonitorStruct import MonitorStructType2
 from ...message_base import MessageBase
 
 
 class RouteDisallow(MessageBase):
-    EventCode = EventCode.RouteDisallow
 
     def __init__(self, init_data, init_type: str):
         self.MonitorData = MonitorStructType2({}, 'default')
