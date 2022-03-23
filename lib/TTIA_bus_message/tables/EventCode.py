@@ -45,3 +45,5 @@ class EventCode:
             return TurnOver({}, 'default')
         elif event_code == cls.RouteDisallow:
             return RouteDisallow({}, 'default')
+        else:
+            raise NotImplemented

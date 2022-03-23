@@ -4,12 +4,15 @@ import unittest
 from .test_base_case import TestBusMsgBaseCase
 from lib.TTIA_bus_message import MessageConstants
 
-MESSAGEID = 0x00
+
+# header para
+MESSAGEID = 0x0A
 CustomerID = 65535
 CarID = 60000
-DriverID = 123456
+head_DriverID = 123456
 IDStorage = 1
-Reserved = 0
+head_Reserved = 0
+
 
 SatelliteNo = 0
 GPSStatus = 0
@@ -41,13 +44,7 @@ gps_strct_pdu = struct.pack(
 AvgSpeed = 40
 moniter2_data_pdu = gps_strct_pdu + struct.pack("<HBBI", AvgSpeed, 1, 1, 60)
 
-fileinfo1_pdu = struct.pack("<4s6s", 'filename1'.encode(), '220320'.encode())
-fileinfo2_pdu = struct.pack("<4s6s", 'filename2'.encode(), '220321'.encode())
-
-IMSI = 'IMSIIMSIIMSI'.encode()
-IMCI = 'IMCIIMCIIMCI'.encode()
-
-payload_pdu = moniter2_data_pdu + struct.pack('<15s15sBQBBB', IMSI, IMCI, 1, 123, 0, 2, 2) + fileinfo1_pdu + fileinfo2_pdu
+payload_pdu = moniter2_data_pdu + struct.pack("<HBB", 30000, 50, 60)
 
 HEADER_PDU = struct.pack('<4sBBHHBIHBH',
                          bytearray(MessageConstants.ProtocolID.encode('ascii')),
@@ -56,15 +53,15 @@ HEADER_PDU = struct.pack('<4sBBHHBIHBH',
                          CustomerID,
                          CarID,
                          1,
-                         DriverID,
+                         head_DriverID,
                          65535,  # Sequence
-                         Reserved,
+                         head_Reserved,
                          len(payload_pdu))  # Len
 
 pdu_pack = HEADER_PDU + payload_pdu
 
 
-class TestBusMsgRegUplink(TestBusMsgBaseCase):
+class TestPoweroffUplink(TestBusMsgBaseCase):
     pdu_pack = pdu_pack
     MESSAGEID = MESSAGEID
 
