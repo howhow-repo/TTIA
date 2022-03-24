@@ -10,3 +10,9 @@ from .test_EventsUplink import TestEventsUplink
 from .test_EventsDownlink import TestEventDownlink
 from .test_PoweroffUplink import TestPoweroffUplink
 from .test_PoweroffDownlink import TestPoweroffDownlink
+from .test_ObstacleUplink import TestObstacleUplink
+from .test_ObstacleDownlink import TestObstacleDownlink
+from .test_ODReportUplink import TestODReportUplink
+from .test_ODReportDownlink import TestODReportDownlink
+from .test_DisseminateDownlink import TestDisseminateDownlink
+from .test_DisseminateUplink import TestDisseminateUplink

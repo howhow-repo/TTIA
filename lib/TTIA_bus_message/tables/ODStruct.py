@@ -49,13 +49,14 @@ class ODStruct(MessageBase):
         self.OrgODTime = TimeStruct(pdu[2:8], 'pdu')
         self.DstODTime = TimeStruct(pdu[8:14], 'pdu')
 
-        pdu = struct.unpack('<BB', pdu[14:15])
-        self.RemainingNum = pdu[0]
-        self.RecordNum = pdu[1]
+        temp = struct.unpack('<BB', pdu[14:16])
+        self.RemainingNum = temp[0]
+        self.RecordNum = temp[1]
+        Records_pdu = pdu[16:]
+        assert len(Records_pdu) >= self.RecordNum * 2, 'pdu length does not mach RecordNum'
 
-        pdu = pdu[15:]
         for i in range(self.RecordNum):
-            record = Record(pdu[2 * i:(2 * i) + 2], 'pdu')
+            record = Record(Records_pdu[2 * i:(2 * i) + 2], 'pdu')
             self.Records.append(record)
 
     def to_pdu(self) -> bytes:

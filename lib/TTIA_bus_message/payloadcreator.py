@@ -54,6 +54,8 @@ class PayloadCreator:
             return ObstacleDownlink(**paras)
         elif message_id == 0xF2:
             return ODReportUplink(**paras)
+        elif message_id == 0xF3:
+            return ODReportDownlink(**paras)
         elif message_id == 0xE0:
             return DisseminateDownlink(**paras)
         elif message_id == 0xE1:

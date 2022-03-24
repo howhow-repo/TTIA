@@ -25,9 +25,11 @@ class TimeStruct(MessageBase):
 
     def to_pdu(self):
         self.self_assert()
-        return struct.pack('<6B',
-                           self.Year - 2000, self.Month, self.Day,
-                           self.Hour, self.Minute, self.Second)
+        return struct.pack(
+            '<6B',
+            self.Year - 2000, self.Month, self.Day,
+            self.Hour, self.Minute, self.Second
+        )
 
     def from_dict(self, input_dict: dict):
         self.Year = input_dict['Year']

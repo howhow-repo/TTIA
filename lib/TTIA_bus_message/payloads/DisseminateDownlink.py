@@ -16,7 +16,6 @@ class DisseminateContent(MessageBase):
 
         pdu = pdu[2:2+self.MsgLen]
         self.MsgContent = pdu.decode('big5').rstrip('\x00')
-
         self.self_assert()
 
     def to_pdu(self) -> bytes:
@@ -43,6 +42,10 @@ class DisseminateContent(MessageBase):
     def from_default(self):
         pass
 
+    def self_assert(self):
+        assert len(self.MsgContent.encode("big5")) == self.MsgLen, "MsgLen != len(MsgContent)"
+        assert len(self.MsgContent.encode("big5")) <= 160, 'MsgContent overflow. under 160 byte'
+
 
 class DisseminateDownlink(MessageBase):
     MessageID = 0xE0
@@ -53,11 +56,13 @@ class DisseminateDownlink(MessageBase):
         super().__init__(init_data, init_type)
 
     def from_pdu(self, pdu: bytes):
-        self.MsgNum = struct.unpack('B', pdu[0])[0]
+        self.MsgNum = pdu[0]
         pdu = pdu[1:]
         for i in range(self.MsgNum):
             content_len = pdu[1]+2
-            self.DisseminateContent.append(DisseminateContent(pdu[:content_len], 'pdu'))
+            d = DisseminateContent(pdu[:content_len], 'pdu')
+            d.MsgIndex = i + 1
+            self.DisseminateContent.append(d)
             pdu = pdu[content_len:]
 
     def to_pdu(self) -> bytes:
@@ -66,7 +71,6 @@ class DisseminateDownlink(MessageBase):
         Content = bytes()
         for content in self.DisseminateContent:
             Content += content.to_pdu()
-
         return head + Content
 
     def from_dict(self, input_dict: dict):
@@ -84,3 +88,6 @@ class DisseminateDownlink(MessageBase):
 
     def from_default(self):
         pass
+
+    def self_assert(self):
+        assert 0 <= self.MsgNum <= 3, 'MsgNum too long, MsgNum <= 3'

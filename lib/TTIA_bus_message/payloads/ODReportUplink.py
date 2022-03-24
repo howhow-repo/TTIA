@@ -16,23 +16,24 @@ class ODReportUplink(MessageBase):
         super().__init__(init_data, init_type)
 
     def from_pdu(self, pdu: bytes):
-        payload = struct.unpack_from('<HBBBB', pdu[:6])
+        payload = struct.unpack_from('<HB1sBB', pdu[:6])
         self.RouteID = payload[0]
         self.RouteDirect = payload[1]
-        self.RouteBranch = payload[2]
+        self.RouteBranch = payload[2].decode().rstrip('\0')
         self.ODRecord_No = payload[3]
         self.Reserved = payload[4]
 
-        pdu = pdu[6:]
+        records_pdu = pdu[6:]
+        assert len(records_pdu) >= self.ODRecord_No*2, 'pdu length does not mach ODRecord_No'
         for i in range(self.ODRecord_No):
-            OD_len = 15 + pdu[14]*2
-            self.ODRecord.append(ODStruct(pdu[:OD_len], 'pdu'))
-            pdu = pdu[OD_len:]
+            OD_len = 16 + records_pdu[15]*2
+            self.ODRecord.append(ODStruct(records_pdu[:OD_len], 'pdu'))
+            records_pdu = records_pdu[OD_len:]
 
         self.self_assert()
 
     def to_pdu(self) -> bytes:
-        head = struct.pack('<HBBBB', self.RouteID, self.RouteDirect, self.RouteBranch, self.ODRecord_No, self.Reserved)
+        head = struct.pack('<HB1sBB', self.RouteID, self.RouteDirect, self.RouteBranch.encode(), self.ODRecord_No, self.Reserved)
         Records = bytes()
         for record in self.ODRecord:
             Records += record.to_pdu()
