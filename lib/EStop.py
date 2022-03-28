@@ -28,8 +28,8 @@ class EStop:
         self.Latitude = 0
         self.Longitude = 0
         self.TypeID = 0
-        self.BootTime = time(5,0)
-        self.ShutdownTime = time(2,0)
+        self.BootTime = time(5, 0)
+        self.ShutdownTime = time(2, 0)
         self.IdleMessage = ""
         self.DisplayMode = 0
         self.MessageGroupID = 0

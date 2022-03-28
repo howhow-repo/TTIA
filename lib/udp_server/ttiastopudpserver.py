@@ -39,8 +39,6 @@ class TTIAStopUdpServer(ServerSideHandler):
                 payload_dict = estop.to_dict()
                 payload_dict['Result'] = 1
                 payload_dict['MsgTag'] = 0
-                # payload_dict['BootTime'] = time(0, 0, 0)  # TODO: data from sql is define wired. Force overwrite.
-                # payload_dict['ShutdownTime'] = time(0, 0, 0)  # TODO: data from sql is define wired. Force overwrite.
                 resp_msg.payload.from_lazy_dict(payload_dict)
             else:
                 logger.error("Fail to match data: StopID & IMSI does not match")
@@ -141,7 +139,7 @@ class TTIAStopUdpServer(ServerSideHandler):
             section = self.create_new_section(msg_obj.header.StopID, estop.address)
         section.logs[msg_obj.header.Sequence] = [msg_obj]
         self.sock.sendto(msg_obj.to_pdu(), estop.address)
-        logger.info(f"send_update_bus_info: {msg_obj.header.StopID}, {msg_obj.header.Sequence}")
+        logger.debug(f"send_update_bus_info: {msg_obj.header.StopID}, {msg_obj.header.Sequence}")
 
         if wait_for_resp:
             ack = self.wait_ack(section, msg_obj.header.Sequence, 0x08)
@@ -158,7 +156,7 @@ class TTIAStopUdpServer(ServerSideHandler):
 
     def recv_update_bus_info_ack(self, msg_obj: TTIABusStopMessage, section: UDPWorkingSection):
         EStopObjCacher.estop_cache[msg_obj.header.StopID].lasttime = datetime.now()
-        logger.info(f"recv_update_bus_ack from id: {msg_obj.header.StopID}, {msg_obj.header.Sequence}")
+        logger.debug(f"recv_update_bus_ack from id: {msg_obj.header.StopID}, {msg_obj.header.Sequence}")
 
     def recv_abnormal(self, msg_obj: TTIABusStopMessage, section: UDPWorkingSection):
         """ 接收定時回報訊息 0x09 """
