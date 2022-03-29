@@ -231,7 +231,7 @@ class BusInfoCacher:
                         updated_routes[route_id].append(stop_id)
                         cls.businfo_cache[int(route_id)].stops[int(stop_id)] = stop
             else:  # no old_route
-                updated_routes[route_id] = [stop.sid for stop in new_route_obj.stops]
+                updated_routes[route_id] = [stop.sid for stop in new_route_obj.stops.values()]
         return updated_routes
         #  {
         #       <route_id>: [<stop_id>, <stop_id>, <stop_id>...],
