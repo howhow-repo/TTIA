@@ -28,7 +28,14 @@ class TTIAAutoStopAndRouteServer:
         logger.debug("checking stop online...")
         for estop in EStopObjCacher.estop_cache.values():
             if estop.ready and estop.lasttime:
-                delta_time = datetime.now() - estop.lasttime
+                now = datetime.now()
+                delta_time = now - estop.lasttime
                 if delta_time > timedelta(seconds=estop.ReportPeriod * 2):
                     estop.ready = False
+                    estop.offline_log.append(now)
                     logger.error(f"set estop {estop.StopID} ready = False: {delta_time.seconds} seconds not replied.")
+
+    @classmethod
+    def remove_timeout_log(cls):
+        """Remove the timeout logs from online/offline in EStop """
+        pass

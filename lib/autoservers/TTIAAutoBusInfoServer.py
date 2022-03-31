@@ -40,17 +40,17 @@ class TTIAAutoBusInfoServer:
         end_sending_info_time = datetime.now()
 
         # for logging
-        changed_stops = []
-        for stops in changed_routes.values():
-            changed_stops += stops
-        logger.info(f"len of changed_stops: {len(changed_stops)}")
-        logger.info(f"Getting bus info api time spend {(end_get_rawdata - start_time).seconds} sec.")
-        logger.info(f"sending udp time spend {(end_sending_info_time - start_sending_info_time).seconds} sec.")
-        logger.info(
-            f"Finish sending {job_num}s bus info update. -- time spent: {(datetime.now() - start_time).seconds} sec")
+        if len(changed_routes) != 0:
+            changed_stops = []
+            for stops in changed_routes.values():
+                changed_stops += stops
+            logger.info(f"Getting bus info api time spend {(end_get_rawdata - start_time).seconds} sec; "
+                        f"sending udp time spend {(end_sending_info_time - start_sending_info_time).seconds} sec.")
+            logger.info(
+                f"Finish sending {job_num}s bus info update. -- time spent: {(datetime.now() - start_time).seconds} sec")
 
-        if self.fail_update_stops > 0:
-            logger.info(f"fail updating bus info to stops: {self.fail_update_stops}s")
+            if self.fail_update_stops > 0:
+                logger.info(f"fail updating bus info to stops: {self.fail_update_stops}s")
 
     def send_bus_info(self, msg_obj: TTIABusStopMessage, wait_for_resp: bool = True, resend: int = 0):
         self.limiting_threads()

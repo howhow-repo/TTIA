@@ -65,9 +65,11 @@ class TTIAStopUdpServer(ServerSideHandler):
             return
 
         if msg_obj.payload.MsgStatus == 1:  # 訊息設定成功
-            EStopObjCacher.estop_cache[msg_obj.header.StopID].ready = True
+            estop = EStopObjCacher.estop_cache[msg_obj.header.StopID]
+            estop.ready = True
+            estop.online_log.append(datetime.now())
             logger.info(f"StopID {msg_obj.header.StopID} set ready and online.")
-            EStopObjCacher.estop_cache[msg_obj.header.StopID].lasttime = datetime.now()
+            estop.lasttime = datetime.now()
             EStopObjCacher.update_addr(msg_obj.header.StopID, section.client_addr)
             logger.info(f"id {msg_obj.header.StopID} registration ack ok")
             self.update_route_info(section.stop_id)
@@ -86,6 +88,7 @@ class TTIAStopUdpServer(ServerSideHandler):
             estop.address = section.client_addr
             if not estop.ready:
                 estop.ready = True
+                estop.online_log.append(datetime.now())
                 logger.info(f"StopID {msg_obj.header.StopID} set ready and online.")
             estop.SentCount = msg_obj.payload.SentCount
             estop.RevCount = msg_obj.payload.RevCount

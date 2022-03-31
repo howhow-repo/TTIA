@@ -65,6 +65,8 @@ class EStop:
         self.lasttime = None  # last report time
         self.ready = False
         self.abnormal_log = []
+        self.online_log = []
+        self.offline_log = []
 
         self.from_dict(setting_config)
 
